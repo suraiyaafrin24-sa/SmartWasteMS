@@ -38,23 +38,23 @@
                 </div>
 
                 <h1 class="text-2xl font-bold">
-                    Smart<span class="text-emerald-600">Bin</span>
+                    <span class="text-black">Smart</span><span class="text-green-900">Bin</span>
                 </h1>
 
             </div>
 
             <nav class="hidden md:flex space-x-8 font-medium">
 
-                <a href="#home" class="hover:font-bold hover:text-emerald-600">Home</a>
-                <a href="#features" class="hover:font-bold hover:text-emerald-600">Features</a>
-                <a href="#technology" class="hover:font-bold hover:text-emerald-600">Technology</a>
-                <a href="#contact" class="hover:font-bold hover:text-emerald-600">Contact</a>
+                <a href="#home" class="hover:font-bold hover:text-black">Home</a>
+                <a href="#features" class="hover:font-bold hover:text-black">Features</a>
+                <a href="#technology" class="hover:font-bold hover:text-black">Technology</a>
+                <a href="#contact" class="hover:font-bold hover:text-black">Contact</a>
 
             </nav>
 
             <div class="flex items-center space-x-6">
 
-                <a href="{{ route('login') }}" class="text-gray-600 hover:text-emerald-600 font-medium">Login</a>
+                <a href="{{ route('login') }}" class="text-gray-600 hover:text-blue-800 font-medium">Login</a>
 
                 <a href="{{ route('register') }}"
                     class="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 font-bold transition-all shadow-lg shadow-emerald-600/20">
