@@ -12,8 +12,30 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                    @if(Auth::user()->isAdmin())
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="'#'">
+                            {{ __('Monitor Requests') }}
+                        </x-nav-link>
+                    @elseif(Auth::user()->isWasteCollector())
+                        <x-nav-link :href="route('waste_collector.dashboard')" :active="request()->routeIs('waste_collector.dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="'#'">
+                            {{ __('My Tasks') }}
+                        </x-nav-link>
+                    @else
+                        <x-nav-link :href="route('user.dashboard')" :active="request()->routeIs('user.dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        <x-nav-link :href="'#'">
+                            {{ __('My Requests') }}
+                        </x-nav-link>
+                    @endif
+                    <x-nav-link :href="'#'" class="relative">
+                        {{ __('Notifications') }} <span class="bg-red-500 text-white rounded-full px-2 py-0.5 text-xs absolute top-3 -right-2">2</span>
                     </x-nav-link>
                 </div>
             </div>
@@ -67,9 +89,19 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+            @if(Auth::user()->isAdmin())
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+            @elseif(Auth::user()->isWasteCollector())
+                <x-responsive-nav-link :href="route('waste_collector.dashboard')" :active="request()->routeIs('waste_collector.dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+            @else
+                <x-responsive-nav-link :href="route('user.dashboard')" :active="request()->routeIs('user.dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
