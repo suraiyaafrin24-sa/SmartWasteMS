@@ -24,7 +24,23 @@ class User extends Authenticatable
         'address',
         'password',
         'confirm_password',
+        'role',
     ];
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isWasteCollector(): bool
+    {
+        return $this->role === 'waste_collector';
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
 
     /**
      * The attributes that should be hidden for serialization.
