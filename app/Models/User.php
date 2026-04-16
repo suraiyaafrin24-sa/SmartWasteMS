@@ -20,6 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'profile_image',
         'phone',
         'address',
         'password',
@@ -63,5 +64,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function collectionRequests()
+    {
+        return $this->hasMany(CollectionRequest::class, 'collector_id');
+    }
+
+    public function requests()
+    {
+        return $this->hasMany(CollectionRequest::class, 'user_id');
     }
 }
