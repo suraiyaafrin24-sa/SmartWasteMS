@@ -65,19 +65,7 @@
 
         <!-- Progress Summary -->
         <div class="space-y-6">
-            <div class="bg-gray-900 rounded-[32px] p-8 text-white relative overflow-hidden">
-                <div class="absolute -right-8 -top-8 opacity-20">
-                     <svg class="w-32 h-32 text-emerald-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-                </div>
-                <h3 class="text-sm font-black uppercase tracking-widest mb-6 relative z-10">Shift Progress</h3>
-                <div class="mb-8 relative z-10">
-                    <div class="text-[42px] font-black leading-none mb-1">85%</div>
-                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Efficiency Target</div>
-                </div>
-                <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden relative z-10">
-                    <div class="bg-emerald-500 h-full w-[85%] rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)]"></div>
-                </div>
-            </div>
+
 
             <div class="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm">
                 <h3 class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-6">Route Summary</h3>
