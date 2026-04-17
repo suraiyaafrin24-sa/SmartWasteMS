@@ -20,7 +20,12 @@
                 <div class="flex items-center gap-3">
                     <div class="relative shrink-0">
                         <div class="w-11 h-11 rounded-full bg-[#DCF5F2] flex items-center justify-center font-bold text-[#19817E] text-lg border-2 border-white shadow-sm overflow-hidden">
-                            {{ substr(Auth::user()->name, 0, 1) }}
+                            @if(Auth::user()->profile_image)
+                                <img src="{{ asset('storage/' . Auth::user()->profile_image) }}" class="w-full h-full object-cover">
+                            @else
+                                {{ substr(Auth::user()->name, 0, 1) }}
+                            @endif
+                        </div>
                         </div>
                     </div>
                     <div class="leading-tight">
@@ -39,14 +44,20 @@
                     <span class="text-sm">My Tasks</span>
                 </a>
 
-                <a href="#" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:bg-gray-100 font-semibold rounded-xl transition-all duration-200">
+                <a href="{{ route('waste_collector.duty_schedule') }}" class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('waste_collector.duty_schedule') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span class="text-sm">Duty Schedule</span>
+                </a>
+
+                <a href="{{ route('waste_collector.live_route') }}" class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('waste_collector.live_route') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span class="text-sm">Live Routes</span>
                 </a>
 
-                <a href="#" class="flex items-center gap-4 px-4 py-3 text-slate-400 hover:bg-gray-100 font-semibold rounded-xl transition-all duration-200">
-                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span class="text-sm">Completed Jobs</span>
+                <a href="{{ route('waste_collector.history') }}" class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('waste_collector.history') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="text-sm">Completed Tasks</span>
+                </a>
                 </a>
                 
                 <a href="{{ route('waste_collector.settings') }}" class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('waste_collector.settings') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">
@@ -92,6 +103,14 @@
 
         <!-- Dynamic Content Slot -->
         <div class="px-8 pb-12 w-full max-w-[1400px]">
+            @if(session('success'))
+                <div class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-600 px-4 py-3 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span class="font-semibold text-sm">{{ session('success') }}</span>
+                    </div>
+                </div>
+            @endif
             @yield('content')
         </div>
     </main>

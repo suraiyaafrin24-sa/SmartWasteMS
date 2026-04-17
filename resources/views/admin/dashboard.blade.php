@@ -11,8 +11,8 @@
             <p class="text-[13px] font-medium text-slate-400">Monitor collections, active staff, and system performance.</p>
         </div>
         <div class="flex gap-2">
-            <button class="bg-gray-50 text-slate-600 text-[13px] font-bold py-2.5 px-5 rounded-xl border border-gray-100 hover:bg-gray-100 transition shadow-sm">Filter Report</button>
-            <button class="bg-[#19817E] text-white text-[13px] font-bold py-2.5 px-5 rounded-xl hover:bg-teal-700 transition shadow-lg shadow-teal-700/20">+ Assign Duty</button>
+            <a href="{{ route('admin.reports') }}" class="bg-gray-50 text-slate-600 text-[13px] font-bold py-2.5 px-5 rounded-xl border border-gray-100 hover:bg-gray-100 transition shadow-sm">Filter Report</a>
+            <a href="{{ route('admin.assign_duty') }}" class="bg-[#19817E] text-white text-[13px] font-bold py-2.5 px-5 rounded-xl hover:bg-teal-700 transition shadow-lg shadow-teal-700/20">+ Assign Duty</a>
         </div>
     </div>
 
@@ -28,7 +28,7 @@
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Pending Collections
                 </div>
-                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">42</div>
+                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">{{ $pendingCollections }}</div>
             </div>
             <p class="text-[12px] text-slate-400 font-medium leading-snug">Awaiting pickup routing</p>
         </div>
@@ -43,9 +43,12 @@
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     Active Duty Staff
                 </div>
-                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">18<span class="text-xl text-slate-300 font-bold ml-1">/25</span></div>
+                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">{{ $activeStaffCount }}</div>
             </div>
-            <p class="text-[12px] text-slate-400 font-medium leading-snug">Collectors currently on route</p>
+            <div class="flex items-center gap-1.5 mt-2">
+                <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 uppercase tracking-widest">{{ $onDutyCount }} Online Now</span>
+                <p class="text-[12px] text-slate-400 font-medium leading-snug">registered staff</p>
+            </div>
         </div>
 
         <!-- System Users Card -->
@@ -58,9 +61,12 @@
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     Total General Users
                 </div>
-                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">1,245</div>
+                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">{{ number_format($totalUsersCount) }}</div>
             </div>
-            <p class="text-[12px] text-slate-400 font-medium leading-snug">+12 new registrations today</p>
+            <div class="flex items-center gap-1.5 mt-2">
+                <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 uppercase tracking-widest">+{{ $newUsersThisMonth }} New This Month</span>
+                <p class="text-[12px] text-slate-400 font-medium leading-snug">resident accounts</p>
+            </div>
         </div>
 
         <!-- Completed Card -->
@@ -73,7 +79,7 @@
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Cleared Today
                 </div>
-                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">86<span class="text-xl text-emerald-500 font-bold ml-1">%</span></div>
+                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">{{ $clearedTodayPercent }}<span class="text-xl text-emerald-500 font-bold ml-1">%</span></div>
             </div>
             <p class="text-[12px] text-slate-400 font-medium leading-snug">Of daily schedules completed</p>
         </div>
@@ -98,6 +104,7 @@
                     <thead>
                         <tr class="text-slate-300 font-bold text-[11px] uppercase tracking-widest border-b border-gray-50">
                             <th class="pb-4 px-2">User / Address</th>
+                            <th class="pb-4 px-2">Waste Type</th>
                             <th class="pb-4 px-2">Assigned Collector</th>
                             <th class="pb-4 px-2">Status</th>
                             <th class="pb-4 px-2">Est. Time</th>
@@ -105,58 +112,56 @@
                         </tr>
                     </thead>
                     <tbody class="text-slate-700 font-bold divide-y divide-gray-50/50">
+                        @forelse($latestRequests as $request)
                         <tr class="hover:bg-gray-50/30 transition-all duration-300">
                             <td class="py-5 px-2">
-                                <div class="font-black text-slate-800">John Doe</div>
-                                <div class="text-[11px] text-slate-400 font-medium">123 Elm Street</div>
+                                <div class="font-black text-slate-800">{{ $request->user->name }}</div>
+                                <div class="text-[11px] text-slate-400 font-medium">{{ $request->address }}</div>
                             </td>
                             <td class="py-5 px-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider
+                                    @if($request->type == 'Organic') bg-emerald-50 text-emerald-600
+                                    @elseif($request->type == 'Recyclable') bg-blue-50 text-blue-600
+                                    @elseif($request->type == 'Hazardous') bg-red-50 text-red-600
+                                    @else bg-gray-50 text-gray-600 @endif">
+                                    {{ $request->type }}
+                                </span>
+                            </td>
+                            <td class="py-5 px-2">
+                                @if($request->collector)
                                 <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded-full bg-[#DCF5F2] text-[#19817E] flex items-center justify-center text-[10px] font-black border border-white shadow-sm">M</div>
-                                    <span class="text-[13px]">Michael S.</span>
+                                    <div class="w-7 h-7 rounded-full bg-[#DCF5F2] text-[#19817E] flex items-center justify-center text-[10px] font-black border border-white shadow-sm">
+                                        {{ substr($request->collector->name, 0, 1) }}
+                                    </div>
+                                    <span class="text-[13px]">{{ $request->collector->name }}</span>
                                 </div>
+                                @else
+                                <div class="text-[13px] text-slate-300 italic font-medium">Unassigned</div>
+                                @endif
                             </td>
                             <td class="py-5 px-2">
-                                <span class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-[#E2F0EC] text-[#19817E] tracking-widest uppercase">On Route</span>
+                                @if($request->status == 'Completed')
+                                    <span class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-gray-100 text-slate-400 tracking-widest uppercase">Completed</span>
+                                @elseif($request->status == 'Scheduled')
+                                    <span class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-[#E2F0EC] text-[#19817E] tracking-widest uppercase">Scheduled</span>
+                                @else
+                                    <span class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-[#FEF3C7] text-[#D97706] tracking-widest uppercase">Pending</span>
+                                @endif
                             </td>
-                            <td class="py-5 px-2 text-[13px] text-slate-500">10:45 AM</td>
+                            <td class="py-5 px-2 text-[13px] text-slate-500">{{ $request->scheduled_time ?? 'ASAP' }}</td>
                             <td class="py-5 px-2 text-right">
-                                <button class="text-slate-400 hover:text-slate-600 text-[11px] font-black border border-slate-100 px-4 py-1.5 rounded-lg transition-all duration-200">Notify</button>
+                                @if(!$request->collector && $request->status == 'Pending')
+                                    <button class="text-white bg-[#19817E] hover:bg-teal-700 text-[11px] font-black px-4 py-1.5 rounded-lg shadow-sm">Assign</button>
+                                @else
+                                    <button class="text-slate-400 hover:text-slate-600 text-[11px] font-black border border-slate-100 px-4 py-1.5 rounded-lg transition-all duration-200">View</button>
+                                @endif
                             </td>
                         </tr>
-                        <tr class="hover:bg-gray-50/30 transition-all duration-300">
-                            <td class="py-5 px-2">
-                                <div class="font-black text-slate-800">Sarah Williams</div>
-                                <div class="text-[11px] text-slate-400 font-medium">House 4, Block B</div>
-                            </td>
-                            <td class="py-5 px-2 text-[13px] text-slate-300 italic font-medium">Unassigned</td>
-                            <td class="py-5 px-2">
-                                <span class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-[#FEF3C7] text-[#D97706] tracking-widest uppercase">Pending</span>
-                            </td>
-                            <td class="py-5 px-2 text-[13px] text-slate-500">ASAP</td>
-                            <td class="py-5 px-2 text-right">
-                                <button class="text-white bg-[#19817E] hover:bg-teal-700 text-[11px] font-black px-4 py-1.5 rounded-lg shadow-sm">Assign</button>
-                            </td>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="py-4 text-center text-gray-500">No requests found.</td>
                         </tr>
-                        <tr class="hover:bg-gray-50/30 transition-all duration-300">
-                            <td class="py-5 px-2">
-                                <div class="font-black text-slate-800">ABC Tech Park</div>
-                                <div class="text-[11px] text-slate-400 font-medium">Industrial Zone 3</div>
-                            </td>
-                            <td class="py-5 px-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center text-[10px] font-black border border-white shadow-sm">D</div>
-                                    <span class="text-[13px]">David L.</span>
-                                </div>
-                            </td>
-                            <td class="py-5 px-2">
-                                <span class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-gray-100 text-slate-400 tracking-widest uppercase">Completed</span>
-                            </td>
-                            <td class="py-5 px-2 text-[13px] text-slate-500">08:30 AM</td>
-                            <td class="py-5 px-2 text-right">
-                                <button class="text-slate-300 hover:text-slate-500 text-[11px] font-black border border-slate-50 px-4 py-1.5 rounded-lg transition-all duration-200">View</button>
-                            </td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -207,38 +212,34 @@
                 <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-8 relative z-10">Live monitoring</p>
                 
                 <div class="space-y-4 relative z-10">
+                    @forelse($activeStaff as $staff)
                     <div class="flex justify-between items-center bg-[#1B252F] p-4 rounded-[24px] border border-white/5 hover:bg-[#202C38] transition-all duration-300">
                         <div class="flex items-center gap-4">
                             <div class="relative">
-                                <div class="w-11 h-11 rounded-full bg-[#34D399]/10 flex items-center justify-center font-black text-[#34D399] border border-[#34D399]/20 text-xs">MS</div>
+                                <div class="w-11 h-11 rounded-full bg-teal-500/10 flex items-center justify-center font-black text-teal-500 border border-teal-500/20 text-xs">
+                                    {{ substr($staff->name, 0, 1) }}
+                                </div>
                                 <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#1B252F]"></span>
                             </div>
                             <div>
-                                <div class="text-[14px] font-black text-white leading-tight">Michael S.</div>
-                                <div class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-0.5">Active • En Route</div>
+                                <div class="text-[14px] font-black text-white leading-tight">{{ $staff->name }}</div>
+                                <div class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-0.5">Active • {{ $staff->collection_requests_count }} Tasks</div>
                             </div>
                         </div>
                         <button class="text-slate-600 hover:text-white transition-colors bg-white/5 p-2 rounded-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
                     </div>
-
-                    <div class="flex justify-between items-center bg-[#1B252F] p-4 rounded-[24px] border border-white/5 hover:bg-[#202C38] transition-all duration-300">
-                        <div class="flex items-center gap-4">
-                            <div class="relative">
-                                <div class="w-11 h-11 rounded-full bg-[#3B82F6]/10 flex items-center justify-center font-black text-[#3B82F6] border border-[#3B82F6]/20 text-xs text-blue-500">DL</div>
-                                <span class="absolute bottom-0 right-0 w-3 h-3 bg-amber-500 rounded-full border-2 border-[#1B252F]"></span>
-                            </div>
-                            <div>
-                                <div class="text-[14px] font-black text-white leading-tight">David L.</div>
-                                <div class="text-[10px] text-amber-500 font-bold uppercase tracking-widest mt-0.5">Break • 10m left</div>
+                    @empty
+                    <p class="text-slate-500 text-xs italic">No staff on system.</p>
+                    @endforelse
                             </div>
                         </div>
                         <button class="text-slate-600 hover:text-white transition-colors bg-white/5 p-2 rounded-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></button>
                     </div>
+                    @empty
+                    <p class="text-gray-500 text-xs italic">No staff on system.</p>
+                    @endforelse
                 </div>
             </div>
-
         </div>
-
     </div>
-
 @endsection

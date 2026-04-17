@@ -3,16 +3,34 @@
 @section('title', 'Collector Dashboard')
 
 @section('content')
+    @if(session('success'))
+        <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-600 px-4 py-3 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="font-semibold text-sm">{{ session('success') }}</span>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="font-semibold text-sm">{{ session('error') }}</span>
+            </div>
+        </div>
+    @endif
+
     <div class="mb-8 mt-2 flex justify-between items-end">
         <div>
             <h1 class="text-2xl font-black tracking-tight text-slate-800 mb-1">My Task Center</h1>
             <p class="text-[13px] font-medium text-slate-400">Manage your collection route and update pickup status.</p>
         </div>
-        <div>
-            <button class="bg-[#0D161F] text-white text-[13px] font-black py-2.5 px-6 rounded-xl hover:bg-black transition flex items-center gap-2 shadow-lg shadow-slate-900/20">
+        <div class="flex gap-3">
+             <a href="{{ route('waste_collector.map') }}" class="bg-[#0D161F] text-white text-[13px] font-black py-2.5 px-6 rounded-xl hover:bg-black transition flex items-center gap-2 shadow-lg shadow-slate-900/20">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 Open Map View
-            </button>
+            </a>
         </div>
     </div>
 
@@ -26,11 +44,11 @@
             <div>
                 <div class="text-teal-100 font-bold text-[13px] mb-1.5 flex items-center gap-1.5 leading-none">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Assigned Today
+                    Remaining Tasks
                 </div>
-                <div class="text-[32px] font-black text-white leading-none tracking-tight">8</div>
+                <div class="text-[32px] font-black text-white leading-none tracking-tight">{{ $activeRoute->count() }}</div>
             </div>
-            <p class="text-[11px] text-white font-black bg-white/10 w-fit px-3 py-1.5 rounded-lg uppercase tracking-wider">4 remaining</p>
+            <p class="text-[11px] text-white font-black bg-white/10 w-fit px-3 py-1.5 rounded-lg uppercase tracking-wider">{{ $assignedToday->count() }} Pickups Scheduled Today</p>
         </div>
 
         <!-- Completed Card (White) -->
@@ -41,11 +59,11 @@
             <div>
                 <div class="text-emerald-500 font-bold text-[13px] mb-1.5 flex items-center gap-1.5 leading-none">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Completed
+                    Successful Collections
                 </div>
-                <div class="text-[32px] font-black text-slate-800 leading-none tracking-tight">4</div>
+                <div class="text-[32px] font-black text-slate-800 leading-none tracking-tight">{{ $completedCount }}</div>
             </div>
-            <p class="text-[12px] text-emerald-500 font-bold leading-none">50% efficiency streak</p>
+            <p class="text-[12px] text-emerald-500 font-bold leading-none uppercase tracking-widest">Lifetime performance</p>
         </div>
 
         <!-- Safety Alerts Card (Dark) -->
@@ -60,62 +78,64 @@
                 </div>
                 <div class="text-[32px] font-black text-white leading-none tracking-tight">0</div>
             </div>
-            <p class="text-[12px] text-slate-500 font-bold leading-none">All zones clear</p>
+            <p class="text-[12px] text-slate-500 font-bold leading-none uppercase tracking-widest">All zones clear</p>
         </div>
     </div>
 
     <!-- Tasks Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- New Tasks -->
-        <div class="bg-white rounded-3xl p-8 border border-gray-50 shadow-sm shadow-gray-100">
-            <h2 class="text-xl font-black text-slate-800 tracking-tight leading-none mb-8">Unaccepted Job Offers</h2>
-            <div class="space-y-4">
-                <div class="p-6 border border-gray-50 rounded-[32px] flex justify-between items-center group transition-all duration-300 hover:border-[#19817E]/20 hover:bg-gray-50/30">
-                    <div class="flex-1">
-                        <div class="text-orange-500 text-[10px] font-black uppercase tracking-widest mb-1.5">Emergency Pickup</div>
-                        <h4 class="text-base font-black text-slate-800 leading-tight mb-1">8 Edigbe Street, District A</h4>
-                        <p class="text-[12px] text-slate-400 font-medium">Requested by: Suraiya Akter • 25kg Estimate</p>
-                    </div>
-                    <div class="flex gap-3">
-                         <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-300 cursor-not-allowed">
-                             <div class="w-5 h-2.5 bg-slate-200/50 rounded-full"></div>
-                         </div>
-                         <button class="text-slate-300 hover:text-red-500 transition-colors bg-gray-50 p-3 rounded-2xl">
-                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                         </button>
-                    </div>
-                </div>
+    <div class="mb-10">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-xl font-black text-slate-800 tracking-tight leading-none">Active Duty Assignments</h2>
+                <p class="text-[11px] font-bold text-[#19817E] uppercase tracking-widest mt-1.5">Directly dispatched by Command Center</p>
+            </div>
+            <div class="bg-[#DCF5F2] px-4 py-2 rounded-xl text-[#19817E] font-black text-[12px] border border-[#19817E]/10">
+                {{ $activeRoute->count() }} Tasks
             </div>
         </div>
 
-        <!-- Current Route -->
-        <div class="bg-white rounded-3xl p-8 border border-gray-50 shadow-sm shadow-gray-100">
-            <h2 class="text-xl font-black text-slate-800 tracking-tight leading-none mb-8">Current active Route</h2>
-            <div class="space-y-4">
-                <div class="p-5 border border-gray-50 rounded-[32px] flex justify-between items-center group bg-white hover:border-emerald-100 transition-all duration-300">
-                    <div class="flex items-center gap-5">
-                        <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-sm border border-emerald-100 shadow-sm">1</div>
-                        <div>
-                            <h4 class="text-base font-black text-slate-800 leading-tight">123 Elm Street</h4>
-                            <p class="text-[10px] text-emerald-500 font-black uppercase tracking-widest mt-1">On Route Now</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @forelse($activeRoute as $index => $request)
+            <div class="bg-white rounded-[40px] p-8 border {{ $index == 0 ? 'border-[#19817E]/20 ring-8 ring-[#19817E]/5' : 'border-gray-50' }} shadow-sm flex flex-col justify-between group hover:border-[#19817E]/10 transition-all duration-300">
+                <div>
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest
+                                @if($request->type == 'Organic') bg-emerald-50 text-emerald-600
+                                @elseif($request->type == 'Recyclable') bg-blue-50 text-blue-600
+                                @elseif($request->type == 'Hazardous') bg-red-50 text-red-600
+                                @else bg-gray-50 text-gray-600 @endif">
+                                {{ $request->type }}
+                            </span>
                         </div>
+                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Job #{{ $index + 1 }}</span>
                     </div>
-                    <div>
-                         <button class="bg-[#E2F0EC] text-[#19817E] text-[11px] font-black px-6 py-2.5 rounded-full hover:bg-[#19817E] hover:text-white transition-all duration-300 uppercase tracking-widest leading-none shadow-sm shadow-teal-700/5">Mark Done</button>
+                    <h4 class="text-base font-black text-slate-800 tracking-tight mb-1">{{ $request->road }}</h4>
+                    <p class="text-[11px] text-slate-400 font-medium mb-4 line-clamp-1">{{ $request->address }} • {{ $request->sector }}</p>
+                    
+                    <div class="flex items-center gap-2 mb-6 p-2.5 bg-gray-50 rounded-2xl">
+                        <div class="w-1.5 h-1.5 rounded-full bg-[#19817E] animate-pulse"></div>
+                        <span class="text-[10px] font-black text-[#19817E] uppercase tracking-widest">{{ $request->shift }} Duty</span>
                     </div>
                 </div>
-
-                <div class="p-5 border border-gray-50 rounded-[32px] flex justify-between items-center opacity-40 hover:opacity-100 transition-all duration-500">
-                    <div class="flex items-center gap-5">
-                        <div class="w-12 h-12 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center font-black text-sm border border-gray-100">2</div>
-                        <div>
-                            <h4 class="text-base font-black text-slate-700 leading-tight">45 High Street</h4>
-                            <p class="text-[10px] text-slate-300 font-black uppercase tracking-widest mt-1">Next in queue</p>
-                        </div>
-                    </div>
-                    <button class="text-slate-300 p-2 transform rotate-90"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                
+                <div class="flex items-center gap-3 pt-5 border-t border-gray-50">
+                    <a href="{{ route('waste_collector.map') }}" class="flex-1 text-center py-3 bg-gray-100 text-slate-400 text-[10px] font-black rounded-xl hover:bg-gray-200 transition uppercase tracking-[0.2em]">
+                        Locate
+                    </a>
+                    <form action="{{ route('waste_collector.requests.complete', $request->id) }}" method="POST" class="flex-[1.5]">
+                        @csrf
+                        <button type="submit" class="w-full bg-[#19817E] text-white text-[10px] font-black py-3 px-4 rounded-xl hover:bg-teal-700 transition shadow-lg shadow-teal-700/10 uppercase tracking-[0.2em]">
+                            Collected
+                        </button>
+                    </form>
                 </div>
             </div>
+            @empty
+            <div class="col-span-full text-center py-16 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-100">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">No active assignments</p>
+            </div>
+            @endforelse
         </div>
     </div>
 @endsection
