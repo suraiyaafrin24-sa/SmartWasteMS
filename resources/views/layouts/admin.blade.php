@@ -27,11 +27,11 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #F8F9FB;
+            background-color: #fbf8f8ff;
         }
 
         .sidebar-bg {
-            background-color: #F2F4F7;
+            background-color: #d7d8daff;
         }
 
         /* Smooth scroll for main content */
@@ -47,7 +47,7 @@
 </head>
 
 <body class="text-slate-800 h-screen w-full flex overflow-hidden antialiased bg-[#F8F9FB]">
-    <aside class="bg-[#F8F9FA] w-64 border-r border-gray-100 flex flex-col justify-between hidden md:flex shrink-0">
+    <aside class="sidebar-bg w-64 border-r border-gray-100 flex flex-col justify-between hidden md:flex shrink-0">
         <div>
             <!-- Profile Status Area -->
             <div class="px-7 py-8 mb-4">
@@ -104,7 +104,7 @@
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                     </path>
                 </svg>
-                <span class="text-sm">Collector Duty Roster</span>
+                <span class="text-sm">Staff Schedule</span>
             </a>
 
             <!-- Manage Users -->
