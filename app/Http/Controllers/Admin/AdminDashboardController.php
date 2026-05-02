@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 
 class AdminDashboardController extends Controller
@@ -227,6 +228,42 @@ class AdminDashboardController extends Controller
         return view('admin.users', compact('users', 'totalCollectors', 'totalAdmins', 'totalGeneralUsers'));
     }
 
+    public function editUser($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.edit_user', compact('user'));
+    }
+
+    public function updateUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$user->id],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'role' => ['required', 'in:admin,user,waste_collector'],
+        ]);
+
+        $user->update($request->only(['name', 'email', 'phone', 'address', 'role']));
+
+        return redirect()->route('admin.users')->with('status', 'User updated successfully');
+    }
+
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+        
+        if ($user->id === Auth::id()) {
+            return redirect()->back()->with('error', 'You cannot delete yourself.');
+        }
+
+        $user->delete();
+
+        return redirect()->route('admin.users')->with('status', 'User deleted successfully');
+    }
+
     public function complaints()
     {
         $reports = \App\Models\Report::with('user')->orderBy('created_at', 'desc')->paginate(15);
@@ -393,12 +430,16 @@ class AdminDashboardController extends Controller
         $data['name'] = trim($request->first_name . ' ' . $request->last_name);
 
         if ($request->hasFile('profile_image')) {
+            Log::info('Admin profile image found in request', ['filename' => $request->file('profile_image')->getClientOriginalName()]);
             if ($user->profile_image) {
                 Storage::disk('public')->delete($user->profile_image);
             }
             
             $path = $request->file('profile_image')->store('profile_images', 'public');
+            Log::info('Admin profile image stored', ['path' => $path]);
             $data['profile_image'] = $path;
+        } else {
+            Log::info('No admin profile image in request');
         }
 
         $user->fill($data);

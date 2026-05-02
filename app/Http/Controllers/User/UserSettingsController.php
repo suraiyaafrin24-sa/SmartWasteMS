@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 
 class UserSettingsController extends Controller
@@ -33,13 +34,17 @@ class UserSettingsController extends Controller
         $data['name'] = trim($request->first_name . ' ' . $request->last_name);
 
         if ($request->hasFile('profile_image')) {
+            Log::info('Profile image found in request', ['filename' => $request->file('profile_image')->getClientOriginalName()]);
             // Delete old image if exists
             if ($user->profile_image) {
                 Storage::disk('public')->delete($user->profile_image);
             }
             
             $path = $request->file('profile_image')->store('profile_images', 'public');
+            Log::info('Profile image stored', ['path' => $path]);
             $data['profile_image'] = $path;
+        } else {
+            Log::info('No profile image in request');
         }
 
         $user->fill($data);

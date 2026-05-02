@@ -138,7 +138,11 @@
             const [file] = this.files;
             if (file) {
                 const preview = document.getElementById('profilePreview');
+                const placeholder = document.getElementById('profilePreviewPlaceholder');
+                
                 preview.src = URL.createObjectURL(file);
+                preview.classList.remove('hidden');
+                if(placeholder) placeholder.classList.add('hidden');
                 
                 // Show filename hint
                 const hint = document.getElementById('fileHint');

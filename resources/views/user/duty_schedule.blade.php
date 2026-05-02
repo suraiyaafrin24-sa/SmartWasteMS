@@ -71,20 +71,64 @@
                         <td class="py-4 px-2">{{ $duty->road ?? 'N/A' }}</td>
                         <td class="py-4 px-2">{{ \Carbon\Carbon::parse($duty->date)->format('M d, Y') }}</td>
                         <td class="py-4 px-2">
-                            @if($duty->shift == 'Morning')
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-amber-50 text-amber-600 tracking-wide uppercase">{{ $duty->shift }}</span>
-                            @elseif($duty->shift == 'Afternoon')
+                            @if(str_contains(strtolower($duty->shift), 'morning'))
+                                <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-blue-50 text-blue-600 tracking-wide uppercase">{{ $duty->shift }}</span>
+                            @elseif(str_contains(strtolower($duty->shift), 'evening') || str_contains(strtolower($duty->shift), 'afternoon'))
                                 <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-orange-50 text-orange-600 tracking-wide uppercase">{{ $duty->shift }}</span>
-                            @else
+                            @elseif(str_contains(strtolower($duty->shift), 'night'))
                                 <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-indigo-50 text-indigo-600 tracking-wide uppercase">{{ $duty->shift }}</span>
+                            @else
+                                <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-teal-50 text-teal-600 tracking-wide uppercase">{{ $duty->shift }}</span>
                             @endif
                         </td>
                         <td class="py-4 px-2">
-                            @if($duty->status == 'Completed')
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-emerald-100 text-emerald-600 tracking-wide uppercase">Completed</span>
-                            @else
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-gray-100 text-gray-600 tracking-wide uppercase">{{ $duty->status }}</span>
-                            @endif
+                            @php
+                                $today = now()->format('Y-m-d');
+                                $currentTime = now()->format('H:i');
+                                $isToday = $duty->date == $today;
+                                $isFuture = $duty->date > $today;
+                                $isPast = $duty->date < $today;
+                                
+                                if ($isPast) {
+                                    $statusText = 'Completed';
+                                    $statusClass = 'bg-gray-50 text-gray-400';
+                                } elseif ($isFuture) {
+                                    $statusText = 'Scheduled';
+                                    $statusClass = 'bg-blue-50 text-blue-500';
+                                } else { // Today
+                                    $statusText = 'NO DUTY';
+                                    $statusClass = 'bg-slate-50 text-slate-400';
+
+                                    if (str_contains(strtolower($duty->shift), 'morning')) {
+                                        if ($currentTime >= '07:00' && $currentTime <= '10:00') {
+                                            $statusText = 'ACTIVE';
+                                            $statusClass = 'bg-teal-50 text-teal-600 animate-pulse';
+                                        } elseif ($currentTime < '07:00') {
+                                            $statusText = 'Shift Pending';
+                                            $statusClass = 'bg-amber-50 text-amber-600';
+                                        }
+                                    } elseif (str_contains(strtolower($duty->shift), 'evening') || str_contains(strtolower($duty->shift), 'afternoon')) {
+                                        if ($currentTime >= '16:00' && $currentTime <= '18:00') {
+                                            $statusText = 'ACTIVE';
+                                            $statusClass = 'bg-teal-50 text-teal-600 animate-pulse';
+                                        } elseif ($currentTime < '16:00') {
+                                            $statusText = 'Shift Pending';
+                                            $statusClass = 'bg-amber-50 text-amber-600';
+                                        }
+                                    }
+                                }
+                            @endphp
+                            <div class="flex items-center gap-2">
+                                @if($statusText == 'Active Now')
+                                    <span class="relative flex h-2 w-2">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    </span>
+                                @endif
+                                <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest {{ $statusClass }}">
+                                    {{ $statusText }}
+                                </span>
+                            </div>
                         </td>
                     </tr>
                     @empty

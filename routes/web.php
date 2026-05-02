@@ -26,6 +26,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/reports/generate', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'generateReport'])->name('reports.generate');
     Route::get('/users/create', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'createUser'])->name('users.create');
     Route::post('/users', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'storeUser'])->name('users.store');
+    Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{id}', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{id}', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'deleteUser'])->name('users.delete');
     Route::get('/collections', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'collections'])->name('collections');
     Route::get('/duty-schedule', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'dutySchedule'])->name('duty_schedule');
     Route::get('/assign-duty', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'showAssignDuty'])->name('assign_duty');
@@ -72,6 +75,7 @@ Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user
     Route::get('/requests/create', [\App\Http\Controllers\User\UserDashboardController::class, 'createRequest'])->name('requests.create');
     Route::post('/requests', [\App\Http\Controllers\User\UserDashboardController::class, 'storeRequest'])->name('requests.store');
     Route::get('/history', [\App\Http\Controllers\User\UserDashboardController::class, 'history'])->name('history');
+    Route::post('/requests/{request}/cancel', [\App\Http\Controllers\User\UserDashboardController::class, 'cancelRequest'])->name('requests.cancel');
     Route::get('/duty-schedule', [\App\Http\Controllers\User\UserDashboardController::class, 'dutySchedule'])->name('duty_schedule');
 });
 

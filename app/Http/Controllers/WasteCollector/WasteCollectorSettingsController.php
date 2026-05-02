@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 
 class WasteCollectorSettingsController extends Controller
@@ -32,12 +33,16 @@ class WasteCollectorSettingsController extends Controller
         $data['name'] = trim($request->first_name . ' ' . $request->last_name);
 
         if ($request->hasFile('profile_image')) {
+            Log::info('Collector profile image found in request', ['filename' => $request->file('profile_image')->getClientOriginalName()]);
             if ($user->profile_image) {
                 Storage::disk('public')->delete($user->profile_image);
             }
             
             $path = $request->file('profile_image')->store('profile_images', 'public');
+            Log::info('Collector profile image stored', ['path' => $path]);
             $data['profile_image'] = $path;
+        } else {
+            Log::info('No collector profile image in request');
         }
 
         $user->fill($data);

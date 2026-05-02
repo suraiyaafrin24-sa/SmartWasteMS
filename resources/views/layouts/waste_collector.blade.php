@@ -125,15 +125,7 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative">
         <header class="flex items-center justify-between px-8 py-5 sticky top-0 bg-white/80 backdrop-blur-md z-20">
-            <div class="flex items-center gap-3">
-                <span class="flex h-3 w-3 relative">
-                    <span
-                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                </span>
-                <span class="text-[11px] font-black text-slate-300 uppercase tracking-widest leading-none">Live Shift:
-                    08:00 - 16:00</span>
-            </div>
+            <div></div>
 
             <div class="flex items-center gap-6 text-gray-500">
                 @include('components.notification-dropdown')

@@ -56,7 +56,7 @@ class UserDashboardController extends Controller
         $request->validate([
             'type' => 'required|string',
             'scheduled_date' => 'required|date|after_or_equal:today',
-            'scheduled_time' => 'nullable|date_format:H:i',
+            'shift' => 'required|string',
             'details' => 'nullable|string',
             'address' => 'nullable|string',
             'phone' => 'nullable|string',
@@ -64,38 +64,28 @@ class UserDashboardController extends Controller
             'road' => 'required|string|max:100',
         ]);
 
-        // Try to find an assigned collector from DutyRoster
-        $roster = DutyRoster::where('sector', $request->sector)
-            ->where('date', $request->scheduled_date)
-            ->first();
-
-        $collectorId = $roster ? $roster->collector_id : null;
-        $status = $collectorId ? 'Scheduled' : 'Pending';
-
         $collectionRequest = CollectionRequest::create([
             'user_id' => Auth::id(),
-            'collector_id' => $collectorId,
+            'collector_id' => null, // Unassigned, goes to the available pool
             'type' => $request->type,
             'scheduled_date' => $request->scheduled_date,
-            'scheduled_time' => $request->scheduled_time,
+            'shift' => $request->shift,
             'details' => $request->details,
             'address' => $request->address ?? Auth::user()->address,
             'phone' => $request->phone ?? Auth::user()->phone,
             'sector' => $request->sector,
             'road' => $request->road,
             'zone' => 'Uttara City Corporation Zone',
-            'status' => $status
+            'status' => 'Pending'
         ]);
 
         // Notify Admins
         $admins = User::where('role', 'admin')->get();
         Notification::send($admins, new CollectionStatusNotification($collectionRequest, 'New waste collection request created.', 'new_request'));
 
-        // Notify Collector
-        if ($collectorId) {
-            $collector = User::find($collectorId);
-            $collector->notify(new CollectionStatusNotification($collectionRequest, 'You have been assigned a new collection request.', 'assigned'));
-        }
+        // Notify All Collectors
+        $collectors = User::where('role', 'waste_collector')->get();
+        Notification::send($collectors, new CollectionStatusNotification($collectionRequest, 'A new collection request is available in ' . $request->sector, 'new_request'));
 
         return redirect()->route('user.dashboard')->with('success', 'Collection request created successfully!');
     }
@@ -108,6 +98,31 @@ class UserDashboardController extends Controller
             ->paginate(10);
 
         return view('user.history', compact('requests'));
+    }
+
+    public function cancelRequest(CollectionRequest $request)
+    {
+        if ($request->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($request->status !== 'Pending' && $request->status !== 'Scheduled') {
+            return redirect()->back()->with('error', 'Only pending or scheduled requests can be cancelled.');
+        }
+
+        $request->update(['status' => 'Cancelled']);
+
+        // Notify Admins
+        $admins = User::where('role', 'admin')->get();
+        Notification::send($admins, new CollectionStatusNotification($request, 'A collection request has been cancelled by the user.', 'cancelled'));
+
+        // Notify Collector if assigned
+        if ($request->collector_id) {
+            $collector = User::find($request->collector_id);
+            $collector->notify(new CollectionStatusNotification($request, 'An assigned collection request has been cancelled.', 'cancelled'));
+        }
+
+        return redirect()->back()->with('success', 'Request cancelled successfully.');
     }
 
     public function dutySchedule(Request $request)

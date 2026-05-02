@@ -68,7 +68,7 @@
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Operating Shift <span class="text-red-500">*</span></label>
                     <select name="shift" required class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
-                        <option value="Morning Shift">🌅 Morning Shift (6-10 AM)</option>
+                        <option value="Morning Shift">🌅 Morning Shift (7-10 AM)</option>
                         <option value="Evening Shift">🌇 Evening Shift (4-6 PM)</option>
                     </select>
                 </div>
@@ -151,20 +151,20 @@
                                         $statusText = 'Upcoming';
                                         $statusClass = 'bg-blue-50 text-blue-600';
                                     } else { // Today
-                                        $statusText = 'Off Duty';
+                                        $statusText = 'NO DUTY';
                                         $statusClass = 'bg-slate-50 text-slate-400';
 
                                         if ($r->shift == 'Morning Shift') {
-                                            if ($currentTime >= '06:00' && $currentTime <= '10:00') {
-                                                $statusText = 'On Duty';
+                                            if ($currentTime >= '07:00' && $currentTime <= '10:00') {
+                                                $statusText = 'ACTIVE';
                                                 $statusClass = 'bg-emerald-50 text-emerald-600 animate-pulse';
-                                            } elseif ($currentTime < '06:00') {
+                                            } elseif ($currentTime < '07:00') {
                                                 $statusText = 'Pending';
                                                 $statusClass = 'bg-amber-50 text-amber-600';
                                             }
                                         } else { // Evening Shift
                                             if ($currentTime >= '16:00' && $currentTime <= '18:00') {
-                                                $statusText = 'On Duty';
+                                                $statusText = 'ACTIVE';
                                                 $statusClass = 'bg-emerald-50 text-emerald-600 animate-pulse';
                                             } elseif ($currentTime < '16:00') {
                                                 $statusText = 'Pending';

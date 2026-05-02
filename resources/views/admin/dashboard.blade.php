@@ -176,7 +176,9 @@
             <div class="bg-white rounded-3xl p-8 border border-gray-50 shadow-sm shadow-gray-100">
                 <div class="flex justify-between items-center mb-8">
                     <h2 class="text-xl font-black text-slate-800 tracking-tight leading-none">Today's Shift Roster</h2>
-                    <button class="text-[#19817E] hover:bg-teal-50 p-1 rounded-lg transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg></button>
+                    <a href="{{ route('admin.duty_roster') }}" class="text-[#19817E] hover:bg-teal-50 p-1 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    </a>
                 </div>
                 
                 <div class="space-y-6">
@@ -199,7 +201,7 @@
                     </div>
                 </div>
                 <div class="mt-8">
-                    <button class="w-full text-center text-[11px] font-black text-[#19817E] py-3.5 border border-dashed border-[#19817E]/30 rounded-2xl hover:bg-teal-50 transition-all duration-300 uppercase tracking-widest">Full Schedule Map</button>
+                    <a href="{{ route('admin.duty_roster') }}" class="block w-full text-center text-[11px] font-black text-[#19817E] py-3.5 border border-dashed border-[#19817E]/30 rounded-2xl hover:bg-teal-50 transition-all duration-300 uppercase tracking-widest">Full Schedule Map</a>
                 </div>
             </div>
 

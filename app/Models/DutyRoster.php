@@ -22,4 +22,14 @@ class DutyRoster extends Model
     {
         return $this->belongsTo(User::class, 'collector_id');
     }
+
+    public function isActive()
+    {
+        return $this->date == now()->format('Y-m-d');
+    }
+
+    public function isPast()
+    {
+        return $this->date < now()->format('Y-m-d');
+    }
 }

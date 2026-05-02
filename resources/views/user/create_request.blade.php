@@ -43,8 +43,8 @@
                             <label class="block text-[11px] font-black text-gray-500 uppercase tracking-widest">Preferred Shift <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <select name="shift" required class="w-full bg-gray-50/50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all shadow-sm cursor-pointer appearance-none">
-                                    <option value="Morning Shift">🌅 Morning Shift (08 AM - 11 AM)</option>
-                                    <option value="Night Shift">🌙 Night Shift (08 PM - 10 PM)</option>
+                                    <option value="Morning Shift">🌅 Morning Shift (07 AM - 10 AM)</option>
+                                    <option value="Evening Shift">🌇 Evening Shift (04 PM - 06 PM)</option>
                                 </select>
                                 <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
