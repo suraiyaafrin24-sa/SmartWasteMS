@@ -27,7 +27,12 @@
                     <select name="collector_id" required class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
                         <option value="">Select Collector...</option>
                         @foreach($collectors as $c)
-                            <option value="{{ $c->id }}">{{ $c->name }}</option>
+                            <option value="{{ $c->id }}">
+                                {{ $c->name }}
+                                @if($c->dutyRosters->first())
+                                    — {{ $c->dutyRosters->first()->sector }}
+                                @endif
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -53,8 +58,8 @@
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Operating Shift <span class="text-red-500">*</span></label>
                     <select name="shift" required class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
-                        <option value="Morning Shift">🌅 Morning Shift</option>
-                        <option value="Night Shift">🌙 Night Shift</option>
+                        <option value="Morning Shift">🌅 Morning Shift (6-10 AM)</option>
+                        <option value="Evening Shift">🌇 Evening Shift (4-6 PM)</option>
                     </select>
                 </div>
             </div>
@@ -110,8 +115,44 @@
                                 <span class="text-xs font-medium text-gray-500">{{ \Carbon\Carbon::parse($r->date)->format('M d, Y') }}</span>
                             </td>
                             <td class="px-8 py-5">
-                                <span class="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600">
-                                    {{ $r->status }}
+                                @php
+                                    $today = now()->format('Y-m-d');
+                                    $currentTime = now()->format('H:i');
+                                    $isToday = $r->date == $today;
+                                    $isFuture = $r->date > $today;
+                                    $isPast = $r->date < $today;
+                                    
+                                    if ($isPast) {
+                                        $statusText = 'Completed';
+                                        $statusClass = 'bg-gray-100 text-gray-400';
+                                    } elseif ($isFuture) {
+                                        $statusText = 'Upcoming';
+                                        $statusClass = 'bg-blue-50 text-blue-600';
+                                    } else { // Today
+                                        $statusText = 'Off Duty';
+                                        $statusClass = 'bg-slate-50 text-slate-400';
+
+                                        if ($r->shift == 'Morning Shift') {
+                                            if ($currentTime >= '06:00' && $currentTime <= '10:00') {
+                                                $statusText = 'On Duty';
+                                                $statusClass = 'bg-emerald-50 text-emerald-600 animate-pulse';
+                                            } elseif ($currentTime < '06:00') {
+                                                $statusText = 'Pending';
+                                                $statusClass = 'bg-amber-50 text-amber-600';
+                                            }
+                                        } else { // Evening Shift
+                                            if ($currentTime >= '16:00' && $currentTime <= '18:00') {
+                                                $statusText = 'On Duty';
+                                                $statusClass = 'bg-emerald-50 text-emerald-600 animate-pulse';
+                                            } elseif ($currentTime < '16:00') {
+                                                $statusText = 'Pending';
+                                                $statusClass = 'bg-amber-50 text-amber-600';
+                                            }
+                                        }
+                                    }
+                                @endphp
+                                <span class="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest {{ $statusClass }}">
+                                    {{ $statusText }}
                                 </span>
                             </td>
                             <td class="px-8 py-5 text-right">

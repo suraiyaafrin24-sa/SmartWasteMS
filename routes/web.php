@@ -72,9 +72,11 @@ Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user
     Route::get('/requests/create', [\App\Http\Controllers\User\UserDashboardController::class, 'createRequest'])->name('requests.create');
     Route::post('/requests', [\App\Http\Controllers\User\UserDashboardController::class, 'storeRequest'])->name('requests.store');
     Route::get('/history', [\App\Http\Controllers\User\UserDashboardController::class, 'history'])->name('history');
+    Route::get('/duty-schedule', [\App\Http\Controllers\User\UserDashboardController::class, 'dutySchedule'])->name('duty_schedule');
 });
 
 Route::middleware('auth')->group(function () {
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

@@ -96,7 +96,7 @@
                     <p class="text-sm text-gray-500 mt-1">Real-time status of waste collections</p>
                 </div>
                 <div class="flex gap-2">
-                    <button class="text-[#19817E] text-sm font-bold py-2 px-4 rounded-xl border border-teal-200 hover:bg-teal-50 transition">Review All</button>
+                    <a href="{{ route('admin.collections') }}" class="text-[#19817E] text-sm font-bold py-2 px-4 rounded-xl border border-teal-200 hover:bg-teal-50 transition text-center">Review All</a>
                 </div>
             </div>
 
@@ -142,8 +142,8 @@
                                 @endif
                             </td>
                             <td class="py-4 px-2">
-                                @if($request->status == 'Completed')
-                                    <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-emerald-100 text-emerald-700 tracking-wide uppercase">Completed</span>
+                                @if($request->status == 'Completed' || $request->status == 'Collected')
+                                    <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-emerald-100 text-emerald-700 tracking-wide uppercase">Collected</span>
                                 @elseif($request->status == 'Scheduled')
                                     <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-blue-100 text-blue-700 tracking-wide uppercase">Scheduled</span>
                                 @else
@@ -153,7 +153,7 @@
                             <td class="py-4 px-2 text-gray-500">{{ $request->scheduled_time ?? 'ASAP' }}</td>
                             <td class="py-4 px-2 text-right">
                                 @if(!$request->collector && $request->status == 'Pending')
-                                    <button class="text-white bg-[#19817E] hover:bg-teal-700 font-semibold px-3 py-1 rounded-lg shadow-sm">Assign</button>
+                                    <a href="{{ route('admin.assign_duty', ['request_id' => $request->id]) }}" class="text-white bg-[#19817E] hover:bg-teal-700 font-semibold px-3 py-1 rounded-lg shadow-sm text-xs">Assign</a>
                                 @else
                                     <button class="text-slate-400 hover:text-teal-600 font-semibold border px-3 py-1 rounded-lg">View</button>
                                 @endif

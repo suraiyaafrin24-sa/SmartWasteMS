@@ -40,8 +40,8 @@
                             <div class="text-[11px] text-gray-400 font-medium tracking-tight">{{ $request->scheduled_time ?? 'Any time' }}</div>
                         </td>
                         <td class="py-4 px-2">
-                            @if($request->status == 'Completed')
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-emerald-100 text-emerald-600 tracking-wide uppercase">Completed</span>
+                            @if($request->status == 'Completed' || $request->status == 'Collected')
+                                <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-emerald-100 text-emerald-600 tracking-wide uppercase">Collected</span>
                             @elseif($request->status == 'Scheduled')
                                 <span class="px-2.5 py-1 rounded-md text-[11px] font-black bg-amber-100 text-amber-600 tracking-wide uppercase">Scheduled</span>
                             @elseif($request->status == 'Cancelled')

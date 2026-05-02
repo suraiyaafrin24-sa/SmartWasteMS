@@ -3,9 +3,9 @@
 @section('title', 'Municipal Performance Reports')
 
 @section('content')
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">Activity Reports</h1>
-        <p class="text-sm text-gray-500">Generate and download performance reports for staff and residents.</p>
+    <div class="mb-8 mt-2">
+        <h1 class="text-[28px] font-black tracking-tight text-gray-900 mb-1">Municipal Performance Reports</h1>
+        <p class="text-sm font-medium text-gray-500">Generate and download professional activity records for staff and residents.</p>
     </div>
 
     <div class="max-w-4xl">
@@ -78,9 +78,9 @@
                     </div>
                 </div>
 
-                <div class="pt-8 border-t border-gray-100 flex justify-end">
-                    <button type="submit" class="bg-blue-600 text-white text-sm font-bold py-3 px-10 rounded-lg hover:bg-blue-700 transition shadow-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"></path></svg>
+                <div class="pt-10 border-t border-gray-50 flex justify-end">
+                    <button type="submit" class="bg-[#19817E] text-white text-[11px] font-black py-4 px-10 rounded-2xl hover:bg-teal-700 transition shadow-xl shadow-teal-500/20 active:scale-[0.98] uppercase tracking-widest flex items-center gap-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         Generate Official Report
                     </button>
                 </div>

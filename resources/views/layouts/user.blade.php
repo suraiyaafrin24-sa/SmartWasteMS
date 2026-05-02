@@ -49,6 +49,11 @@
                     New Request
                 </a>
 
+                <a href="{{ route('user.duty_schedule') }}" class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('user.duty_schedule') ? 'bg-[#E2F0EC] text-teal-700 font-bold' : 'text-slate-500 hover:bg-gray-200/50 font-semibold' }} rounded-xl transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Duty Schedule
+                </a>
+
                 <a href="{{ route('user.history') }}" class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('user.history') ? 'bg-[#E2F0EC] text-teal-700 font-bold' : 'text-slate-500 hover:bg-gray-200/50 font-semibold' }} rounded-xl transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     History
@@ -82,18 +87,10 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative">
         <header class="flex items-center justify-between px-8 py-5 sticky top-0 bg-[#F8F9FB]/90 backdrop-blur-md z-20">
-            <div class="relative w-[340px]">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <input type="text" placeholder="Search my requests..." class="bg-gray-100/80 border-none font-medium text-sm text-gray-700 rounded-full w-full pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all">
-            </div>
+            <div></div>
             
             <div class="flex items-center gap-6">
-                <button class="text-gray-500 hover:text-gray-800 transition relative">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                    <span class="absolute top-0 right-0 block w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                </button>
+                @include('components.notification-dropdown')
                 
                 <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-black text-teal-700 text-sm border-2 border-white shadow-sm overflow-hidden">
                     @if(Auth::user()->profile_image)
