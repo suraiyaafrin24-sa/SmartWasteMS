@@ -54,7 +54,12 @@
                                         <select name="collector_id" required class="text-[10px] font-bold bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 focus:ring-1 focus:ring-teal-500 outline-none">
                                             <option value="">Select Collector</option>
                                             @foreach($collectors as $c)
-                                                <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                                <option value="{{ $c->id }}">
+                                                    {{ $c->name }}
+                                                    @if($c->dutyRosters->first())
+                                                        — {{ $c->dutyRosters->first()->sector }}
+                                                    @endif
+                                                </option>
                                             @endforeach
                                         </select>
                                         <input type="date" name="scheduled_date" required value="{{ date('Y-m-d') }}" class="text-[10px] font-bold bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 outline-none">
@@ -66,7 +71,7 @@
                             </td>
                             <td class="px-6 py-5 text-right">
                                 <span class="px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest
-                                    @if($request->status == 'Completed') bg-emerald-50 text-emerald-600
+                                    @if($request->status == 'Completed' || $request->status == 'Collected') bg-emerald-50 text-emerald-600
                                     @elseif($request->status == 'Scheduled') bg-blue-50 text-blue-600
                                     @elseif($request->status == 'Pending') bg-amber-50 text-amber-600
                                     @else bg-gray-50 text-gray-500 @endif">

@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\CollectionRequest;
+use App\Models\User;
+use App\Notifications\CollectionStatusNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class WasteCollectorDashboardController extends Controller
 {
@@ -20,7 +23,7 @@ class WasteCollectorDashboardController extends Controller
             ->get();
             
         $completedCount = CollectionRequest::where('collector_id', $collectorId)
-            ->where('status', 'Completed')
+            ->whereIn('status', ['Completed', 'Collected'])
             ->count();
             
         // Current active route (Assigned to this collector and Scheduled)
@@ -30,10 +33,18 @@ class WasteCollectorDashboardController extends Controller
             ->orderBy('scheduled_date', 'asc')
             ->get();
 
+        // Available requests for anyone to pick up
+        $availableRequests = CollectionRequest::where('status', 'Pending')
+            ->whereNull('collector_id')
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('waste_collector.dashboard', compact(
             'assignedToday',
             'completedCount',
-            'activeRoute'
+            'activeRoute',
+            'availableRequests'
         ));
     }
 
@@ -64,18 +75,25 @@ class WasteCollectorDashboardController extends Controller
         }
 
         $request->update([
-            'status' => 'Completed',
+            'status' => 'Collected',
             'weight' => rand(50, 500) / 10 // Dynamic mock weight logic
         ]);
 
-        return redirect()->back()->with('success', 'Pickup for ' . $request->user->name . ' has been recorded as Completed!');
+        // Notify User
+        $request->user->notify(new CollectionStatusNotification($request, 'Your waste has been Collected!', 'collected'));
+
+        // Notify Admins
+        $admins = User::where('role', 'admin')->get();
+        Notification::send($admins, new CollectionStatusNotification($request, 'Waste collection completed for ' . $request->user->name, 'collected'));
+
+        return redirect()->back()->with('success', 'Pickup for ' . $request->user->name . ' has been recorded as Collected!');
     }
 
     public function history()
     {
         $collectorId = Auth::id();
         $completedRequests = CollectionRequest::where('collector_id', $collectorId)
-            ->where('status', 'Completed')
+            ->whereIn('status', ['Completed', 'Collected'])
             ->with('user')
             ->orderBy('updated_at', 'desc')
             ->paginate(15);

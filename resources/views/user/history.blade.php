@@ -37,8 +37,8 @@
                             <div class="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-1">{{ $request->scheduled_time ?? 'Standard Window' }}</div>
                         </td>
                         <td class="py-6 px-2 text-center">
-                            @if($request->status == 'Completed')
-                                <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-emerald-50 text-emerald-600 tracking-widest uppercase">Completed</span>
+                            @if($request->status == 'Completed' || $request->status == 'Collected')
+                                <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-emerald-50 text-emerald-600 tracking-widest uppercase">Collected</span>
                             @elseif($request->status == 'Scheduled')
                                 <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-amber-50 text-amber-600 tracking-widest uppercase">Scheduled</span>
                             @elseif($request->status == 'Cancelled')

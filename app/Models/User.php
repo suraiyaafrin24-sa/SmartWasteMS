@@ -75,4 +75,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(CollectionRequest::class, 'user_id');
     }
+
+    public function dutyRosters()
+    {
+        return $this->hasMany(DutyRoster::class, 'collector_id');
+    }
 }

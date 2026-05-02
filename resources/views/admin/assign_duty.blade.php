@@ -8,10 +8,11 @@
         <p class="text-sm font-medium text-gray-500">Configure and deploy field staff to Uttara City Corporation Sectors.</p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Assignment Form -->
-        <div class="lg:col-span-2">
-            <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]">
+    <div class="max-w-4xl mx-auto px-4 md:px-14 lg:px-26">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- Assignment Form -->
+            <div class="lg:col-span-8">
+                <div class="bg-white rounded-[32px] p-10 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
                 <div class="border-b border-gray-100 pb-4 mb-6">
                     <h2 class="text-lg font-bold text-gray-800">Assign Collector to Request</h2>
                 </div>
@@ -29,7 +30,8 @@
                                 @foreach($unassignedRequests as $req)
                                     <option value="{{ $req->id }}" 
                                             data-sector="{{ $req->sector }}" 
-                                            data-road="{{ $req->road }}">
+                                            data-road="{{ $req->road }}"
+                                            {{ isset($selectedRequestId) && $selectedRequestId == $req->id ? 'selected' : '' }}>
                                         {{ $req->user->name }} — {{ $req->sector }} ({{ $req->type }})
                                     </option>
                                 @endforeach
@@ -43,7 +45,12 @@
                                 class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-[#19817E] focus:border-[#19817E] block p-3 transition">
                                 <option value="">Choose a staff member...</option>
                                 @foreach($collectors as $c)
-                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                    <option value="{{ $c->id }}">
+                                        {{ $c->name }} 
+                                        @if($c->dutyRosters->first())
+                                            — {{ $c->dutyRosters->first()->sector }}
+                                        @endif
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -98,7 +105,7 @@
         </div>
 
         <!-- Live Status Sidebar -->
-        <div class="space-y-6">
+        <div class="lg:col-span-4 space-y-6">
             <div class="bg-gray-900 rounded-3xl p-6 text-white shadow-xl">
                 <div class="flex items-center gap-3 mb-6">
                     <div class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></div>
@@ -131,9 +138,17 @@
                 </p>
             </div>
         </div>
+        </div>
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const requestSelect = document.getElementById('requestSelect');
+            if (requestSelect.value) {
+                handleRequestChange(requestSelect);
+            }
+        });
+
         function handleRequestChange(select) {
             const form = document.getElementById('assignForm');
             const selectedOption = select.options[select.selectedIndex];

@@ -6,7 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\CollectionRequest;
+use App\Models\DutyRoster;
+use App\Models\User;
+use App\Notifications\CollectionStatusNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class UserDashboardController extends Controller
 {
@@ -60,8 +64,17 @@ class UserDashboardController extends Controller
             'road' => 'required|string|max:100',
         ]);
 
-        CollectionRequest::create([
+        // Try to find an assigned collector from DutyRoster
+        $roster = DutyRoster::where('sector', $request->sector)
+            ->where('date', $request->scheduled_date)
+            ->first();
+
+        $collectorId = $roster ? $roster->collector_id : null;
+        $status = $collectorId ? 'Scheduled' : 'Pending';
+
+        $collectionRequest = CollectionRequest::create([
             'user_id' => Auth::id(),
+            'collector_id' => $collectorId,
             'type' => $request->type,
             'scheduled_date' => $request->scheduled_date,
             'scheduled_time' => $request->scheduled_time,
@@ -71,8 +84,18 @@ class UserDashboardController extends Controller
             'sector' => $request->sector,
             'road' => $request->road,
             'zone' => 'Uttara City Corporation Zone',
-            'status' => 'Pending'
+            'status' => $status
         ]);
+
+        // Notify Admins
+        $admins = User::where('role', 'admin')->get();
+        Notification::send($admins, new CollectionStatusNotification($collectionRequest, 'New waste collection request created.', 'new_request'));
+
+        // Notify Collector
+        if ($collectorId) {
+            $collector = User::find($collectorId);
+            $collector->notify(new CollectionStatusNotification($collectionRequest, 'You have been assigned a new collection request.', 'assigned'));
+        }
 
         return redirect()->route('user.dashboard')->with('success', 'Collection request created successfully!');
     }
@@ -85,5 +108,19 @@ class UserDashboardController extends Controller
             ->paginate(10);
 
         return view('user.history', compact('requests'));
+    }
+
+    public function dutySchedule(Request $request)
+    {
+        $query = \App\Models\DutyRoster::with('collector');
+
+        if ($request->has('sector') && $request->sector != '') {
+            $query->where('sector', $request->sector);
+        }
+
+        $dutyRosters = $query->orderBy('date', 'desc')->paginate(15);
+        $sectors = \App\Models\DutyRoster::select('sector')->distinct()->pluck('sector');
+
+        return view('user.duty_schedule', compact('dutyRosters', 'sectors'));
     }
 }

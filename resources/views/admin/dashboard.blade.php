@@ -95,7 +95,9 @@
                     <h2 class="text-xl font-black text-slate-800 tracking-tight">Live Request Status</h2>
                     <p class="text-[12px] text-slate-400 font-medium mt-1">Real-time status of waste collections</p>
                 </div>
-                <button class="text-[#19817E] text-[12px] font-bold py-2 px-5 rounded-full border border-[#19817E]/20 hover:bg-[#19817E] hover:text-white transition-all duration-300 uppercase tracking-wider leading-none">Review All</button>
+                <div class="flex gap-2">
+                    <a href="{{ route('admin.collections') }}" class="text-[#19817E] text-[12px] font-bold py-2 px-5 rounded-full border border-[#19817E]/20 hover:bg-[#19817E] hover:text-white transition-all duration-300 uppercase tracking-wider leading-none text-center flex items-center">Review All</a>
+                </div>
             </div>
 
             <!-- Table -->
@@ -140,8 +142,8 @@
                                 @endif
                             </td>
                             <td class="py-5 px-2">
-                                @if($request->status == 'Completed')
-                                    <span class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-gray-100 text-slate-400 tracking-widest uppercase">Completed</span>
+                                @if($request->status == 'Completed' || $request->status == 'Collected')
+                                    <span class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-emerald-50 text-emerald-600 tracking-widest uppercase">Collected</span>
                                 @elseif($request->status == 'Scheduled')
                                     <span class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-[#E2F0EC] text-[#19817E] tracking-widest uppercase">Scheduled</span>
                                 @else
@@ -151,7 +153,7 @@
                             <td class="py-5 px-2 text-[13px] text-slate-500">{{ $request->scheduled_time ?? 'ASAP' }}</td>
                             <td class="py-5 px-2 text-right">
                                 @if(!$request->collector && $request->status == 'Pending')
-                                    <button class="text-white bg-[#19817E] hover:bg-teal-700 text-[11px] font-black px-4 py-1.5 rounded-lg shadow-sm">Assign</button>
+                                    <a href="{{ route('admin.assign_duty', ['request_id' => $request->id]) }}" class="text-white bg-[#19817E] hover:bg-teal-700 text-[11px] font-black px-4 py-1.5 rounded-lg shadow-sm">Assign</a>
                                 @else
                                     <button class="text-slate-400 hover:text-slate-600 text-[11px] font-black border border-slate-100 px-4 py-1.5 rounded-lg transition-all duration-200">View</button>
                                 @endif
