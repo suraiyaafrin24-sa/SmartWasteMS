@@ -44,8 +44,8 @@
                             {{ $request->weight }} <span class="text-[10px] text-slate-300 uppercase ml-0.5">KG</span>
                         </td>
                         <td class="py-6 px-2 text-right">
-                            <span class="px-4 py-2 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-xl uppercase tracking-widest border border-emerald-100/50">
-                                Verified
+                            <span class="px-4 py-2 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-xl uppercase tracking-widest border border-emerald-100/50 shadow-sm shadow-emerald-500/5">
+                                {{ $request->status }}
                             </span>
                         </td>
                     </tr>

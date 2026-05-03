@@ -64,9 +64,18 @@ class UserDashboardController extends Controller
             'road' => 'required|string|max:100',
         ]);
 
+        // Find assigned collector for this sector, date and shift
+        $roster = DutyRoster::where('sector', $request->sector)
+            ->where('date', $request->scheduled_date)
+            ->where('shift', $request->shift)
+            ->first();
+
+        $collectorId = $roster ? $roster->collector_id : null;
+        $status = $collectorId ? 'Scheduled' : 'Pending';
+
         $collectionRequest = CollectionRequest::create([
             'user_id' => Auth::id(),
-            'collector_id' => null, // Unassigned, goes to the available pool
+            'collector_id' => $collectorId,
             'type' => $request->type,
             'scheduled_date' => $request->scheduled_date,
             'shift' => $request->shift,
@@ -76,18 +85,55 @@ class UserDashboardController extends Controller
             'sector' => $request->sector,
             'road' => $request->road,
             'zone' => 'Uttara City Corporation Zone',
-            'status' => 'Pending'
+            'status' => $status
         ]);
 
         // Notify Admins
         $admins = User::where('role', 'admin')->get();
         Notification::send($admins, new CollectionStatusNotification($collectionRequest, 'New waste collection request created.', 'new_request'));
 
-        // Notify All Collectors
-        $collectors = User::where('role', 'waste_collector')->get();
-        Notification::send($collectors, new CollectionStatusNotification($collectionRequest, 'A new collection request is available in ' . $request->sector, 'new_request'));
+        // Notify the assigned collector if exists
+        if ($collectorId) {
+            $collector = User::find($collectorId);
+            $collector->notify(new CollectionStatusNotification($collectionRequest, 'A new collection request has been assigned to you in ' . $request->sector, 'new_request'));
+        }
 
         return redirect()->route('user.dashboard')->with('success', 'Collection request created successfully!');
+    }
+
+    public function getCollector(Request $request)
+    {
+        $request->validate([
+            'sector' => 'required|string',
+            'date' => 'required|date',
+        ]);
+
+        $rosters = DutyRoster::where('sector', $request->sector)
+            ->where('date', $request->date)
+            ->with('collector')
+            ->get();
+
+        if ($rosters->count() > 0) {
+            return response()->json([
+                'success' => true,
+                'rosters' => $rosters->map(function($r) {
+                    return [
+                        'shift' => $r->shift,
+                        'collector' => [
+                            'name' => $r->collector->name,
+                            'phone' => $r->collector->phone ?? 'N/A',
+                            'image' => $r->collector->profile_image ? asset('storage/' . $r->collector->profile_image) : null,
+                            'initial' => strtoupper(substr($r->collector->name, 0, 1)),
+                        ]
+                    ];
+                })
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'No collector assigned for this sector on the selected date.'
+        ]);
     }
 
     public function history()

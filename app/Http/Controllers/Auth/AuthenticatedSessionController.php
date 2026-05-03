@@ -28,16 +28,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $url = '';
-        if ($request->user()->isAdmin()) {
-            $url = 'admin/dashboard';
-        } elseif ($request->user()->isWasteCollector()) {
-            $url = 'waste_collector/dashboard';
-        } else {
-            $url = 'user/dashboard';
-        }
-
-        return redirect()->intended($url);
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**

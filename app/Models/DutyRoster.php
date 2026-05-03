@@ -18,6 +18,10 @@ class DutyRoster extends Model
         'status'
     ];
 
+    protected $casts = [
+        'date' => 'date',
+    ];
+
     public function collector()
     {
         return $this->belongsTo(User::class, 'collector_id');

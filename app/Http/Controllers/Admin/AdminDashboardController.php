@@ -508,7 +508,7 @@ class AdminDashboardController extends Controller
             'sector' => 'required|string',
             'road' => 'nullable|string',
             'date' => 'required|date|after_or_equal:today',
-            'shift' => 'required|string|in:Morning Shift,Night Shift',
+            'shift' => 'required|string|in:Morning Shift,Evening Shift',
         ]);
 
         \App\Models\DutyRoster::create($request->all());

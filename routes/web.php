@@ -17,7 +17,7 @@ Route::get('/dashboard', function (Illuminate\Http\Request $request) {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Admin Routes
-Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth:admin', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'users'])->name('users');
     Route::get('/complaints', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'complaints'])->name('complaints');
@@ -45,7 +45,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 });
 
 // Waste Collector Routes
-Route::middleware(['auth', 'verified', 'role:waste_collector'])->prefix('waste_collector')->name('waste_collector.')->group(function () {
+Route::middleware(['auth:collector', 'verified', 'role:waste_collector'])->prefix('waste_collector')->name('waste_collector.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [\App\Http\Controllers\WasteCollector\WasteCollectorSettingsController::class, 'index'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\WasteCollector\WasteCollectorSettingsController::class, 'updateProfile'])->name('settings.update');
@@ -60,7 +60,7 @@ Route::middleware(['auth', 'verified', 'role:waste_collector'])->prefix('waste_c
 });
 
 // User Routes
-Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user.')->group(function () {
+Route::middleware(['auth:user_guard', 'verified', 'role:user'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\User\UserDashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [\App\Http\Controllers\User\UserSettingsController::class, 'index'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\User\UserSettingsController::class, 'updateProfile'])->name('settings.update');
@@ -73,6 +73,7 @@ Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user
     Route::post('/reports', [\App\Http\Controllers\User\ReportController::class, 'store'])->name('reports.store');
     
     Route::get('/requests/create', [\App\Http\Controllers\User\UserDashboardController::class, 'createRequest'])->name('requests.create');
+    Route::get('/get-collector', [\App\Http\Controllers\User\UserDashboardController::class, 'getCollector'])->name('get_collector');
     Route::post('/requests', [\App\Http\Controllers\User\UserDashboardController::class, 'storeRequest'])->name('requests.store');
     Route::get('/history', [\App\Http\Controllers\User\UserDashboardController::class, 'history'])->name('history');
     Route::post('/requests/{request}/cancel', [\App\Http\Controllers\User\UserDashboardController::class, 'cancelRequest'])->name('requests.cancel');

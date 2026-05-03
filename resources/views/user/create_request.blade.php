@@ -89,6 +89,28 @@
                         <label class="block text-[11px] font-black text-gray-500 uppercase tracking-widest">Additional Instructions (Optional)</label>
                         <textarea name="details" rows="4" class="w-full bg-gray-50/50 border border-gray-100 text-gray-800 text-sm rounded-2xl p-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all shadow-sm resize-none" placeholder="Provide any extra details for the collection staff..."></textarea>
                     </div>
+
+                    <!-- Assigned Collectors Display -->
+                    <div id="collector-info" class="hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div class="space-y-4">
+                            <label class="block text-[11px] font-black text-blue-500 uppercase tracking-widest mb-1">Today's Assigned Staff for this Sector</label>
+                            <div id="collectors-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Collector cards will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="no-collector-alert" class="hidden">
+                        <div class="p-5 bg-amber-50 border border-amber-100 rounded-2xl flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-black text-amber-800 uppercase tracking-wider">No collector assigned yet</p>
+                                <p class="text-[11px] text-amber-600 font-medium">Your request will be sent to the admin panel for manual assignment.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Action Buttons -->
@@ -101,4 +123,70 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sectorSelect = document.querySelector('select[name="sector"]');
+            const dateInput = document.querySelector('input[name="scheduled_date"]');
+            const shiftSelect = document.querySelector('select[name="shift"]');
+            
+            const collectorInfo = document.getElementById('collector-info');
+            const noCollectorAlert = document.getElementById('no-collector-alert');
+            const collectorsGrid = document.getElementById('collectors-grid');
+
+            function fetchCollectors() {
+                const sector = sectorSelect.value;
+                const date = dateInput.value;
+
+                if (sector && date) {
+                    fetch(`{{ route('user.get_collector') }}?sector=${sector}&date=${date}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.rosters.length > 0) {
+                                collectorsGrid.innerHTML = '';
+                                data.rosters.forEach(roster => {
+                                    const isCurrentShift = shiftSelect.value === roster.shift;
+                                    const card = `
+                                        <div class="p-4 rounded-2xl border ${isCurrentShift ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-100'} transition-all">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-12 h-12 rounded-xl ${isCurrentShift ? 'bg-white' : 'bg-gray-50'} flex items-center justify-center font-black ${isCurrentShift ? 'text-blue-600' : 'text-gray-400'} border border-gray-100 overflow-hidden shrink-0">
+                                                    ${roster.collector.image ? `<img src="${roster.collector.image}" class="w-full h-full object-cover">` : roster.collector.initial}
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="text-[9px] font-black ${isCurrentShift ? 'text-blue-400' : 'text-gray-400'} uppercase tracking-widest leading-none mb-1">${roster.shift}</div>
+                                                    <h4 class="text-sm font-black text-gray-800 tracking-tight truncate">${roster.collector.name}</h4>
+                                                    <p class="text-[10px] font-bold text-gray-400">${roster.collector.phone}</p>
+                                                </div>
+                                                ${isCurrentShift ? '<div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>' : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                    collectorsGrid.innerHTML += card;
+                                });
+                                collectorInfo.classList.remove('hidden');
+                                noCollectorAlert.classList.add('hidden');
+                            } else {
+                                collectorInfo.classList.add('hidden');
+                                noCollectorAlert.classList.remove('hidden');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching collectors:', error);
+                        });
+                } else {
+                    collectorInfo.classList.add('hidden');
+                    noCollectorAlert.classList.add('hidden');
+                }
+            }
+
+            sectorSelect.addEventListener('change', fetchCollectors);
+            dateInput.addEventListener('change', fetchCollectors);
+            shiftSelect.addEventListener('change', fetchCollectors);
+            
+            // Initial check
+            if (sectorSelect.value && dateInput.value) {
+                fetchCollectors();
+            }
+        });
+    </script>
 @endsection

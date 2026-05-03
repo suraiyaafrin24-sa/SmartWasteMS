@@ -33,9 +33,15 @@ class WasteCollectorDashboardController extends Controller
             ->orderBy('scheduled_date', 'asc')
             ->get();
 
-        // Available requests for anyone to pick up
+        // Get all sectors this collector is ever assigned to in the duty roster
+        $mySectors = \App\Models\DutyRoster::where('collector_id', $collectorId)
+            ->distinct()
+            ->pluck('sector');
+
+        // Available requests for anyone to pick up - filtered by collector's assigned sectors
         $availableRequests = CollectionRequest::where('status', 'Pending')
             ->whereNull('collector_id')
+            ->whereIn('sector', $mySectors)
             ->with('user')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -127,10 +133,9 @@ class WasteCollectorDashboardController extends Controller
     public function dutySchedule()
     {
         $collectorId = Auth::id();
-        $schedule = CollectionRequest::where('collector_id', $collectorId)
-            ->where('status', 'Scheduled')
-            ->with('user')
-            ->orderBy('scheduled_date', 'asc')
+        $schedule = \App\Models\DutyRoster::where('collector_id', $collectorId)
+            ->orderBy('date', 'desc')
+            ->orderBy('shift', 'asc')
             ->get();
             
         return view('waste_collector.duty_schedule', compact('schedule'));

@@ -155,13 +155,24 @@
                                 @if(!$request->collector && $request->status == 'Pending')
                                     <a href="{{ route('admin.assign_duty', ['request_id' => $request->id]) }}" class="text-white bg-[#19817E] hover:bg-teal-700 text-[11px] font-black px-4 py-1.5 rounded-lg shadow-sm">Assign</a>
                                 @else
-                                    <button class="text-slate-400 hover:text-slate-600 text-[11px] font-black border border-slate-100 px-4 py-1.5 rounded-lg transition-all duration-200">View</button>
+                                    <button 
+                                        data-user="{{ $request->user->name }}"
+                                        data-phone="{{ $request->phone ?? $request->user->phone ?? 'N/A' }}"
+                                        data-address="{{ $request->address }}"
+                                        data-type="{{ $request->type }}"
+                                        data-details="{{ $request->details ?? 'No special instructions provided.' }}"
+                                        data-date="{{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d, Y') }}"
+                                        data-time="{{ $request->shift ?? 'Anytime' }}"
+                                        data-status="{{ $request->status }}"
+                                        data-collector="{{ $request->collector->name ?? 'Unassigned' }}"
+                                        onclick="openRequestModal(this)"
+                                        class="text-slate-400 hover:text-slate-600 text-[11px] font-black border border-slate-100 px-4 py-1.5 rounded-lg transition-all duration-200">View</button>
                                 @endif
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="py-4 text-center text-gray-500">No requests found.</td>
+                            <td colspan="6" class="py-4 text-center text-gray-500">No requests found.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -173,7 +184,7 @@
         <div class="xl:col-span-1 space-y-8">
             
             <!-- Shift Roster Widget -->
-            <div class="bg-white rounded-3xl p-8 border border-gray-50 shadow-sm shadow-gray-100">
+            <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm shadow-gray-100">
                 <div class="flex justify-between items-center mb-8">
                     <h2 class="text-xl font-black text-slate-800 tracking-tight leading-none">Today's Shift Roster</h2>
                     <a href="{{ route('admin.duty_roster') }}" class="text-[#19817E] hover:bg-teal-50 p-1 rounded-lg transition-colors">
@@ -239,4 +250,88 @@
             </div>
         </div>
     </div>
+
+    <!-- Request Details Modal -->
+    <div id="detailsModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-6">
+        <div class="bg-white rounded-[24px] w-full max-w-md overflow-hidden shadow-2xl transform transition-all">
+            <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-base font-black text-gray-900 tracking-tight">Collection Request Overview</h3>
+                <button onclick="closeDetailsModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Resident / User</p>
+                        <p id="modalUser" class="text-xs font-bold text-gray-800"></p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Assigned To</p>
+                        <p id="modalCollector" class="text-xs font-bold text-[#19817E]"></p>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Full Pickup Address</p>
+                    <p id="modalAddress" class="text-xs font-medium text-gray-600 leading-tight"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Waste Type</p>
+                        <p id="modalType" class="text-xs font-bold text-gray-800"></p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Current Status</p>
+                        <span id="modalStatus" class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest"></span>
+                    </div>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Additional Details</p>
+                    <p id="modalDetails" class="text-[11px] font-medium text-gray-700 leading-normal"></p>
+                </div>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+                <button onclick="closeDetailsModal()" class="px-5 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-black transition">
+                    Close Overview
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openRequestModal(btn) {
+            document.getElementById('modalUser').innerText = btn.getAttribute('data-user');
+            document.getElementById('modalCollector').innerText = btn.getAttribute('data-collector');
+            document.getElementById('modalAddress').innerText = btn.getAttribute('data-address');
+            document.getElementById('modalType').innerText = btn.getAttribute('data-type');
+            document.getElementById('modalDetails').innerText = btn.getAttribute('data-details');
+            
+            const status = btn.getAttribute('data-status');
+            const statusEl = document.getElementById('modalStatus');
+            statusEl.innerText = status;
+            
+            // Status styling
+            if (status === 'Collected' || status === 'Completed') {
+                statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600';
+            } else if (status === 'Scheduled') {
+                statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-600';
+            } else {
+                statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-50 text-amber-600';
+            }
+
+            const modal = document.getElementById('detailsModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetailsModal() {
+            const modal = document.getElementById('detailsModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDetailsModal();
+        });
+    </script>
 @endsection
