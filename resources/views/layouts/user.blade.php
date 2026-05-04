@@ -70,7 +70,9 @@
                 <a href="{{ route('user.duty_schedule') }}"
                     class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('user.duty_schedule') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                        </path>
                     </svg>
                     <span class="text-sm">Duty Schedule</span>
                 </a>
@@ -130,16 +132,9 @@
     <main class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative">
         <header class="flex items-center justify-between px-8 py-5 sticky top-0 bg-[#F8F9FB]/90 backdrop-blur-md z-20">
             <div></div>
-            
-            <div class="flex items-center gap-6">
+
+            <div class="flex items-center gap-6 text-gray-500">
                 @include('components.notification-dropdown')
-                <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-black text-teal-700 text-sm border-2 border-white shadow-sm overflow-hidden">
-                    @if(Auth::user()->profile_image)
-                        <img src="{{ asset('storage/' . Auth::user()->profile_image) }}" class="w-full h-full object-cover">
-                    @else
-                        {{ substr(Auth::user()->name, 0, 1) }}
-                    @endif
-                </div>
             </div>
         </header>
 

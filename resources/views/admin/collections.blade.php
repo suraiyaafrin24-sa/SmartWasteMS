@@ -71,7 +71,9 @@
                                             @foreach($collectors as $c)
                                                 <option value="{{ $c->id }}">
                                                     {{ $c->name }}
-                                                    @if($c->dutyRosters->first())
+                                                    @if($c->sector)
+                                                        — {{ $c->sector }}
+                                                    @elseif($c->dutyRosters->first())
                                                         — {{ $c->dutyRosters->first()->sector }}
                                                     @endif
                                                 </option>

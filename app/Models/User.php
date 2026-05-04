@@ -23,6 +23,8 @@ class User extends Authenticatable
         'profile_image',
         'phone',
         'address',
+        'sector',
+        'road',
         'password',
         'confirm_password',
         'role',

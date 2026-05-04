@@ -56,18 +56,16 @@
                     <!-- Row 2: Sector & Micro-location -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="space-y-2">
-                            <label class="block text-[11px] font-black text-gray-500 uppercase tracking-widest">Uttara Sector <span class="text-red-500">*</span></label>
-                            <select name="sector" class="w-full bg-gray-50/50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all shadow-sm cursor-pointer" required>
-                                <option value="">Choose your Sector...</option>
-                                @for($i = 1; $i <= 18; $i++)
-                                    <option value="Sector {{ $i }}">Sector {{ $i }}</option>
-                                @endfor
-                            </select>
+                            <label class="block text-[11px] font-black text-gray-500 uppercase tracking-widest">Uttara Sector (Auto-defined from Profile)</label>
+                            <div class="relative">
+                                <input type="text" value="{{ auth()->user()->sector ?? 'Not Defined' }}" class="w-full bg-gray-100 border border-gray-100 text-gray-500 text-sm font-bold rounded-xl p-4 cursor-not-allowed" readonly>
+                                <input type="hidden" name="sector" value="{{ auth()->user()->sector }}">
+                            </div>
                         </div>
 
                         <div class="space-y-2">
                             <label class="block text-[11px] font-black text-gray-500 uppercase tracking-widest">Road / Block / House <span class="text-red-500">*</span></label>
-                            <input type="text" name="road" placeholder="e.g. Road 12, Block D, House 5" class="w-full bg-gray-50/50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all shadow-sm" required>
+                            <input type="text" name="road" value="{{ auth()->user()->road ?? '' }}" placeholder="e.g. Road 12, Block D, House 5" class="w-full bg-gray-50/50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all shadow-sm" required>
                         </div>
                     </div>
 
@@ -126,7 +124,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const sectorSelect = document.querySelector('select[name="sector"]');
+            const sectorInput = document.querySelector('input[name="sector"]');
             const dateInput = document.querySelector('input[name="scheduled_date"]');
             const shiftSelect = document.querySelector('select[name="shift"]');
             
@@ -135,7 +133,7 @@
             const collectorsGrid = document.getElementById('collectors-grid');
 
             function fetchCollectors() {
-                const sector = sectorSelect.value;
+                const sector = sectorInput.value;
                 const date = dateInput.value;
 
                 if (sector && date) {
@@ -179,12 +177,11 @@
                 }
             }
 
-            sectorSelect.addEventListener('change', fetchCollectors);
             dateInput.addEventListener('change', fetchCollectors);
             shiftSelect.addEventListener('change', fetchCollectors);
             
             // Initial check
-            if (sectorSelect.value && dateInput.value) {
+            if (sectorInput.value && dateInput.value) {
                 fetchCollectors();
             }
         });

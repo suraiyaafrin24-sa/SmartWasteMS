@@ -141,6 +141,8 @@ class AdminDashboardController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:255'],
+            'sector' => ['nullable', 'string', 'max:50'],
+            'road' => ['nullable', 'string', 'max:100'],
             'password' => ['required', 'confirmed', Password::defaults()],
             'role' => ['required', 'in:admin,user,waste_collector'],
         ]);
@@ -150,6 +152,8 @@ class AdminDashboardController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
+            'sector' => $request->sector,
+            'road' => $request->road,
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
@@ -243,10 +247,12 @@ class AdminDashboardController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:255'],
+            'sector' => ['nullable', 'string', 'max:50'],
+            'road' => ['nullable', 'string', 'max:100'],
             'role' => ['required', 'in:admin,user,waste_collector'],
         ]);
 
-        $user->update($request->only(['name', 'email', 'phone', 'address', 'role']));
+        $user->update($request->only(['name', 'email', 'phone', 'address', 'sector', 'road', 'role']));
 
         return redirect()->route('admin.users')->with('status', 'User updated successfully');
     }

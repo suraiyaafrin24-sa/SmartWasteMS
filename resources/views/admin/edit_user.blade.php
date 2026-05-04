@@ -57,10 +57,31 @@
                     <x-input-error :messages="$errors->get('phone')" class="mt-2" />
                 </div>
 
-                <!-- Address -->
+                <!-- Sector -->
                 <div>
-                    <label for="address" class="block text-sm font-bold text-gray-700 mb-2">Location / Address</label>
-                    <input id="address" type="text" name="address" value="{{ old('address', $user->address) }}" placeholder="Location Details"
+                    <label for="sector" class="block text-sm font-bold text-gray-700 mb-2">Uttara Sector</label>
+                    <select id="sector" name="sector" 
+                        class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-[#19817E] focus:border-[#19817E] block p-3 transition appearance-none cursor-pointer">
+                        <option value="">Select Sector</option>
+                        @for($i = 1; $i <= 18; $i++)
+                            <option value="Sector {{ $i }}" {{ (old('sector', $user->sector) == "Sector $i") ? 'selected' : '' }}>Sector {{ $i }}</option>
+                        @endfor
+                    </select>
+                    <x-input-error :messages="$errors->get('sector')" class="mt-2" />
+                </div>
+
+                <!-- Road -->
+                <div>
+                    <label for="road" class="block text-sm font-bold text-gray-700 mb-2">Road / Block / House</label>
+                    <input id="road" type="text" name="road" value="{{ old('road', $user->road) }}" placeholder="e.g. Road 12, Sector 4"
+                        class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-[#19817E] focus:border-[#19817E] block p-3 transition">
+                    <x-input-error :messages="$errors->get('road')" class="mt-2" />
+                </div>
+
+                <!-- Address -->
+                <div class="md:col-span-2">
+                    <label for="address" class="block text-sm font-bold text-gray-700 mb-2">Full Address Details</label>
+                    <input id="address" type="text" name="address" value="{{ old('address', $user->address) }}" placeholder="Detailed Landmark description"
                         class="w-full bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-[#19817E] focus:border-[#19817E] block p-3 transition">
                     <x-input-error :messages="$errors->get('address')" class="mt-2" />
                 </div>
