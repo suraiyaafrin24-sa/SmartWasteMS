@@ -53,7 +53,7 @@
                         class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
                         <option value="">Choose Sector...</option>
                         @for($i = 1; $i <= 18; $i++)
-                            <option value="Sector {{ $i }}">Sector {{ $i }}</option>
+                            <option value="Sector {{ $i }}" {{ (isset($prefill['sector']) && $prefill['sector'] == "Sector $i") ? 'selected' : '' }}>Sector {{ $i }}</option>
                         @endfor
                     </select>
                 </div>
@@ -62,7 +62,7 @@
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Duty Date <span
                             class="text-red-500">*</span></label>
-                    <input type="date" name="date" value="{{ date('Y-m-d') }}" required
+                    <input type="date" name="date" value="{{ $prefill['date'] ?? date('Y-m-d') }}" required
                         class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all">
                 </div>
 
@@ -70,8 +70,8 @@
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Operating Shift <span class="text-red-500">*</span></label>
                     <select name="shift" required class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
-                        <option value="Morning Shift">🌅 Morning Shift (7-10 AM)</option>
-                        <option value="Evening Shift">🌇 Evening Shift (4-6 PM)</option>
+                        <option value="Morning Shift" {{ (isset($prefill['shift']) && $prefill['shift'] == 'Morning Shift') ? 'selected' : '' }}>🌅 Morning Shift (7-10 AM)</option>
+                        <option value="Evening Shift" {{ (isset($prefill['shift']) && $prefill['shift'] == 'Evening Shift') ? 'selected' : '' }}>🌇 Evening Shift (4-6 PM)</option>
                     </select>
                 </div>
             </div>

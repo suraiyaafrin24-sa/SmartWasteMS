@@ -31,7 +31,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::delete('/users/{id}', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'deleteUser'])->name('users.delete');
     Route::get('/collections', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'collections'])->name('collections');
     Route::get('/duty-schedule', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'dutySchedule'])->name('duty_schedule');
-    Route::get('/assign-duty', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'showAssignDuty'])->name('assign_duty');
+
     Route::get('/system-settings', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'settings'])->name('settings');
     Route::get('/profile', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'profile'])->name('profile');
     Route::post('/profile', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updateProfile'])->name('profile.update');
@@ -54,8 +54,7 @@ Route::middleware(['auth', 'verified', 'role:waste_collector'])->prefix('waste_c
     Route::post('/requests/{id}/accept', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'acceptRequest'])->name('requests.accept');
     Route::post('/requests/{id}/complete', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'completeRequest'])->name('requests.complete');
     Route::get('/history', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'history'])->name('history');
-    Route::get('/live-route', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'liveRoute'])->name('live_route');
-    Route::get('/map', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'map'])->name('map');
+
     Route::get('/duty-schedule', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'dutySchedule'])->name('duty_schedule');
 });
 

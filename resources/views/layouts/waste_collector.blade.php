@@ -69,16 +69,6 @@
                 <span class="text-sm">Duty Schedule</span>
             </a>
 
-            <a href="{{ route('waste_collector.live_route') }}"
-                class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('waste_collector.live_route') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <span class="text-sm">Live Routes</span>
-            </a>
 
             <a href="{{ route('waste_collector.history') }}"
                 class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('waste_collector.history') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">
@@ -87,7 +77,6 @@
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <span class="text-sm">Completed Tasks</span>
-            </a>
             </a>
 
             <a href="{{ route('waste_collector.settings') }}"

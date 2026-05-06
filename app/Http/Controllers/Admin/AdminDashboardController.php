@@ -207,7 +207,14 @@ class AdminDashboardController extends Controller
                 $q->whereDate('date', today());
             }])
             ->get();
-        return view('admin.duty_roster', compact('rosters', 'collectors'));
+
+        $prefill = [
+            'sector' => $request->query('sector'),
+            'date' => $request->query('date'),
+            'shift' => $request->query('shift'),
+        ];
+
+        return view('admin.duty_roster', compact('rosters', 'collectors', 'prefill'));
     }
 
     public function users(Request $request)
@@ -375,26 +382,7 @@ class AdminDashboardController extends Controller
         return view('admin.collections', compact('collections', 'collectors'));
     }
 
-    public function showAssignDuty(Request $request)
-    {
-        $unassignedRequests = CollectionRequest::where('status', 'Pending')->with('user')->get();
-        $collectors = User::where('role', 'waste_collector')
-            ->with(['dutyRosters' => function($q) {
-                $q->whereDate('date', today());
-            }])
-            ->get();
-        
-        // Map collectors to sectors based on active (Scheduled) tasks today
-        $activeDeployments = CollectionRequest::where('status', 'Scheduled')
-            ->whereDate('scheduled_date', today())
-            ->with('collector')
-            ->get()
-            ->groupBy('sector');
 
-        $selectedRequestId = $request->query('request_id');
-
-        return view('admin.assign_duty', compact('unassignedRequests', 'collectors', 'activeDeployments', 'selectedRequestId'));
-    }
 
     public function dutySchedule()
     {

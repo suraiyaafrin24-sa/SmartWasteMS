@@ -226,54 +226,53 @@
 
                 <div class="grid lg:grid-cols-2 gap-16 items-start">
 
-                    <!-- Contact Form -->
-                    <div class="bg-gray-50 p-10 rounded-3xl border border-gray-100 shadow-xl">
-                        <h2 class="text-4xl font-bold mb-8 text-gray-900 leading-tight">
-                            Send an <span class="text-emerald-600">Emergency</span> <br> Request
-                        </h2>
-                        <p class="text-gray-600 mb-10 font-medium">
-                            Please provide your details and location for immediate waste collection assistance in your
-                            area.
-                        </p>
-
-                        <form action="#" class="space-y-6">
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
-                                    <input type="text" placeholder="John Doe"
-                                        class="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+                    <!-- Service Coverage Info -->
+                    <div class="bg-white p-12 rounded-[40px] border border-emerald-100 shadow-2xl shadow-emerald-900/10 relative overflow-hidden h-full">
+                        <div class="absolute -right-20 -top-20 w-64 h-64 bg-emerald-50 rounded-full blur-3xl opacity-50"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="inline-flex items-center px-4 py-1.5 bg-emerald-50 border border-emerald-100 rounded-full mb-6">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-emerald-600">Active Coverage</span>
+                            </div>
+                            
+                            <h2 class="text-4xl font-black text-gray-900 leading-tight mb-6">
+                                Operating across <br>
+                                <span class="text-emerald-600">Uttara Model Town</span>
+                            </h2>
+                            
+                            <p class="text-gray-500 font-medium leading-relaxed mb-10">
+                                Our smart waste collection network covers all major sectors in Uttara. We utilize real-time GPS tracking and automated routing to ensure every corner of the city stays clean and sustainable.
+                            </p>
+                            
+                            <div class="space-y-8">
+                                <div class="flex items-start gap-5">
+                                    <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
+                                        <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-black text-gray-900 uppercase text-[11px] tracking-widest mb-1">Central Hub</h4>
+                                        <p class="text-sm font-bold text-gray-600">Sector 15, Road 2, Block D <br> Uttara, Dhaka 1230</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Phone Number</label>
-                                    <input type="tel" placeholder="+880 1XXX-XXXXXX"
-                                        class="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+                                
+                                <div class="flex items-start gap-5">
+                                    <div class="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
+                                        <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-black text-gray-900 uppercase text-[11px] tracking-widest mb-1">Emergency Support</h4>
+                                        <p class="text-sm font-bold text-gray-600">+880 1234-567890 <br> Available 24/7 for urgent pickups</p>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Area / Sector</label>
-                                <select
-                                    class="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none appearance-none transition-all bg-white">
-                                    <option>Select Your Area</option>
-                                    <option>Zone A (Sector 01-05)</option>
-                                    <option>Zone B (Sector 06-12)</option>
-                                    <option>Zone C (Central Business Dist.)</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Location Info</label>
-                                <textarea rows="4" placeholder="House 24, Flat 4B, Road 12..."
-                                    class="w-full px-5 py-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"></textarea>
-                            </div>
-                            <div class="flex justify-center">
-                                <a href="{{ route('login') }}"
-                                    class="bg-emerald-600 text-white px-10 py-4 rounded-lg font-bold text-lg hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/30 text-center">
-                                    Submit Request
+                            <div class="mt-12">
+                                <a href="{{ route('register') }}" class="inline-flex items-center text-emerald-600 font-black text-xs uppercase tracking-widest hover:gap-3 transition-all duration-300">
+                                    Join our network now <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                                 </a>
                             </div>
-
-                        </form>
+                        </div>
                     </div>
 
                     <!-- Map Section -->

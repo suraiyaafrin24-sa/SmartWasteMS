@@ -14,9 +14,9 @@
             <a href="{{ route('admin.reports') }}"
                 class="bg-gray-50 text-slate-600 text-[13px] font-bold py-2.5 px-5 rounded-xl border border-gray-100 hover:bg-gray-100 transition shadow-sm">Filter
                 Report</a>
-            <a href="{{ route('admin.assign_duty') }}"
+            <a href="{{ route('admin.duty_roster') }}"
                 class="bg-[#19817E] text-white text-[13px] font-bold py-2.5 px-5 rounded-xl hover:bg-teal-700 transition shadow-lg shadow-teal-700/20">+
-                Assign Duty</a>
+                Staff Schedule</a>
         </div>
     </div>
 
@@ -133,11 +133,11 @@
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
 
         <!-- Live Collection Status Table -->
-        <div class="xl:col-span-2 bg-white rounded-3xl p-8 border border-gray-50 shadow-sm shadow-gray-100">
+        <div class="xl:col-span-3 bg-white rounded-3xl p-8 border border-gray-50 shadow-sm shadow-gray-100">
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h2 class="text-xl font-black text-slate-800 tracking-tight">Live Request Status</h2>
-                    <p class="text-[12px] text-slate-400 font-medium mt-1">Real-time status of waste collections</p>
+                    <h2 class="text-xl font-black text-slate-800 tracking-tight">Collection Request Status</h2>
+                    <p class="text-[12px] text-slate-400 font-medium mt-1">Status of waste collections</p>
                 </div>
                 <div class="flex gap-2">
                     <a href="{{ route('admin.collections') }}"
@@ -203,8 +203,8 @@
                                 <td class="py-5 px-2 text-[13px] text-slate-500">{{ $request->scheduled_time ?? 'ASAP' }}</td>
                                 <td class="py-5 px-2 text-right">
                                     @if(!$request->collector && $request->status == 'Pending')
-                                        <a href="{{ route('admin.assign_duty', ['request_id' => $request->id]) }}"
-                                            class="text-white bg-[#19817E] hover:bg-teal-700 text-[11px] font-black px-4 py-1.5 rounded-lg shadow-sm">Assign</a>
+                                        <a href="{{ route('admin.duty_roster', ['sector' => $request->sector, 'date' => $request->scheduled_date, 'shift' => $request->shift]) }}"
+                                            class="text-white bg-[#19817E] hover:bg-teal-700 text-[11px] font-black px-4 py-1.5 rounded-lg shadow-sm">Schedule Staff</a>
                                     @else
                                         <button data-user="{{ $request->user->name }}"
                                             data-phone="{{ $request->phone ?? $request->user->phone ?? 'N/A' }}"
@@ -227,100 +227,6 @@
                 </table>
             </div>
         </div>
-
-        <!-- Right Side Widgets -->
-        <div class="xl:col-span-1 space-y-8">
-
-            <!-- Shift Roster Widget -->
-            <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm shadow-gray-100">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-xl font-black text-slate-800 tracking-tight leading-none">Today's Staff Schedule</h2>
-                    <a href="{{ route('admin.duty_roster') }}"
-                        class="text-[#19817E] hover:bg-teal-50 p-1 rounded-lg transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
-                    </a>
-                </div>
-
-                <div class="space-y-6">
-                    <div
-                        class="flex gap-4 items-center group cursor-pointer p-1 rounded-xl hover:bg-gray-50 transition-all duration-300">
-                        <div class="w-1 bg-amber-400 h-10 rounded-full"></div>
-                        <div class="flex-1">
-                            <h4 class="text-sm font-black text-slate-800 leading-tight">Zone A - General</h4>
-                            <p class="text-[11px] text-slate-400 font-bold">Assigned: Michael & David</p>
-                        </div>
-                        <div class="text-right text-[10px] font-bold text-slate-300 uppercase tracking-widest">08:00 - 14:00
-                        </div>
-                    </div>
-
-                    <div
-                        class="flex gap-4 items-center group cursor-pointer p-1 rounded-xl hover:bg-gray-50 transition-all duration-300">
-                        <div class="w-1 bg-teal-500 h-10 rounded-full"></div>
-                        <div class="flex-1">
-                            <h4 class="text-sm font-black text-slate-800 leading-tight">Zone B - Recycling</h4>
-                            <p class="text-[11px] text-slate-400 font-bold">Assigned: Sarah W.</p>
-                        </div>
-                        <div class="text-right text-[10px] font-bold text-slate-300 uppercase tracking-widest">10:00 - 16:00
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-8">
-                    <a href="{{ route('admin.duty_roster') }}"
-                        class="block w-full text-center text-[11px] font-black text-[#19817E] py-3.5 border border-dashed border-[#19817E]/30 rounded-2xl hover:bg-teal-50 transition-all duration-300 uppercase tracking-widest">Full
-                        Schedule Map</a>
-                </div>
-            </div>
-
-            <!-- Active Staff Monitor Widget -->
-            <div class="bg-[#0D161F] rounded-[40px] p-8 shadow-2xl shadow-slate-900/40 relative overflow-hidden group">
-                <!-- Large Pause Background Icon -->
-                <div class="absolute -right-6 -top-6 text-[#19817E]/10 rotate-12">
-                    <svg class="w-40 h-40" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                    </svg>
-                </div>
-
-                <h2 class="text-xl font-black text-white tracking-tight mb-1 relative z-10">Active Staff</h2>
-                <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-8 relative z-10">Live monitoring
-                </p>
-
-                <div class="space-y-4 relative z-10">
-                    @forelse($activeStaff as $staff)
-                        <div
-                            class="flex justify-between items-center bg-[#1B252F] p-4 rounded-[24px] border border-white/5 hover:bg-[#202C38] transition-all duration-300">
-                            <div class="flex items-center gap-4">
-                                <div class="relative">
-                                    <div
-                                        class="w-11 h-11 rounded-full bg-teal-500/10 flex items-center justify-center font-black text-teal-500 border border-teal-500/20 text-xs">
-                                        {{ substr($staff->name, 0, 1) }}
-                                    </div>
-                                    <span
-                                        class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#1B252F]"></span>
-                                </div>
-                                <div>
-                                    <div class="text-[14px] font-black text-white leading-tight">{{ $staff->name }}</div>
-                                    <div class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mt-0.5">Active
-                                        • {{ $staff->collection_requests_count }} Tasks</div>
-                                </div>
-                            </div>
-                            <button class="text-slate-600 hover:text-white transition-colors bg-white/5 p-2 rounded-xl"><svg
-                                    class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                    </path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg></button>
-                        </div>
-                    @empty
-                        <p class="text-slate-500 text-xs italic">No staff on system.</p>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Request Details Modal -->
     <div id="detailsModal"

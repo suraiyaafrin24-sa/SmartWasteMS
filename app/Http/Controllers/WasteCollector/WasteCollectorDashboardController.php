@@ -107,28 +107,7 @@ class WasteCollectorDashboardController extends Controller
         return view('waste_collector.history', compact('completedRequests'));
     }
 
-    public function liveRoute()
-    {
-        $collectorId = Auth::id();
-        $activeRoute = CollectionRequest::where('collector_id', $collectorId)
-            ->where('status', 'Scheduled')
-            ->with('user')
-            ->orderBy('scheduled_date', 'asc')
-            ->get();
 
-        return view('waste_collector.live_route', compact('activeRoute'));
-    }
-
-    public function map()
-    {
-        $collectorId = Auth::id();
-        $activeRoute = CollectionRequest::where('collector_id', $collectorId)
-            ->where('status', 'Scheduled')
-            ->with('user')
-            ->get();
-
-        return view('waste_collector.map', compact('activeRoute'));
-    }
 
     public function dutySchedule()
     {

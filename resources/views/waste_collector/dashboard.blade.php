@@ -32,12 +32,7 @@
             <h1 class="text-2xl font-black tracking-tight text-slate-800 mb-1">My Task Center</h1>
             <p class="text-[13px] font-medium text-slate-400">Manage your collection route and update pickup status.</p>
         </div>
-        <div class="flex gap-3">
-             <a href="{{ route('waste_collector.map') }}" class="bg-[#0D161F] text-white text-[13px] font-black py-2.5 px-6 rounded-xl hover:bg-black transition flex items-center gap-2 shadow-lg shadow-slate-900/20">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                Open Map View
-            </a>
-        </div>
+
     </div>
 
     <!-- Collector Status Cards -->
@@ -126,10 +121,8 @@
                 </div>
                 
                 <div class="flex items-center gap-3 pt-5 border-t border-gray-50">
-                    <a href="{{ route('waste_collector.map') }}" class="flex-1 text-center py-3 bg-gray-100 text-slate-400 text-[10px] font-black rounded-xl hover:bg-gray-200 transition uppercase tracking-[0.2em]">
-                        Locate
-                    </a>
-                    <form action="{{ route('waste_collector.requests.complete', $request->id) }}" method="POST" class="flex-[1.5]">
+
+                    <form action="{{ route('waste_collector.requests.complete', $request->id) }}" method="POST" class="flex-1">
                         @csrf
                         <button type="submit" class="w-full bg-[#19817E] text-white text-[10px] font-black py-3 px-4 rounded-xl hover:bg-teal-700 transition shadow-lg shadow-teal-700/10 uppercase tracking-[0.2em]">
                             Collected
