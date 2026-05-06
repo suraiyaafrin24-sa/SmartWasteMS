@@ -164,7 +164,7 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative">
         <!-- Top Nav Header -->
-        <header class="flex items-center justify-between px-8 py-5 sticky top-0 bg-[#F8F9FB]/90 backdrop-blur-md z-20">
+        <header class="flex items-center justify-between px-8 py-5 sticky top-0 bg-[#F8F9FB]/90 backdrop-blur-md z-20 no-print">
             <div></div>
             
             <!-- Top Right Icons -->
