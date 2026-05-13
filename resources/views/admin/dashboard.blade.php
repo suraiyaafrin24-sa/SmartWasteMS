@@ -153,9 +153,9 @@
                         <tr class="text-slate-300 font-bold text-[11px] uppercase tracking-widest border-b border-gray-50">
                             <th class="pb-4 px-2">User / Address</th>
                             <th class="pb-4 px-2">Waste Type</th>
+                            <th class="pb-4 px-2">Shift</th>
                             <th class="pb-4 px-2">Assigned Collector</th>
                             <th class="pb-4 px-2">Status</th>
-                            <th class="pb-4 px-2">Est. Time</th>
                             <th class="pb-4 px-2 text-right">Action</th>
                         </tr>
                     </thead>
@@ -174,6 +174,12 @@
                                                                                                                                                                                             @elseif($request->type == 'Hazardous') bg-red-50 text-red-600
                                                                                                                                                                                             @else bg-gray-50 text-gray-600 @endif">
                                         {{ $request->type }}
+                                    </span>
+                                </td>
+                                <td class="py-5 px-2">
+                                    <span class="px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest
+                                        {{ $request->shift == 'Morning Shift' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-indigo-50 text-indigo-600 border border-indigo-100' }}">
+                                        {{ $request->shift ?? 'N/A' }}
                                     </span>
                                 </td>
                                 <td class="py-5 px-2">
@@ -201,19 +207,23 @@
                                             class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-[#FEF3C7] text-[#D97706] tracking-widest uppercase">Pending</span>
                                     @endif
                                 </td>
-                                <td class="py-5 px-2 text-[13px] text-slate-500">{{ $request->scheduled_time ?? 'ASAP' }}</td>
                                 <td class="py-5 px-2 text-right">
                                     @if(!$request->collector && $request->status == 'Pending')
                                         <form action="{{ route('admin.requests.assign', $request->id) }}" method="POST"
                                             class="flex items-center justify-end gap-1.5">
                                             @csrf
-                                            <select name="collector_id" required
-                                                class="text-[10px] font-black bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 focus:ring-1 focus:ring-teal-500 outline-none w-24">
-                                                <option value="">Staff Select</option>
-                                                @foreach($collectors as $c)
-                                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
-                                                @endforeach
-                                            </select>
+                                            <div class="relative">
+                                                <select name="collector_id" required
+                                                    class="text-[10px] font-black bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 pr-6 focus:ring-1 focus:ring-teal-500 outline-none w-24 appearance-none cursor-pointer">
+                                                    <option value="">Staff Select</option>
+                                                    @foreach($collectors as $c)
+                                                        <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="absolute inset-y-0 right-1.5 flex items-center pointer-events-none text-gray-400">
+                                                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                                                </div>
+                                            </div>
                                             <input type="hidden" name="scheduled_date"
                                                 value="{{ $request->scheduled_date ?? date('Y-m-d') }}">
                                             <button type="submit"

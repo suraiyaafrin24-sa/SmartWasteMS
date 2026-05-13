@@ -211,19 +211,26 @@
                                 collectorsGrid.innerHTML = '';
                                 data.rosters.forEach(roster => {
                                     const isCurrentShift = shiftSelect.value === roster.shift;
+                                    const isBooked = roster.is_booked;
                                     const card = `
-                                        <div class="collector-card p-4 rounded-2xl border ${isCurrentShift ? 'bg-blue-50/30 border-blue-200' : 'bg-white border-gray-100'} transition-all cursor-pointer hover:border-blue-300 group" 
-                                             onclick="selectCollector(this, ${roster.collector.id})">
-                                            <div class="flex items-center gap-4">
+                                        <div class="collector-card p-4 rounded-2xl border ${isBooked ? 'bg-gray-50/50 border-gray-100 opacity-70 cursor-not-allowed' : (isCurrentShift ? 'bg-blue-50/30 border-blue-200 shadow-sm' : 'bg-white border-gray-100')} transition-all cursor-pointer hover:border-blue-300 group relative overflow-hidden" 
+                                             ${isBooked ? '' : `onclick="selectCollector(this, ${roster.collector.id})"`}>
+                                            ${isBooked ? '<div class="absolute inset-0 bg-white/10 z-10"></div>' : ''}
+                                            <div class="flex items-center gap-4 relative z-0">
                                                 <div class="w-12 h-12 rounded-xl ${isCurrentShift ? 'bg-white' : 'bg-gray-50'} flex items-center justify-center font-black ${isCurrentShift ? 'text-blue-600' : 'text-gray-400'} border border-gray-100 overflow-hidden shrink-0">
                                                     ${roster.collector.image ? `<img src="${roster.collector.image}" class="w-full h-full object-cover">` : roster.collector.initial}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <div class="text-[9px] font-black ${isCurrentShift ? 'text-blue-400' : 'text-gray-400'} uppercase tracking-widest leading-none mb-1">${roster.shift}</div>
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <div class="text-[9px] font-black ${isBooked ? 'text-red-500' : (isCurrentShift ? 'text-blue-400' : 'text-gray-400')} uppercase tracking-widest leading-none">
+                                                            ${roster.shift}
+                                                        </div>
+                                                        ${isBooked ? '<span class="bg-red-500 text-white text-[7px] px-1.5 py-0.5 rounded-md font-black uppercase tracking-tighter">Booked</span>' : ''}
+                                                    </div>
                                                     <h4 class="text-sm font-black text-gray-800 tracking-tight truncate">${roster.collector.name}</h4>
                                                     <p class="text-[10px] font-bold text-gray-400">${roster.collector.phone}</p>
                                                 </div>
-                                                <div class="selection-indicator w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center transition-all group-hover:border-blue-200">
+                                                <div class="selection-indicator w-5 h-5 rounded-full border-2 ${isBooked ? 'border-gray-100' : 'border-gray-200'} flex items-center justify-center transition-all ${isBooked ? '' : 'group-hover:border-blue-200'}">
                                                     <div class="w-2.5 h-2.5 rounded-full bg-blue-500 scale-0 transition-all"></div>
                                                 </div>
                                             </div>
@@ -232,8 +239,9 @@
                                     collectorsGrid.innerHTML += card;
                                 });
 
-                                // Auto-select if there is a collector for the current shift
-                                const currentShiftCard = Array.from(document.querySelectorAll('.collector-card')).find(c => c.innerHTML.includes(shiftSelect.value));
+                                // Auto-select if there is a collector for the current shift who is NOT booked
+                                const currentShiftCard = Array.from(document.querySelectorAll('.collector-card'))
+                                    .find(c => c.innerHTML.includes(shiftSelect.value) && !c.innerHTML.includes('Booked'));
                                 if (currentShiftCard) {
                                     currentShiftCard.click();
                                 }

@@ -18,17 +18,20 @@ class UserDashboardController extends Controller
     {
         $user = Auth::user();
 
-        $totalRequests = CollectionRequest::where('user_id', $user->id)->count();
+        $totalRequests = CollectionRequest::where('user_id', $user->id)
+            ->where('status', '!=', 'Cancelled')
+            ->count();
+            
         $pendingPickups = CollectionRequest::where('user_id', $user->id)
             ->whereIn('status', ['Pending', 'Scheduled'])
             ->count();
             
         $completedRequestsCount = CollectionRequest::where('user_id', $user->id)
-            ->where('status', 'Completed')
+            ->whereIn('status', ['Completed', 'Collected'])
             ->count();
             
         $ecoContribution = CollectionRequest::where('user_id', $user->id)
-            ->where('status', 'Completed')
+            ->whereIn('status', ['Completed', 'Collected'])
             ->sum('weight');
 
         $recentRequests = CollectionRequest::where('user_id', $user->id)
@@ -104,7 +107,10 @@ class UserDashboardController extends Controller
             $collector->notify(new CollectionStatusNotification($collectionRequest, 'A new collection request has been assigned to you in ' . $request->sector, 'new_request'));
         }
 
-        return redirect()->route('user.dashboard')->with('success', 'Collection request created successfully!');
+        return redirect()->route('user.dashboard')
+            ->with('success', 'Collection request created successfully!')
+            ->with('show_payment_modal', true)
+            ->with('request_id', $collectionRequest->id);
     }
 
     public function getCollector(Request $request)
@@ -122,9 +128,17 @@ class UserDashboardController extends Controller
         if ($rosters->count() > 0) {
             return response()->json([
                 'success' => true,
-                'rosters' => $rosters->map(function($r) {
+                'rosters' => $rosters->map(function ($r) use ($request) {
+                    // Check if this collector is already booked for this specific date AND shift
+                    $isBooked = CollectionRequest::where('collector_id', $r->collector->id)
+                        ->where('scheduled_date', $request->date)
+                        ->where('shift', $r->shift)
+                        ->whereIn('status', ['Pending', 'Scheduled', 'Collected', 'Completed'])
+                        ->exists();
+
                     return [
                         'shift' => $r->shift,
+                        'is_booked' => $isBooked,
                         'collector' => [
                             'id' => $r->collector->id,
                             'name' => $r->collector->name,
@@ -190,5 +204,18 @@ class UserDashboardController extends Controller
         $sectors = \App\Models\DutyRoster::select('sector')->distinct()->pluck('sector');
 
         return view('user.duty_schedule', compact('dutyRosters', 'sectors'));
+    }
+
+    public function receipt(CollectionRequest $request)
+    {
+        if ($request->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($request->payment_status !== 'Paid') {
+            return redirect()->back()->with('error', 'Receipt is only available for paid requests.');
+        }
+
+        return view('user.receipt', compact('request'));
     }
 }

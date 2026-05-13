@@ -58,6 +58,7 @@
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Duty Date <span
                             class="text-red-500">*</span></label>
                     <input type="date" name="date" value="{{ $prefill['date'] ?? date('Y-m-d') }}" required
+                        min="{{ date('Y-m-d') }}"
                         class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all">
                 </div>
 
@@ -176,7 +177,7 @@
                             </td>
                             <td class="px-8 py-5 text-right">
                                 <form action="{{ route('admin.duty_roster.delete', $r->id) }}" method="POST"
-                                    onsubmit="return confirm('Remove this roster entry?');">
+                                    onsubmit="return confirm('Remove this staff entry?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-gray-300 hover:text-red-500 transition">

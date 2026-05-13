@@ -307,8 +307,8 @@ class AdminDashboardController extends Controller
         ]);
 
         $actor = User::findOrFail($request->user_id);
-        $startDate = \Carbon\Carbon::parse($request->start_date);
-        $endDate = $startDate->copy()->addDays((int) $request->days);
+        $endDate = \Carbon\Carbon::parse($request->start_date);
+        $startDate = $endDate->copy()->subDays((int) $request->days);
 
         $query = CollectionRequest::whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
 
@@ -515,5 +515,27 @@ class AdminDashboardController extends Controller
         $roster = \App\Models\DutyRoster::findOrFail($id);
         $roster->delete();
         return redirect()->back()->with('success', 'Roster entry removed successfully.');
+    }
+
+    public function payments(Request $request)
+    {
+        $query = CollectionRequest::with(['user', 'collector']);
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('transaction_id', 'LIKE', "%{$search}%")
+                    ->orWhere('payment_status', 'LIKE', "%{$search}%")
+                    ->orWhereHas('user', function ($qu) use ($search) {
+                        $qu->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('collector', function ($qc) use ($search) {
+                        $qc->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $payments = $query->orderBy('updated_at', 'desc')->paginate(15);
+        return view('admin.payments', compact('payments'));
     }
 }

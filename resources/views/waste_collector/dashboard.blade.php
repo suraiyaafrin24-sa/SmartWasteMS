@@ -53,33 +53,44 @@
         </div>
 
         <!-- Completed Card (White) -->
-        <div class="bg-white rounded-3xl p-6 border border-gray-50 shadow-sm flex flex-col justify-between h-40 relative overflow-hidden group hover:border-[#F8F9FA] transition-colors">
+        <div class="bg-white rounded-3xl p-6 border border-gray-50 shadow-sm flex flex-col justify-between h-40 relative overflow-hidden group hover:border-teal-100 transition-colors">
             <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-[0.03] group-hover:scale-110 transition duration-500">
-                <svg class="w-20 h-20 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+                <svg class="w-20 h-20 text-[#19817E]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
             </div>
             <div>
-                <div class="text-emerald-500 font-bold text-[13px] mb-1.5 flex items-center gap-1.5 leading-none">
+                <div class="text-[#19817E] font-bold text-[13px] mb-1.5 flex items-center gap-1.5 leading-none">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Successful Collections
                 </div>
                 <div class="text-[32px] font-black text-slate-800 leading-none tracking-tight">{{ $completedCount }}</div>
             </div>
-            <p class="text-[12px] text-emerald-500 font-bold leading-none uppercase tracking-widest">Lifetime performance</p>
+            <p class="text-[12px] text-[#19817E] font-bold leading-none uppercase tracking-widest">Lifetime performance</p>
         </div>
 
-        <!-- Safety Alerts Card (Dark) -->
-        <div class="bg-[#0D161F] rounded-3xl p-6 shadow-xl shadow-slate-900/20 flex flex-col justify-between h-40 relative overflow-hidden group">
-             <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:scale-110 transition duration-500">
-                <svg class="w-20 h-20 text-slate-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <!-- Today's Schedule Card (White) -->
+        <div class="bg-white rounded-3xl p-6 border border-gray-50 shadow-sm flex flex-col justify-between h-40 relative overflow-hidden group hover:border-teal-100 transition-colors">
+             <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-[0.03] group-hover:scale-110 transition duration-500">
+                <svg class="w-20 h-20 text-[#19817E]" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
             </div>
             <div>
-                <div class="text-slate-500 font-bold text-[13px] mb-1.5 flex items-center gap-1.5 leading-none">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Safety Alerts
+                <div class="text-[#19817E] font-bold text-[13px] mb-2.5 flex items-center gap-1.5 leading-none">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z"></path></svg>
+                    Today's Schedule
                 </div>
-                <div class="text-[32px] font-black text-white leading-none tracking-tight">0</div>
+                <div class="space-y-3">
+                    @forelse($todaysSchedules as $schedule)
+                        <div class="flex items-center justify-between border-b border-gray-50 pb-2 last:border-0 last:pb-0">
+                            <div class="text-[16px] font-black text-slate-800 tracking-tight leading-none">{{ $schedule->sector }}</div>
+                            <div class="text-[9px] font-black text-white bg-[#19817E] px-2 py-1 rounded-md uppercase tracking-widest leading-none">{{ $schedule->shift }}</div>
+                        </div>
+                    @empty
+                        <div class="text-[16px] font-black text-slate-300 tracking-tight leading-none italic">No Duty Assigned</div>
+                    @endforelse
+                </div>
             </div>
-            <p class="text-[12px] text-slate-500 font-bold leading-none uppercase tracking-widest">All zones clear</p>
+            <p class="text-[11px] text-[#19817E] font-bold leading-none uppercase tracking-widest">
+                {{ $todaysSchedules->count() > 0 ? 'Assigned Duty' : 'Rest Day' }}
+            </p>
         </div>
     </div>
 

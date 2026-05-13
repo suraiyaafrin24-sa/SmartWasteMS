@@ -20,7 +20,9 @@ class CollectionRequest extends Model
         'zone',
         'sector',
         'road',
-        'shift'
+        'shift',
+        'payment_status',
+        'transaction_id'
     ];
 
     protected $casts = [

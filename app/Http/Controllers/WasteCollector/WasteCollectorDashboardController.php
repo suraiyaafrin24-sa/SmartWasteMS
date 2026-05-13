@@ -46,11 +46,17 @@ class WasteCollectorDashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Today's specific duty assignment from admin
+        $todaysSchedules = \App\Models\DutyRoster::where('collector_id', $collectorId)
+            ->where('date', date('Y-m-d'))
+            ->get();
+
         return view('waste_collector.dashboard', compact(
             'assignedToday',
             'completedCount',
             'activeRoute',
-            'availableRequests'
+            'availableRequests',
+            'todaysSchedules'
         ));
     }
 
@@ -118,5 +124,16 @@ class WasteCollectorDashboardController extends Controller
             ->get();
             
         return view('waste_collector.duty_schedule', compact('schedule'));
+    }
+
+    public function paymentCollection()
+    {
+        $collectorId = Auth::id();
+        $payments = CollectionRequest::where('collector_id', $collectorId)
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+            
+        return view('waste_collector.payment_collection', compact('payments'));
     }
 }

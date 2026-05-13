@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SslCommerzPaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -40,8 +41,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::get('/duty-roster', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'showDutyRoster'])->name('duty_roster');
     Route::post('/duty-roster', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'storeDutyRoster'])->name('duty_roster.store');
     Route::delete('/duty-roster/{id}', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'deleteDutyRoster'])->name('duty_roster.delete');
-    
+
     Route::post('/requests/{id}/assign', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'assignTask'])->name('requests.assign');
+    Route::get('/payments', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'payments'])->name('payments');
 });
 
 // Waste Collector Routes
@@ -56,6 +58,7 @@ Route::middleware(['auth', 'verified', 'role:waste_collector'])->prefix('waste_c
     Route::get('/history', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'history'])->name('history');
 
     Route::get('/duty-schedule', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'dutySchedule'])->name('duty_schedule');
+    Route::get('/payment-collection', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'paymentCollection'])->name('payment_collection');
 });
 
 // User Routes
@@ -65,18 +68,19 @@ Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user
     Route::post('/settings', [\App\Http\Controllers\User\UserSettingsController::class, 'updateProfile'])->name('settings.update');
     Route::delete('/settings/avatar', [\App\Http\Controllers\User\UserSettingsController::class, 'deleteAvatar'])->name('settings.avatar.delete');
     Route::put('/settings/password', [\App\Http\Controllers\User\UserSettingsController::class, 'updatePassword'])->name('password.update');
-    
+
     // User Reports
     Route::get('/reports', [\App\Http\Controllers\User\ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/create', [\App\Http\Controllers\User\ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports', [\App\Http\Controllers\User\ReportController::class, 'store'])->name('reports.store');
-    
+
     Route::get('/requests/create', [\App\Http\Controllers\User\UserDashboardController::class, 'createRequest'])->name('requests.create');
     Route::get('/get-collector', [\App\Http\Controllers\User\UserDashboardController::class, 'getCollector'])->name('get_collector');
     Route::post('/requests', [\App\Http\Controllers\User\UserDashboardController::class, 'storeRequest'])->name('requests.store');
     Route::get('/history', [\App\Http\Controllers\User\UserDashboardController::class, 'history'])->name('history');
     Route::post('/requests/{request}/cancel', [\App\Http\Controllers\User\UserDashboardController::class, 'cancelRequest'])->name('requests.cancel');
     Route::get('/duty-schedule', [\App\Http\Controllers\User\UserDashboardController::class, 'dutySchedule'])->name('duty_schedule');
+    Route::get('/receipt/{request}', [\App\Http\Controllers\User\UserDashboardController::class, 'receipt'])->name('receipt');
 });
 
 Route::middleware('auth')->group(function () {
@@ -86,4 +90,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::middleware(['auth'])->group(function () {
+    Route::post('/pay', [SslCommerzPaymentController::class, 'index'])->name('sslc.pay');
+});
+
+Route::post('/success', [SslCommerzPaymentController::class, 'success'])->name('sslc.success');
+Route::post('/fail', [SslCommerzPaymentController::class, 'fail'])->name('sslc.failure');
+Route::post('/cancel', [SslCommerzPaymentController::class, 'cancel'])->name('sslc.cancel');
+Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn'])->name('sslc.ipn');
+
+require __DIR__ . '/auth.php';
