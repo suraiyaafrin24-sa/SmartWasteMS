@@ -20,11 +20,11 @@ class AdminDashboardController extends Controller
         $search = request('search');
 
         // Base queries for counts
-        $pendingQuery = CollectionRequest::where('status', 'Pending');
+        $pendingQuery = CollectionRequest::whereIn('status', ['Pending', 'Scheduled']);
         $staffQuery = User::where('role', 'waste_collector');
         $userQuery = User::where('role', 'user');
         $todayQuery = CollectionRequest::whereDate('scheduled_date', date('Y-m-d'));
-        $todayCompletedQuery = CollectionRequest::whereDate('scheduled_date', date('Y-m-d'))->where('status', 'Completed');
+        $todayCompletedQuery = CollectionRequest::whereDate('scheduled_date', date('Y-m-d'))->whereIn('status', ['Completed', 'Collected']);
         
         // Base query for the list
         $requestQuery = CollectionRequest::with(['user', 'collector']);
@@ -484,11 +484,11 @@ class AdminDashboardController extends Controller
         $collectionRequest->update([
             'collector_id' => $request->collector_id,
             'scheduled_date' => $request->scheduled_date,
-            'scheduled_time' => $request->scheduled_time,
-            'zone' => $request->zone,
-            'sector' => $request->sector,
-            'road' => $request->road,
-            'shift' => $request->shift,
+            'scheduled_time' => $request->scheduled_time ?? $collectionRequest->scheduled_time,
+            'zone' => $request->zone ?? $collectionRequest->zone,
+            'sector' => $request->sector ?? $collectionRequest->sector,
+            'road' => $request->road ?? $collectionRequest->road,
+            'shift' => $request->shift ?? $collectionRequest->shift,
             'status' => 'Scheduled'
         ]);
 

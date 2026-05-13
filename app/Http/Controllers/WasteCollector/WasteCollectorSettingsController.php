@@ -25,11 +25,13 @@ class WasteCollectorSettingsController extends Controller
             'first_name' => 'required|string|max:120',
             'last_name' => 'nullable|string|max:120',
             'phone' => 'nullable|string|max:20',
+            'sector' => 'nullable|string|max:50',
+            'road' => 'nullable|string|max:100',
             'address' => 'nullable|string|max:255',
             'profile_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,avif,webp|max:5120',
         ]);
 
-        $data = $request->only(['phone', 'address']);
+        $data = $request->only(['phone', 'address', 'sector', 'road']);
         $data['name'] = trim($request->first_name . ' ' . $request->last_name);
 
         if ($request->hasFile('profile_image')) {

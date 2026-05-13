@@ -42,7 +42,7 @@
                 </div>
                 <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">{{ $pendingCollections }}</div>
             </div>
-            <p class="text-[12px] text-slate-400 font-medium leading-snug">Awaiting pickup routing</p>
+            <p class="text-[12px] text-slate-400 font-medium leading-snug">Active collections in system</p>
         </div>
 
         <!-- Active Collectors Card -->
@@ -167,11 +167,12 @@
                                     <div class="text-[11px] text-slate-400 font-medium">{{ $request->address }}</div>
                                 </td>
                                 <td class="py-5 px-2">
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider
-                                                    @if($request->type == 'Organic') bg-emerald-50 text-emerald-600
-                                                    @elseif($request->type == 'Recyclable') bg-blue-50 text-blue-600
-                                                    @elseif($request->type == 'Hazardous') bg-red-50 text-red-600
-                                                    @else bg-gray-50 text-gray-600 @endif">
+                                    <span
+                                        class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider
+                                                                                                                                                                                            @if($request->type == 'Organic') bg-emerald-50 text-emerald-600
+                                                                                                                                                                                            @elseif($request->type == 'Recyclable') bg-blue-50 text-blue-600
+                                                                                                                                                                                            @elseif($request->type == 'Hazardous') bg-red-50 text-red-600
+                                                                                                                                                                                            @else bg-gray-50 text-gray-600 @endif">
                                         {{ $request->type }}
                                     </span>
                                 </td>
@@ -203,8 +204,21 @@
                                 <td class="py-5 px-2 text-[13px] text-slate-500">{{ $request->scheduled_time ?? 'ASAP' }}</td>
                                 <td class="py-5 px-2 text-right">
                                     @if(!$request->collector && $request->status == 'Pending')
-                                        <a href="{{ route('admin.duty_roster', ['sector' => $request->sector, 'date' => $request->scheduled_date, 'shift' => $request->shift]) }}"
-                                            class="text-white bg-[#19817E] hover:bg-teal-700 text-[11px] font-black px-4 py-1.5 rounded-lg shadow-sm">Schedule Staff</a>
+                                        <form action="{{ route('admin.requests.assign', $request->id) }}" method="POST"
+                                            class="flex items-center justify-end gap-1.5">
+                                            @csrf
+                                            <select name="collector_id" required
+                                                class="text-[10px] font-black bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 focus:ring-1 focus:ring-teal-500 outline-none w-24">
+                                                <option value="">Staff Select</option>
+                                                @foreach($collectors as $c)
+                                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <input type="hidden" name="scheduled_date"
+                                                value="{{ $request->scheduled_date ?? date('Y-m-d') }}">
+                                            <button type="submit"
+                                                class="bg-[#19817E] text-white text-[9px] font-black px-3 py-1.5 rounded-lg hover:bg-teal-700 transition uppercase tracking-widest">Assign</button>
+                                        </form>
                                     @else
                                         <button data-user="{{ $request->user->name }}"
                                             data-phone="{{ $request->phone ?? $request->user->phone ?? 'N/A' }}"
@@ -228,93 +242,96 @@
             </div>
         </div>
 
-    <!-- Request Details Modal -->
-    <div id="detailsModal"
-        class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-6">
-        <div class="bg-white rounded-[24px] w-full max-w-md overflow-hidden shadow-2xl transform transition-all">
-            <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-base font-black text-gray-900 tracking-tight">Collection Request Overview</h3>
-                <button onclick="closeDetailsModal()" class="text-gray-400 hover:text-gray-600 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-            <div class="p-6 space-y-4">
-                <div class="grid grid-cols-2 gap-4">
+        <!-- Request Details Modal -->
+        <div id="detailsModal"
+            class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-6">
+            <div class="bg-white rounded-[24px] w-full max-w-md overflow-hidden shadow-2xl transform transition-all">
+                <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="text-base font-black text-gray-900 tracking-tight">Collection Request Overview</h3>
+                    <button onclick="closeDetailsModal()" class="text-gray-400 hover:text-gray-600 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Resident / User
+                            </p>
+                            <p id="modalUser" class="text-xs font-bold text-gray-800"></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Assigned To</p>
+                            <p id="modalCollector" class="text-xs font-bold text-[#19817E]"></p>
+                        </div>
+                    </div>
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Resident / User</p>
-                        <p id="modalUser" class="text-xs font-bold text-gray-800"></p>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Full Pickup Address
+                        </p>
+                        <p id="modalAddress" class="text-xs font-medium text-gray-600 leading-tight"></p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Assigned To</p>
-                        <p id="modalCollector" class="text-xs font-bold text-[#19817E]"></p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Waste Type</p>
+                            <p id="modalType" class="text-xs font-bold text-gray-800"></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Current Status
+                            </p>
+                            <span id="modalStatus"
+                                class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest"></span>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Full Pickup Address</p>
-                    <p id="modalAddress" class="text-xs font-medium text-gray-600 leading-tight"></p>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Waste Type</p>
-                        <p id="modalType" class="text-xs font-bold text-gray-800"></p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Current Status</p>
-                        <span id="modalStatus"
-                            class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest"></span>
+                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Additional Details</p>
+                        <p id="modalDetails" class="text-[11px] font-medium text-gray-700 leading-normal"></p>
                     </div>
                 </div>
-                <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Additional Details</p>
-                    <p id="modalDetails" class="text-[11px] font-medium text-gray-700 leading-normal"></p>
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+                    <button onclick="closeDetailsModal()"
+                        class="px-5 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-black transition">
+                        Close Overview
+                    </button>
                 </div>
-            </div>
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-                <button onclick="closeDetailsModal()"
-                    class="px-5 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-black transition">
-                    Close Overview
-                </button>
             </div>
         </div>
-    </div>
 
-    <script>
-        function openRequestModal(btn) {
-            document.getElementById('modalUser').innerText = btn.getAttribute('data-user');
-            document.getElementById('modalCollector').innerText = btn.getAttribute('data-collector');
-            document.getElementById('modalAddress').innerText = btn.getAttribute('data-address');
-            document.getElementById('modalType').innerText = btn.getAttribute('data-type');
-            document.getElementById('modalDetails').innerText = btn.getAttribute('data-details');
+        <script>
+            function openRequestModal(btn) {
+                document.getElementById('modalUser').innerText = btn.getAttribute('data-user');
+                document.getElementById('modalCollector').innerText = btn.getAttribute('data-collector');
+                document.getElementById('modalAddress').innerText = btn.getAttribute('data-address');
+                document.getElementById('modalType').innerText = btn.getAttribute('data-type');
+                document.getElementById('modalDetails').innerText = btn.getAttribute('data-details');
 
-            const status = btn.getAttribute('data-status');
-            const statusEl = document.getElementById('modalStatus');
-            statusEl.innerText = status;
+                const status = btn.getAttribute('data-status');
+                const statusEl = document.getElementById('modalStatus');
+                statusEl.innerText = status;
 
-            // Status styling
-            if (status === 'Collected' || status === 'Completed') {
-                statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600';
-            } else if (status === 'Scheduled') {
-                statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-600';
-            } else {
-                statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-50 text-amber-600';
+                // Status styling
+                if (status === 'Collected' || status === 'Completed') {
+                    statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600';
+                } else if (status === 'Scheduled') {
+                    statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-600';
+                } else {
+                    statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-50 text-amber-600';
+                }
+
+                const modal = document.getElementById('detailsModal');
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
             }
 
-            const modal = document.getElementById('detailsModal');
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
+            function closeDetailsModal() {
+                const modal = document.getElementById('detailsModal');
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
 
-        function closeDetailsModal() {
-            const modal = document.getElementById('detailsModal');
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeDetailsModal();
-        });
-    </script>
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeDetailsModal();
+            });
+        </script>
 @endsection

@@ -150,6 +150,8 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <input type="hidden" name="collector_id" id="selected-collector-id">
                 </div>
 
                 <!-- Action Buttons -->
@@ -176,6 +178,27 @@
             const noCollectorAlert = document.getElementById('no-collector-alert');
             const collectorsGrid = document.getElementById('collectors-grid');
 
+            window.selectCollector = function(element, collectorId) {
+                // Remove selected state from all cards
+                document.querySelectorAll('.collector-card').forEach(card => {
+                    card.classList.remove('border-blue-500', 'bg-blue-50', 'ring-2', 'ring-blue-100');
+                    card.classList.add('border-gray-100', 'bg-white');
+                    card.querySelector('.selection-indicator').classList.remove('border-blue-500');
+                    card.querySelector('.selection-indicator div').classList.remove('scale-100');
+                    card.querySelector('.selection-indicator div').classList.add('scale-0');
+                });
+
+                // Add selected state to clicked card
+                element.classList.remove('border-gray-100', 'bg-white');
+                element.classList.add('border-blue-500', 'bg-blue-50', 'ring-2', 'ring-blue-100');
+                element.querySelector('.selection-indicator').classList.add('border-blue-500');
+                element.querySelector('.selection-indicator div').classList.remove('scale-0');
+                element.querySelector('.selection-indicator div').classList.add('scale-100');
+
+                // Update hidden input
+                document.getElementById('selected-collector-id').value = collectorId;
+            }
+
             function fetchCollectors() {
                 const sector = sectorInput.value;
                 const date = dateInput.value;
@@ -189,27 +212,38 @@
                                 data.rosters.forEach(roster => {
                                     const isCurrentShift = shiftSelect.value === roster.shift;
                                     const card = `
-                                                    <div class="p-4 rounded-2xl border ${isCurrentShift ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-100'} transition-all">
-                                                        <div class="flex items-center gap-4">
-                                                            <div class="w-12 h-12 rounded-xl ${isCurrentShift ? 'bg-white' : 'bg-gray-50'} flex items-center justify-center font-black ${isCurrentShift ? 'text-blue-600' : 'text-gray-400'} border border-gray-100 overflow-hidden shrink-0">
-                                                                ${roster.collector.image ? `<img src="${roster.collector.image}" class="w-full h-full object-cover">` : roster.collector.initial}
-                                                            </div>
-                                                            <div class="flex-1 min-w-0">
-                                                                <div class="text-[9px] font-black ${isCurrentShift ? 'text-blue-400' : 'text-gray-400'} uppercase tracking-widest leading-none mb-1">${roster.shift}</div>
-                                                                <h4 class="text-sm font-black text-gray-800 tracking-tight truncate">${roster.collector.name}</h4>
-                                                                <p class="text-[10px] font-bold text-gray-400">${roster.collector.phone}</p>
-                                                            </div>
-                                                            ${isCurrentShift ? '<div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>' : ''}
-                                                        </div>
-                                                    </div>
-                                                `;
+                                        <div class="collector-card p-4 rounded-2xl border ${isCurrentShift ? 'bg-blue-50/30 border-blue-200' : 'bg-white border-gray-100'} transition-all cursor-pointer hover:border-blue-300 group" 
+                                             onclick="selectCollector(this, ${roster.collector.id})">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-12 h-12 rounded-xl ${isCurrentShift ? 'bg-white' : 'bg-gray-50'} flex items-center justify-center font-black ${isCurrentShift ? 'text-blue-600' : 'text-gray-400'} border border-gray-100 overflow-hidden shrink-0">
+                                                    ${roster.collector.image ? `<img src="${roster.collector.image}" class="w-full h-full object-cover">` : roster.collector.initial}
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="text-[9px] font-black ${isCurrentShift ? 'text-blue-400' : 'text-gray-400'} uppercase tracking-widest leading-none mb-1">${roster.shift}</div>
+                                                    <h4 class="text-sm font-black text-gray-800 tracking-tight truncate">${roster.collector.name}</h4>
+                                                    <p class="text-[10px] font-bold text-gray-400">${roster.collector.phone}</p>
+                                                </div>
+                                                <div class="selection-indicator w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center transition-all group-hover:border-blue-200">
+                                                    <div class="w-2.5 h-2.5 rounded-full bg-blue-500 scale-0 transition-all"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
                                     collectorsGrid.innerHTML += card;
                                 });
+
+                                // Auto-select if there is a collector for the current shift
+                                const currentShiftCard = Array.from(document.querySelectorAll('.collector-card')).find(c => c.innerHTML.includes(shiftSelect.value));
+                                if (currentShiftCard) {
+                                    currentShiftCard.click();
+                                }
+
                                 collectorInfo.classList.remove('hidden');
                                 noCollectorAlert.classList.add('hidden');
                             } else {
                                 collectorInfo.classList.add('hidden');
                                 noCollectorAlert.classList.remove('hidden');
+                                document.getElementById('selected-collector-id').value = '';
                             }
                         })
                         .catch(error => {

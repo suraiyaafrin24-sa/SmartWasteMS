@@ -5,7 +5,7 @@
 @section('content')
     <div class="mb-8 mt-2 flex justify-between items-center no-print">
         <div>
-            <h1 class="text-[28px] font-black tracking-tight text-gray-900 mb-1">Activity Synthesis</h1>
+            <h1 class="text-[28px] font-black tracking-tight text-gray-900 mb-1">Activity Summary</h1>
             <p class="text-sm font-medium text-gray-500">Summary for {{ $actor->name }} ({{ $start_date }} to
                 {{ $end_date }})</p>
         </div>
@@ -83,10 +83,12 @@
                             <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Date/Time</th>
                             <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Area / Road</th>
                             <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Waste Type</th>
+                        
                             <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                 {{ $type == 'collector' ? 'Requested By' : 'Collected By' }}</th>
                             <th class="py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                 Status</th>
+                           <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Remark</th
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">

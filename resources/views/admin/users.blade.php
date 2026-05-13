@@ -21,6 +21,7 @@
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">User / Identity</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Email Address</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-center">Role</th>
+                        <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-center">Sector</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Joined Date</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">Actions</th>
                     </tr>
@@ -54,6 +55,15 @@
                                     {{ str_replace('_', ' ', $user->role) }}
                                 </span>
                             </td>
+                            <td class="px-6 py-5 text-center">
+                                @if($user->sector)
+                                    <span class="bg-orange-50 text-orange-600 border border-orange-100 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                        {{ $user->sector }}
+                                    </span>
+                                @else
+                                    <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">N/A</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-5">
                                 <div class="text-[11px] text-gray-800 font-black tracking-tight leading-none mb-1">{{ $user->created_at->format('M d, Y') }}</div>
                                 <div class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{{ $user->created_at->diffForHumans() }}</div>
@@ -75,7 +85,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-20 text-center text-gray-400 font-bold uppercase tracking-[2px]">No users found.</td>
+                            <td colspan="6" class="py-20 text-center text-gray-400 font-bold uppercase tracking-[2px]">No users found.</td>
                         </tr>
                     @endforelse
                 </tbody>

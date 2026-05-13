@@ -111,12 +111,14 @@
                         </div>
                         <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Job #{{ $index + 1 }}</span>
                     </div>
-                    <h4 class="text-base font-black text-slate-800 tracking-tight mb-1">{{ $request->road }}</h4>
-                    <p class="text-[11px] text-slate-400 font-medium mb-4 line-clamp-1">{{ $request->address }} • {{ $request->sector }}</p>
+                    <h4 class="text-base font-black text-slate-800 tracking-tight mb-1">{{ $request->road ?? 'General Pickup' }}</h4>
+                    <p class="text-[11px] text-slate-400 font-medium mb-4 line-clamp-1">
+                        {{ $request->address }} @if($request->sector) • {{ $request->sector }} @endif @if($request->scheduled_date) • {{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d') }} @endif
+                    </p>
                     
                     <div class="flex items-center gap-2 mb-6 p-2.5 bg-gray-50 rounded-2xl">
                         <div class="w-1.5 h-1.5 rounded-full bg-[#19817E] animate-pulse"></div>
-                        <span class="text-[10px] font-black text-[#19817E] uppercase tracking-widest">{{ $request->shift }} Duty</span>
+                        <span class="text-[10px] font-black text-[#19817E] uppercase tracking-widest">{{ strtoupper($request->shift ?? 'Scheduled') }} DUTY</span>
                     </div>
                 </div>
                 

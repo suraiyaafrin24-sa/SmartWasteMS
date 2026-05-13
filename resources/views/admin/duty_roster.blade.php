@@ -24,39 +24,34 @@
         <form action="{{ route('admin.duty_roster.store') }}" method="POST">
             @csrf
 
+            <!-- Hidden inputs for auto-population from collector profile -->
+            <input type="hidden" name="sector" id="hidden_sector">
+            <input type="hidden" name="road" id="hidden_road">
+
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <!-- Collector -->
                 <div class="space-y-2">
-                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Assign Staff <span
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Staff Name <span
                             class="text-red-500">*</span></label>
-                    <select name="collector_id" required
+                    <select name="collector_id" id="collector_select" required
                         class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
                         <option value="">Select Collector...</option>
                         @foreach($collectors as $c)
-                            <option value="{{ $c->id }}">
+                            <option value="{{ $c->id }}" data-sector="{{ $c->sector }}" data-road="{{ $c->road }}">
                                 {{ $c->name }}
-                                @if($c->sector)
-                                    — {{ $c->sector }}
-                                @elseif($c->dutyRosters->first())
-                                    — {{ $c->dutyRosters->first()->sector }}
-                                @endif
                             </option>
                         @endforeach
                     </select>
                 </div>
 
-                <!-- Sector -->
+                <!-- Staff Sector Display -->
                 <div class="space-y-2">
-                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Target Sector <span
-                            class="text-red-500">*</span></label>
-                    <select name="sector" required
-                        class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
-                        <option value="">Choose Sector...</option>
-                        @for($i = 1; $i <= 18; $i++)
-                            <option value="Sector {{ $i }}" {{ (isset($prefill['sector']) && $prefill['sector'] == "Sector $i") ? 'selected' : '' }}>Sector {{ $i }}</option>
-                        @endfor
-                    </select>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Staff Sector</label>
+                    <div id="display_address" class="w-full bg-gray-50 border border-gray-100 text-gray-400 text-sm font-bold rounded-xl p-3.5 italic h-[50px] flex items-center">
+                        Select a collector...
+                    </div>
                 </div>
+
 
                 <!-- Date -->
                 <div class="space-y-2">
@@ -197,7 +192,7 @@
                     @empty
                         <tr>
                             <td colspan="6" class="px-8 py-20 text-center">
-                                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">No duty roster entries
+                                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">No duty staff entries
                                     found.</p>
                             </td>
                         </tr>
@@ -213,3 +208,49 @@
         @endif
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const collectorSelect = document.getElementById('collector_select');
+        const hiddenSector = document.getElementById('hidden_sector');
+        const hiddenRoad = document.getElementById('hidden_road');
+        const displayAddress = document.getElementById('display_address');
+
+        if (collectorSelect) {
+            function updateFields() {
+                const selectedOption = collectorSelect.options[collectorSelect.selectedIndex];
+                
+                if (selectedOption && selectedOption.value) {
+                    const sector = selectedOption.getAttribute('data-sector') || '';
+                    const road = selectedOption.getAttribute('data-road') || '';
+                    
+                    hiddenSector.value = sector;
+                    hiddenRoad.value = road;
+                    
+                    if (sector) {
+                        displayAddress.textContent = sector;
+                        displayAddress.classList.remove('text-gray-400', 'italic');
+                        displayAddress.classList.add('text-gray-800');
+                    } else {
+                        displayAddress.textContent = 'No sector assigned';
+                        displayAddress.classList.add('text-red-400');
+                        displayAddress.classList.remove('text-gray-400', 'italic', 'text-gray-800');
+                    }
+                } else {
+                    hiddenSector.value = '';
+                    hiddenRoad.value = '';
+                    displayAddress.textContent = 'Select a collector...';
+                    displayAddress.classList.add('text-gray-400', 'italic');
+                    displayAddress.classList.remove('text-gray-800', 'text-red-400');
+                }
+            }
+
+            collectorSelect.addEventListener('change', updateFields);
+            
+            // Trigger once on load
+            updateFields();
+        }
+    });
+</script>
+@endpush

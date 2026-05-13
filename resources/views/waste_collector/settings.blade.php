@@ -82,8 +82,21 @@
                         <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Contact Number <span class="text-red-500">*</span></label>
                         <input type="text" name="phone" value="{{ Auth::user()->phone }}" class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-3.5 px-4 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold">
                     </div>
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Uttara Sector <span class="text-red-500">*</span></label>
+                        <select name="sector" class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-3.5 px-4 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold">
+                            <option value="">Select Sector</option>
+                            @for($i = 1; $i <= 18; $i++)
+                                <option value="Sector {{ $i }}" {{ Auth::user()->sector == "Sector $i" ? 'selected' : '' }}>Sector {{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Road / Block / House <span class="text-red-500">*</span></label>
+                        <input type="text" name="road" value="{{ Auth::user()->road }}" class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-3.5 px-4 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold">
+                    </div>
                     <div class="md:col-span-2">
-                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Present Address</label>
+                        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Full Residential Address Details</label>
                         <textarea name="address" rows="3" class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-3.5 px-4 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold">{{ Auth::user()->address }}</textarea>
                     </div>
                 </div>

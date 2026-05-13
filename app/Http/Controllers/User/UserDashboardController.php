@@ -64,13 +64,19 @@ class UserDashboardController extends Controller
             'road' => 'required|string|max:100',
         ]);
 
-        // Find assigned collector for this sector, date and shift
-        $roster = DutyRoster::where('sector', $request->sector)
-            ->where('date', $request->scheduled_date)
-            ->where('shift', $request->shift)
-            ->first();
+        // Use manually selected collector if provided, otherwise find assigned collector
+        $manualCollectorId = $request->collector_id;
+        
+        if ($manualCollectorId) {
+            $collectorId = $manualCollectorId;
+        } else {
+            $roster = DutyRoster::where('sector', $request->sector)
+                ->where('date', $request->scheduled_date)
+                ->where('shift', $request->shift)
+                ->first();
+            $collectorId = $roster ? $roster->collector_id : null;
+        }
 
-        $collectorId = $roster ? $roster->collector_id : null;
         $status = $collectorId ? 'Scheduled' : 'Pending';
 
         $collectionRequest = CollectionRequest::create([
@@ -120,6 +126,7 @@ class UserDashboardController extends Controller
                     return [
                         'shift' => $r->shift,
                         'collector' => [
+                            'id' => $r->collector->id,
                             'name' => $r->collector->name,
                             'phone' => $r->collector->phone ?? 'N/A',
                             'image' => $r->collector->profile_image ? asset('storage/' . $r->collector->profile_image) : null,

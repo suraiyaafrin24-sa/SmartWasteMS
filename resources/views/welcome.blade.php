@@ -165,12 +165,12 @@
                 <div class="bg-white p-8 rounded-xl shadow hover:shadow-lg">
 
                     <h3 class="text-xl font-semibold mb-3">
-                        Smart Route Planning
+                        Systematic Scheduling
                     </h3>
 
                     <p class="text-gray-600">
-                        Collectors receive optimized routes to reduce
-                        time, fuel, and operational cost.
+                        Collectors receive organized schedules and sector assignments to reduce
+                        time and improve operational efficiency.
                     </p>
 
                 </div>
@@ -201,17 +201,17 @@
 
                 <p class="text-gray-600 mb-4">
 
-                    The system integrates modern technologies such as GPS tracking,
-                    IoT smart bins, and real-time data monitoring to improve
+                    The system integrates modern management features such as organized scheduling,
+                    sector-based assignments, and real-time data monitoring to improve
                     waste collection efficiency.
 
                 </p>
 
                 <ul class="space-y-3 text-gray-600">
 
-                    <li>✔ GPS location tracking</li>
+                    <li>✔ Systematic sector-based collection</li>
                     <li>✔ Admin monitoring dashboard</li>
-                    <li>✔ Waste collector mobile system</li>
+                    <li>✔ Waste collector duty rosters</li>
 
                 </ul>
 
@@ -242,7 +242,7 @@
                             </h2>
                             
                             <p class="text-gray-500 font-medium leading-relaxed mb-10">
-                                Our smart waste collection network covers all major sectors in Uttara. We utilize real-time GPS tracking and automated routing to ensure every corner of the city stays clean and sustainable.
+                                Our smart waste collection network covers all major sectors in Uttara. We prioritize efficient scheduling and systematic coordination to ensure every corner of the city stays clean and sustainable.
                             </p>
                             
                             <div class="space-y-8">
@@ -262,7 +262,7 @@
                                     </div>
                                     <div>
                                         <h4 class="font-black text-gray-900 uppercase text-[11px] tracking-widest mb-1">Emergency Support</h4>
-                                        <p class="text-sm font-bold text-gray-600">+880 1234-567890 <br> Available 24/7 for urgent pickups</p>
+                                        <p class="text-sm font-bold text-gray-600">+880 1234-567890 <br> Support for your waste collection needs</p>
                                     </div>
                                 </div>
                             </div>
@@ -285,7 +285,7 @@
                         <div
                             class="absolute bottom-6 left-6 right-6 bg-white p-6 rounded-2xl shadow-2xl border border-gray-100 group-hover:translate-y-2 transition-transform duration-500">
                             <h4 class="font-bold text-lg text-gray-900">Service Coverage</h4>
-                            <p class="text-gray-500 text-sm mt-1">Real-time status of 24/7 emergency collectors in your
+                            <p class="text-gray-500 text-sm mt-1">Real-time status of active collectors in your
                                 zone.</p>
                         </div>
                     </div>

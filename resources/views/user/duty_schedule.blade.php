@@ -19,7 +19,7 @@
                     <option value="">All Sectors</option>
                     @foreach($sectors as $sec)
                         @if(!empty($sec))
-                            <option value="{{ $sec }}" {{ request('sector') == $sec ? 'selected' : '' }}>Sector {{ $sec }}</option>
+                            <option value="{{ $sec }}" {{ request('sector') == $sec ? 'selected' : '' }}>{{ $sec }}</option>
                         @endif
                     @endforeach
                 </select>
@@ -67,7 +67,7 @@
                             </div>
                             <span>{{ $duty->collector ? $duty->collector->name : 'Unassigned' }}</span>
                         </td>
-                        <td class="py-4 px-2">Sector {{ $duty->sector }}</td>
+                        <td class="py-4 px-2">{{ $duty->sector }}</td>
                         <td class="py-4 px-2">{{ $duty->road ?? 'N/A' }}</td>
                         <td class="py-4 px-2">{{ \Carbon\Carbon::parse($duty->date)->format('M d, Y') }}</td>
                         <td class="py-4 px-2">

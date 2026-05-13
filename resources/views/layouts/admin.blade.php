@@ -40,13 +40,16 @@
         }
 
         main::-webkit-scrollbar-thumb {
-            background: #E2E8F0;
+            background: #edf0e2ff;
             border-radius: 10px;
+        }
+        .header-bg {
+            background-color: #F8F9FB;
         }
     </style>
 </head>
 
-<body class="text-slate-800 h-screen w-full flex overflow-hidden antialiased bg-[#F8F9FB]">
+<body class="text-slate-800 h-screen w-full flex overflow-hidden antialiased">
     <aside class="sidebar-bg w-64 border-r border-gray-100 flex flex-col justify-between hidden md:flex shrink-0">
         <div>
             <!-- Profile Status Area -->
@@ -129,17 +132,14 @@
                 <span class="text-sm">User Complaints</span>
             </a>
 
-            <!-- Settings -->
-            <div class="mt-4 border-t border-gray-100 pt-4">
-                <a href="{{ route('admin.profile') }}"
-                    class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('admin.profile') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                    <span class="text-sm">Profile Settings</span>
-                </a>
-            </div>
+            <a href="{{ route('admin.profile') }}"
+                class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('admin.profile') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <span class="text-sm">Profile Settings</span>
+            </a>
         </nav>
         </div>
 
@@ -164,9 +164,10 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative">
         <!-- Top Nav Header -->
-        <header class="flex items-center justify-between px-8 py-5 sticky top-0 bg-[#F8F9FB]/90 backdrop-blur-md z-20 no-print">
+        <header
+            class="header-bg flex items-center justify-between px-8 py-5 sticky top-0 backdrop-blur-md z-20 no-print">
             <div></div>
-            
+
             <!-- Top Right Icons -->
             <div class="flex items-center gap-6 text-gray-500">
                 @include('components.notification-dropdown')
@@ -187,6 +188,7 @@
             @yield('content')
         </div>
     </main>
+    @stack('scripts')
 </body>
 
 </html>

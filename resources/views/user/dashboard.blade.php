@@ -17,12 +17,7 @@
             <h1 class="text-2xl font-black tracking-tight text-slate-800 mb-1">My Dashboard</h1>
             <p class="text-[13px] font-medium text-slate-400">Track your waste collection requests and history.</p>
         </div>
-        <div>
-            <a href="{{ route('user.requests.create') }}" class="bg-[#19817E] text-white text-[13px] font-bold py-3 px-7 rounded-2xl hover:bg-teal-700 transition shadow-lg shadow-teal-700/20 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                New Collection Request
-            </a>
-        </div>
+
     </div>
 
     <!-- User Stats Cards -->

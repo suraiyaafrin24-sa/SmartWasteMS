@@ -16,13 +16,17 @@
         }
 
         .sidebar-bg {
-            background-color: #F2F4F7;
+            background-color: #f8fbf9ff;
+        }
+
+        .header-bg {
+            background-color: #ffffff;
         }
     </style>
 </head>
 
 <body class="text-slate-800 h-screen flex overflow-hidden antialiased">
-    <aside class="bg-[#F8F9FA] w-64 border-r border-gray-100 flex flex-col justify-between hidden md:flex shrink-0">
+    <aside class="sidebar-bg w-64 border-r border-gray-100 flex flex-col justify-between hidden md:flex shrink-0">
         <div>
             <!-- Profile Status Area -->
             <div class="px-7 py-8 mb-4">
@@ -113,7 +117,7 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-y-auto w-full relative">
-        <header class="flex items-center justify-between px-8 py-5 sticky top-0 bg-white/80 backdrop-blur-md z-20">
+        <header class="header-bg flex items-center justify-between px-8 py-5 sticky top-0 backdrop-blur-md z-20">
             <div></div>
 
             <div class="flex items-center gap-6 text-gray-500">
