@@ -182,7 +182,7 @@
                                     data-collector="{{ $request->collector ? $request->collector->name : 'Waiting for assignment' }}"
                                     data-phone="{{ $request->collector ? $request->collector->phone : 'N/A' }}"
                                     data-details="{{ $request->details ?? 'No special instructions provided.' }}"
-                                    data-address="{{ $request->address }}" onclick="openRequestModal(this)"
+                                    data-sector="{{ $request->sector }}" onclick="openRequestModal(this)"
                                     class="text-[#19817E] hover:text-teal-700 text-[11px] font-black transition-colors uppercase tracking-widest">
                                     View
                                 </button>
@@ -239,8 +239,8 @@
                 </div>
 
                 <div>
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Pickup Address</p>
-                    <p id="modalAddress" class="text-xs font-medium text-gray-600 leading-tight"></p>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Sector</p>
+                    <p id="modalSector" class="text-xs font-medium text-gray-600 leading-tight"></p>
                 </div>
 
                 <div class="p-3 bg-amber-50/50 rounded-xl border border-amber-100/50">
@@ -329,7 +329,7 @@
             document.getElementById('modalDate').innerText = btn.getAttribute('data-date');
             document.getElementById('modalCollector').innerText = btn.getAttribute('data-collector');
             document.getElementById('modalCollectorPhone').innerText = btn.getAttribute('data-phone');
-            document.getElementById('modalAddress').innerText = btn.getAttribute('data-address');
+            document.getElementById('modalSector').innerText = btn.getAttribute('data-sector');
             document.getElementById('modalDetails').innerText = btn.getAttribute('data-details');
 
             const modal = document.getElementById('detailsModal');

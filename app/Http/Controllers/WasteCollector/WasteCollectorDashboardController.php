@@ -86,6 +86,11 @@ class WasteCollectorDashboardController extends Controller
             return redirect()->back()->with('error', 'Unauthorized. You are not assigned to this collection.');
         }
 
+        // Time check: prevent collecting future requests
+        if (strtotime($request->scheduled_date) > strtotime(date('Y-m-d'))) {
+            return redirect()->back()->with('error', 'You cannot mark a future request as collected. Please wait until ' . \Carbon\Carbon::parse($request->scheduled_date)->format('M d, Y') . '.');
+        }
+
         $request->update([
             'status' => 'Collected',
             'weight' => rand(50, 500) / 10 // Dynamic mock weight logic

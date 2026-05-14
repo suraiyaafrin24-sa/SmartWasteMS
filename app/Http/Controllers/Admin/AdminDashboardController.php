@@ -479,6 +479,19 @@ class AdminDashboardController extends Controller
             'scheduled_time' => 'nullable|string',
         ]);
 
+        // Logic to prevent booking passed shifts for today
+        $isToday = $request->scheduled_date == date('Y-m-d');
+        $currentTime = date('H:i');
+        
+        if ($isToday && $request->shift) {
+            if ($request->shift == 'Morning Shift' && $currentTime >= '10:00') {
+                return redirect()->back()->withInput()->with('error', 'Morning shift is no longer available for today.');
+            }
+            if ($request->shift == 'Evening Shift' && $currentTime >= '18:00') {
+                return redirect()->back()->withInput()->with('error', 'Evening shift is no longer available for today.');
+            }
+        }
+
         $collectionRequest = CollectionRequest::findOrFail($id);
         
         $collectionRequest->update([
@@ -502,12 +515,65 @@ class AdminDashboardController extends Controller
             'sector' => 'required|string',
             'road' => 'nullable|string',
             'date' => 'required|date|after_or_equal:today',
+            'end_date' => 'nullable|date|after_or_equal:date',
             'shift' => 'required|string|in:Morning Shift,Evening Shift',
         ]);
 
-        \App\Models\DutyRoster::create($request->all());
+        $startDate = \Carbon\Carbon::parse($request->date);
+        $endDate = $request->end_date ? \Carbon\Carbon::parse($request->end_date) : $startDate;
 
-        return redirect()->back()->with('success', 'Duty roster updated successfully!');
+        // Limit range to 7 days
+        if ($startDate->diffInDays($endDate) > 7) {
+            return redirect()->back()->withInput()->with('error', 'You can only assign staff for up to 7 days at a time.');
+        }
+
+        $currentTime = date('H:i');
+        $todayStr = date('Y-m-d');
+        
+        $createdCount = 0;
+        $tempDate = $startDate->copy();
+
+        while ($tempDate->lte($endDate)) {
+            $currentLoopDate = $tempDate->format('Y-m-d');
+            
+            // Logic to prevent booking passed shifts for today
+            if ($currentLoopDate == $todayStr) {
+                if ($request->shift == 'Morning Shift' && $currentTime >= '10:00') {
+                    $tempDate->addDay();
+                    continue;
+                }
+                if ($request->shift == 'Evening Shift' && $currentTime >= '18:00') {
+                    $tempDate->addDay();
+                    continue;
+                }
+            }
+
+            // Check if THIS collector is already assigned to this shift on this date
+            $exists = \App\Models\DutyRoster::where('date', $currentLoopDate)
+                ->where('shift', $request->shift)
+                ->where('collector_id', $request->collector_id)
+                ->exists();
+
+            if (!$exists) {
+                \App\Models\DutyRoster::create([
+                    'collector_id' => $request->collector_id,
+                    'sector' => $request->sector,
+                    'road' => $request->road,
+                    'date' => $currentLoopDate,
+                    'shift' => $request->shift,
+                    'status' => 'Active'
+                ]);
+                $createdCount++;
+            }
+
+            $tempDate->addDay();
+        }
+
+        if ($createdCount == 0) {
+            return redirect()->back()->with('error', 'No new assignments were created (already assigned or shifts passed).');
+        }
+
+        return redirect()->back()->with('success', "Duty roster updated successfully ($createdCount assignments created).");
     }
 
     public function deleteDutyRoster($id)

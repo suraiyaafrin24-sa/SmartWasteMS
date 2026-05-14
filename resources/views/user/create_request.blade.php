@@ -178,6 +178,44 @@
             const noCollectorAlert = document.getElementById('no-collector-alert');
             const collectorsGrid = document.getElementById('collectors-grid');
 
+            function updateShiftOptions() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const todayStr = `${year}-${month}-${day}`;
+                
+                const selectedDate = dateInput.value;
+                const currentTime = now.getHours() * 100 + now.getMinutes();
+                
+                let anyEnabled = false;
+                Array.from(shiftSelect.options).forEach(option => {
+                    if (selectedDate === todayStr) {
+                        if (option.value === 'Morning Shift' && currentTime >= 1000) {
+                            option.disabled = true;
+                        } else if (option.value === 'Evening Shift' && currentTime >= 1800) {
+                            option.disabled = true;
+                        } else {
+                            option.disabled = false;
+                            anyEnabled = true;
+                        }
+                    } else {
+                        option.disabled = false;
+                        anyEnabled = true;
+                    }
+                });
+
+                // If current selection is disabled, pick first enabled one
+                if (shiftSelect.selectedOptions[0]?.disabled) {
+                    const firstEnabled = Array.from(shiftSelect.options).find(opt => !opt.disabled && opt.value !== "");
+                    if (firstEnabled) {
+                        shiftSelect.value = firstEnabled.value;
+                    } else {
+                        shiftSelect.value = "";
+                    }
+                }
+            }
+
             window.selectCollector = function(element, collectorId) {
                 // Remove selected state from all cards
                 document.querySelectorAll('.collector-card').forEach(card => {
@@ -203,8 +241,10 @@
                 const sector = sectorInput.value;
                 const date = dateInput.value;
 
-                if (sector && date) {
-                    fetch(`{{ route('user.get_collector') }}?sector=${sector}&date=${date}`)
+                const shift = shiftSelect.value;
+
+                if (sector && date && shift) {
+                    fetch(`{{ route('user.get_collector') }}?sector=${sector}&date=${date}&shift=${shift}`)
                         .then(response => response.json())
                         .then(data => {
                             if (data.success && data.rosters.length > 0) {
@@ -212,25 +252,27 @@
                                 data.rosters.forEach(roster => {
                                     const isCurrentShift = shiftSelect.value === roster.shift;
                                     const isBooked = roster.is_booked;
+                                    const isPassed = roster.is_passed;
                                     const card = `
-                                        <div class="collector-card p-4 rounded-2xl border ${isBooked ? 'bg-gray-50/50 border-gray-100 opacity-70 cursor-not-allowed' : (isCurrentShift ? 'bg-blue-50/30 border-blue-200 shadow-sm' : 'bg-white border-gray-100')} transition-all cursor-pointer hover:border-blue-300 group relative overflow-hidden" 
-                                             ${isBooked ? '' : `onclick="selectCollector(this, ${roster.collector.id})"`}>
-                                            ${isBooked ? '<div class="absolute inset-0 bg-white/10 z-10"></div>' : ''}
+                                        <div class="collector-card p-4 rounded-2xl border ${(isBooked || isPassed) ? 'bg-gray-50/50 border-gray-100 opacity-70 cursor-not-allowed' : (isCurrentShift ? 'bg-blue-50/30 border-blue-200 shadow-sm' : 'bg-white border-gray-100')} transition-all cursor-pointer hover:border-blue-300 group relative overflow-hidden" 
+                                             ${(isBooked || isPassed) ? '' : `onclick="selectCollector(this, ${roster.collector.id})"`}>
+                                            ${(isBooked || isPassed) ? '<div class="absolute inset-0 bg-white/10 z-10"></div>' : ''}
                                             <div class="flex items-center gap-4 relative z-0">
                                                 <div class="w-12 h-12 rounded-xl ${isCurrentShift ? 'bg-white' : 'bg-gray-50'} flex items-center justify-center font-black ${isCurrentShift ? 'text-blue-600' : 'text-gray-400'} border border-gray-100 overflow-hidden shrink-0">
                                                     ${roster.collector.image ? `<img src="${roster.collector.image}" class="w-full h-full object-cover">` : roster.collector.initial}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
                                                     <div class="flex items-center gap-2 mb-1">
-                                                        <div class="text-[9px] font-black ${isBooked ? 'text-red-500' : (isCurrentShift ? 'text-blue-400' : 'text-gray-400')} uppercase tracking-widest leading-none">
+                                                        <div class="text-[9px] font-black ${(isBooked || isPassed) ? 'text-red-500' : (isCurrentShift ? 'text-blue-400' : 'text-gray-400')} uppercase tracking-widest leading-none">
                                                             ${roster.shift}
                                                         </div>
                                                         ${isBooked ? '<span class="bg-red-500 text-white text-[7px] px-1.5 py-0.5 rounded-md font-black uppercase tracking-tighter">Booked</span>' : ''}
+                                                        ${isPassed ? '<span class="bg-gray-500 text-white text-[7px] px-1.5 py-0.5 rounded-md font-black uppercase tracking-tighter">Shift Ended</span>' : ''}
                                                     </div>
                                                     <h4 class="text-sm font-black text-gray-800 tracking-tight truncate">${roster.collector.name}</h4>
                                                     <p class="text-[10px] font-bold text-gray-400">${roster.collector.phone}</p>
                                                 </div>
-                                                <div class="selection-indicator w-5 h-5 rounded-full border-2 ${isBooked ? 'border-gray-100' : 'border-gray-200'} flex items-center justify-center transition-all ${isBooked ? '' : 'group-hover:border-blue-200'}">
+                                                <div class="selection-indicator w-5 h-5 rounded-full border-2 ${(isBooked || isPassed) ? 'border-gray-100' : 'border-gray-200'} flex items-center justify-center transition-all ${(isBooked || isPassed) ? '' : 'group-hover:border-blue-200'}">
                                                     <div class="w-2.5 h-2.5 rounded-full bg-blue-500 scale-0 transition-all"></div>
                                                 </div>
                                             </div>
@@ -239,9 +281,9 @@
                                     collectorsGrid.innerHTML += card;
                                 });
 
-                                // Auto-select if there is a collector for the current shift who is NOT booked
+                                // Auto-select if there is a collector for the current shift who is NOT booked AND NOT passed
                                 const currentShiftCard = Array.from(document.querySelectorAll('.collector-card'))
-                                    .find(c => c.innerHTML.includes(shiftSelect.value) && !c.innerHTML.includes('Booked'));
+                                    .find(c => c.innerHTML.includes(shiftSelect.value) && !c.innerHTML.includes('Booked') && !c.innerHTML.includes('Shift Ended'));
                                 if (currentShiftCard) {
                                     currentShiftCard.click();
                                 }
@@ -263,10 +305,14 @@
                 }
             }
 
-            dateInput.addEventListener('change', fetchCollectors);
+            dateInput.addEventListener('change', () => {
+                updateShiftOptions();
+                fetchCollectors();
+            });
             shiftSelect.addEventListener('change', fetchCollectors);
 
             // Initial check
+            updateShiftOptions();
             if (sectorInput.value && dateInput.value) {
                 fetchCollectors();
             }

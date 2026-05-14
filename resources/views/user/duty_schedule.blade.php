@@ -83,22 +83,17 @@
                         </td>
                         <td class="py-4 px-2">
                             @php
-                                $today = now()->format('Y-m-d');
+                                $todayDate = now()->toDateString();
+                                $rosterDate = \Carbon\Carbon::parse($duty->date)->toDateString();
                                 $currentTime = now()->format('H:i');
-                                $isToday = $duty->date == $today;
-                                $isFuture = $duty->date > $today;
-                                $isPast = $duty->date < $today;
                                 
-                                if ($isPast) {
+                                if ($rosterDate < $todayDate) {
                                     $statusText = 'Completed';
                                     $statusClass = 'bg-gray-50 text-gray-400';
-                                } elseif ($isFuture) {
-                                    $statusText = 'Scheduled';
+                                } elseif ($rosterDate > $todayDate) {
+                                    $statusText = 'Upcoming';
                                     $statusClass = 'bg-blue-50 text-blue-500';
                                 } else { // Today
-                                    $statusText = 'NO DUTY';
-                                    $statusClass = 'bg-slate-50 text-slate-400';
-
                                     if (str_contains(strtolower($duty->shift), 'morning')) {
                                         if ($currentTime >= '07:00' && $currentTime <= '10:00') {
                                             $statusText = 'ACTIVE';
@@ -106,6 +101,9 @@
                                         } elseif ($currentTime < '07:00') {
                                             $statusText = 'Shift Pending';
                                             $statusClass = 'bg-amber-50 text-amber-600';
+                                        } else {
+                                            $statusText = 'Shift Ended';
+                                            $statusClass = 'bg-gray-50 text-gray-400';
                                         }
                                     } elseif (str_contains(strtolower($duty->shift), 'evening') || str_contains(strtolower($duty->shift), 'afternoon')) {
                                         if ($currentTime >= '16:00' && $currentTime <= '18:00') {
@@ -114,17 +112,17 @@
                                         } elseif ($currentTime < '16:00') {
                                             $statusText = 'Shift Pending';
                                             $statusClass = 'bg-amber-50 text-amber-600';
+                                        } else {
+                                            $statusText = 'Shift Ended';
+                                            $statusClass = 'bg-gray-50 text-gray-400';
                                         }
+                                    } else {
+                                        $statusText = 'Today';
+                                        $statusClass = 'bg-slate-50 text-slate-400';
                                     }
                                 }
                             @endphp
                             <div class="flex items-center gap-2">
-                                @if($statusText == 'Active Now')
-                                    <span class="relative flex h-2 w-2">
-                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                    </span>
-                                @endif
                                 <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest {{ $statusClass }}">
                                     {{ $statusText }}
                                 </span>

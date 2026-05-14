@@ -67,6 +67,19 @@ class UserDashboardController extends Controller
             'road' => 'required|string|max:100',
         ]);
 
+        // Logic to prevent booking passed shifts for today
+        $isToday = $request->scheduled_date == date('Y-m-d');
+        $currentTime = date('H:i');
+        
+        if ($isToday) {
+            if ($request->shift == 'Morning Shift' && $currentTime >= '10:00') {
+                return redirect()->back()->withInput()->with('error', 'Morning shift is no longer available for today.');
+            }
+            if ($request->shift == 'Evening Shift' && $currentTime >= '18:00') {
+                return redirect()->back()->withInput()->with('error', 'Evening shift is no longer available for today.');
+            }
+        }
+
         // Use manually selected collector if provided, otherwise find assigned collector
         $manualCollectorId = $request->collector_id;
         
@@ -118,27 +131,42 @@ class UserDashboardController extends Controller
         $request->validate([
             'sector' => 'required|string',
             'date' => 'required|date',
+            'shift' => 'required|string',
         ]);
 
         $rosters = DutyRoster::where('sector', $request->sector)
             ->where('date', $request->date)
+            ->where('shift', $request->shift)
             ->with('collector')
             ->get();
+
+        $isToday = $request->date == date('Y-m-d');
+        $currentTime = date('H:i');
 
         if ($rosters->count() > 0) {
             return response()->json([
                 'success' => true,
-                'rosters' => $rosters->map(function ($r) use ($request) {
-                    // Check if this collector is already booked for this specific date AND shift
+                'rosters' => $rosters->map(function ($r) use ($request, $isToday, $currentTime) {
+                    $isPassed = false;
+                    if ($isToday) {
+                        if ($r->shift == 'Morning Shift' && $currentTime >= '10:00') {
+                            $isPassed = true;
+                        } elseif ($r->shift == 'Evening Shift' && $currentTime >= '18:00') {
+                            $isPassed = true;
+                        }
+                    }
+
+                    // Check if this collector is currently busy (Pending or Scheduled) for this date AND shift
                     $isBooked = CollectionRequest::where('collector_id', $r->collector->id)
                         ->where('scheduled_date', $request->date)
                         ->where('shift', $r->shift)
-                        ->whereIn('status', ['Pending', 'Scheduled', 'Collected', 'Completed'])
+                        ->whereIn('status', ['Pending', 'Scheduled'])
                         ->exists();
 
                     return [
                         'shift' => $r->shift,
                         'is_booked' => $isBooked,
+                        'is_passed' => $isPassed,
                         'collector' => [
                             'id' => $r->collector->id,
                             'name' => $r->collector->name,

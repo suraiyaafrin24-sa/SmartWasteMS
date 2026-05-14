@@ -55,17 +55,26 @@
 
                 <!-- Date -->
                 <div class="space-y-2">
-                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Duty Date <span
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Duty Start Date <span
                             class="text-red-500">*</span></label>
-                    <input type="date" name="date" value="{{ $prefill['date'] ?? date('Y-m-d') }}" required
+                    <input type="date" name="date" id="duty_date" value="{{ $prefill['date'] ?? date('Y-m-d') }}" required
                         min="{{ date('Y-m-d') }}"
                         class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all">
+                </div>
+
+                <!-- End Date (Bulk Assign) -->
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">End Date (Optional)</label>
+                    <input type="date" name="end_date" id="end_date" min="{{ date('Y-m-d') }}"
+                        placeholder="Bulk assign up to 7 days"
+                        class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all">
+                    <p class="text-[9px] text-gray-400 font-medium italic mt-1">Leave blank for single day assignment.</p>
                 </div>
 
                 <!-- Shift -->
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest">Operating Shift <span class="text-red-500">*</span></label>
-                    <select name="shift" required class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
+                    <select name="shift" id="shift_select" required class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
                         <option value="Morning Shift" {{ (isset($prefill['shift']) && $prefill['shift'] == 'Morning Shift') ? 'selected' : '' }}>🌅 Morning Shift (7-10 AM)</option>
                         <option value="Evening Shift" {{ (isset($prefill['shift']) && $prefill['shift'] == 'Evening Shift') ? 'selected' : '' }}>🌇 Evening Shift (4-6 PM)</option>
                     </select>
@@ -136,22 +145,17 @@
                             </td>
                             <td class="px-8 py-5">
                                 @php
-                                    $today = now()->format('Y-m-d');
+                                    $todayDate = now()->toDateString();
+                                    $rosterDate = \Carbon\Carbon::parse($r->date)->toDateString();
                                     $currentTime = now()->format('H:i');
-                                    $isToday = $r->date == $today;
-                                    $isFuture = $r->date > $today;
-                                    $isPast = $r->date < $today;
                                     
-                                    if ($isPast) {
+                                    if ($rosterDate < $todayDate) {
                                         $statusText = 'Completed';
                                         $statusClass = 'bg-gray-100 text-gray-400';
-                                    } elseif ($isFuture) {
+                                    } elseif ($rosterDate > $todayDate) {
                                         $statusText = 'Upcoming';
                                         $statusClass = 'bg-blue-50 text-blue-600';
                                     } else { // Today
-                                        $statusText = 'NO DUTY';
-                                        $statusClass = 'bg-slate-50 text-slate-400';
-
                                         if ($r->shift == 'Morning Shift') {
                                             if ($currentTime >= '07:00' && $currentTime <= '10:00') {
                                                 $statusText = 'ACTIVE';
@@ -159,6 +163,9 @@
                                             } elseif ($currentTime < '07:00') {
                                                 $statusText = 'Pending';
                                                 $statusClass = 'bg-amber-50 text-amber-600';
+                                            } else {
+                                                $statusText = 'Shift Ended';
+                                                $statusClass = 'bg-gray-100 text-gray-400';
                                             }
                                         } else { // Evening Shift
                                             if ($currentTime >= '16:00' && $currentTime <= '18:00') {
@@ -167,6 +174,9 @@
                                             } elseif ($currentTime < '16:00') {
                                                 $statusText = 'Pending';
                                                 $statusClass = 'bg-amber-50 text-amber-600';
+                                            } else {
+                                                $statusText = 'Shift Ended';
+                                                $statusClass = 'bg-gray-100 text-gray-400';
                                             }
                                         }
                                     }
@@ -214,9 +224,44 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const collectorSelect = document.getElementById('collector_select');
+        const dutyDate = document.getElementById('duty_date');
+        const shiftSelect = document.getElementById('shift_select');
         const hiddenSector = document.getElementById('hidden_sector');
         const hiddenRoad = document.getElementById('hidden_road');
         const displayAddress = document.getElementById('display_address');
+
+        function updateShiftOptions() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+            
+            const selectedDate = dutyDate.value;
+            const currentTime = now.getHours() * 100 + now.getMinutes();
+            
+            Array.from(shiftSelect.options).forEach(option => {
+                if (selectedDate === todayStr) {
+                    if (option.value === 'Morning Shift' && currentTime >= 1000) {
+                        option.disabled = true;
+                    } else if (option.value === 'Evening Shift' && currentTime >= 1800) {
+                        option.disabled = true;
+                    } else {
+                        option.disabled = false;
+                    }
+                } else {
+                    option.disabled = false;
+                }
+            });
+
+            // If current selection is disabled, pick first enabled one
+            if (shiftSelect.selectedOptions[0]?.disabled) {
+                const firstEnabled = Array.from(shiftSelect.options).find(opt => !opt.disabled);
+                if (firstEnabled) {
+                    shiftSelect.value = firstEnabled.value;
+                }
+            }
+        }
 
         if (collectorSelect) {
             function updateFields() {
@@ -248,9 +293,11 @@
             }
 
             collectorSelect.addEventListener('change', updateFields);
+            dutyDate.addEventListener('change', updateShiftOptions);
             
             // Trigger once on load
             updateFields();
+            updateShiftOptions();
         }
     });
 </script>

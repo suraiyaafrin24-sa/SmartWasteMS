@@ -79,9 +79,23 @@
                 </div>
                 <div class="space-y-3">
                     @forelse($todaysSchedules as $schedule)
+                        @php
+                            $isPassed = false;
+                            $currentTime = date('H:i');
+                            
+                            if ($schedule->shift == 'Morning Shift' && $currentTime >= '10:00') {
+                                $isPassed = true;
+                            } elseif ($schedule->shift == 'Evening Shift' && $currentTime >= '18:00') {
+                                $isPassed = true;
+                            }
+                        @endphp
                         <div class="flex items-center justify-between border-b border-gray-50 pb-2 last:border-0 last:pb-0">
-                            <div class="text-[16px] font-black text-slate-800 tracking-tight leading-none">{{ $schedule->sector }}</div>
-                            <div class="text-[9px] font-black text-white bg-[#19817E] px-2 py-1 rounded-md uppercase tracking-widest leading-none">{{ $schedule->shift }}</div>
+                            <div class="text-[16px] font-black text-slate-800 tracking-tight leading-none {{ $isPassed ? 'opacity-50' : '' }}">{{ $schedule->sector }}</div>
+                            @if($isPassed)
+                                <div class="text-[9px] font-black text-slate-400 bg-slate-100 border border-slate-200 px-2 py-1 rounded-md uppercase tracking-widest leading-none">Shift Ended</div>
+                            @else
+                                <div class="text-[9px] font-black text-white bg-[#19817E] px-2 py-1 rounded-md uppercase tracking-widest leading-none">{{ $schedule->shift }}</div>
+                            @endif
                         </div>
                     @empty
                         <div class="text-[16px] font-black text-slate-300 tracking-tight leading-none italic">No Duty Assigned</div>
@@ -134,13 +148,22 @@
                 </div>
                 
                 <div class="flex items-center gap-3 pt-5 border-t border-gray-50">
-
-                    <form action="{{ route('waste_collector.requests.complete', $request->id) }}" method="POST" class="flex-1">
-                        @csrf
-                        <button type="submit" class="w-full bg-[#19817E] text-white text-[10px] font-black py-3 px-4 rounded-xl hover:bg-teal-700 transition shadow-lg shadow-teal-700/10 uppercase tracking-[0.2em]">
-                            Collected
-                        </button>
-                    </form>
+                    @php
+                        $isFuture = strtotime($request->scheduled_date) > strtotime(date('Y-m-d'));
+                    @endphp
+                    
+                    @if($isFuture)
+                        <div class="flex-1 w-full text-center py-3 px-4 rounded-xl bg-gray-100 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] border border-gray-200 cursor-not-allowed" title="Available on {{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d') }}">
+                            Available {{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d') }}
+                        </div>
+                    @else
+                        <form action="{{ route('waste_collector.requests.complete', $request->id) }}" method="POST" class="flex-1">
+                            @csrf
+                            <button type="submit" class="w-full bg-[#19817E] text-white text-[10px] font-black py-3 px-4 rounded-xl hover:bg-teal-700 transition shadow-lg shadow-teal-700/10 uppercase tracking-[0.2em]">
+                                Collected
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
             @empty

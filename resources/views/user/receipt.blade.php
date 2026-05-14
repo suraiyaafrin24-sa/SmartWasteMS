@@ -75,20 +75,46 @@
             <div class="p-10">
                 <div class="grid grid-cols-2 gap-10 mb-12">
                     <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Customer Details</p>
-                        <h3 class="text-lg font-black text-slate-800">{{ $request->user->name }}</h3>
-                        <p class="text-slate-500 text-sm font-medium">{{ $request->user->email }}</p>
-                        <p class="text-slate-500 text-sm font-medium">{{ $request->user->phone }}</p>
-                        <p class="text-slate-500 text-sm font-medium mt-2 max-w-[200px]">{{ $request->address }}</p>
+                        <p class="text-[10px] font-black text-[#19817E] uppercase tracking-[0.2em] mb-4 border-b border-teal-50 pb-2">Customer Details</p>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Customer Name</p>
+                                <p class="text-sm font-black text-slate-800">{{ $request->user->name }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Email Address</p>
+                                <p class="text-sm font-bold text-slate-600">{{ $request->user->email }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Contact Number</p>
+                                <p class="text-sm font-bold text-slate-600">{{ $request->user->phone ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sector</p>
+                                <p class="text-sm font-bold text-slate-600 leading-relaxed max-w-[240px]">{{ $request->sector }}</p>
+                            </div>
+                        </div>
                     </div>
                     <div class="text-right">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Transaction Info</p>
-                        <p class="text-slate-500 text-sm font-bold">Transaction ID:</p>
-                        <p class="text-slate-800 text-sm font-black mb-2">{{ $request->transaction_id }}</p>
-                        <p class="text-slate-500 text-sm font-bold">Request ID:</p>
-                        <p class="text-slate-800 text-sm font-black mb-2">#CR-{{ str_pad($request->id, 6, '0', STR_PAD_LEFT) }}</p>
-                        <p class="text-slate-500 text-sm font-bold">Date Paid:</p>
-                        <p class="text-slate-800 text-sm font-black">{{ $request->updated_at->format('M d, Y h:i A') }}</p>
+                        <p class="text-[10px] font-black text-[#19817E] uppercase tracking-[0.2em] mb-4 border-b border-teal-50 pb-2 inline-block ml-auto">Transaction Info</p>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Transaction ID</p>
+                                <p class="text-sm font-black text-slate-800">{{ $request->transaction_id }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Request Number</p>
+                                <p class="text-sm font-black text-slate-800">#CR-{{ str_pad($request->id, 6, '0', STR_PAD_LEFT) }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Payment Date</p>
+                                <p class="text-sm font-black text-slate-800">{{ $request->updated_at->format('M d, Y h:i A') }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Payment Status</p>
+                                <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-100">Verified</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
