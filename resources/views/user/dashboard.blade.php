@@ -86,7 +86,7 @@
                 </div>
                 <div class="text-[42px] font-black text-slate-800 leading-none tracking-tight">{{ $pendingPickups }}</div>
             </div>
-            <p class="text-[12px] text-slate-400 font-medium tracking-wide">Assigned for tomorrow 10 AM</p>
+            <p class="text-[12px] text-slate-400 font-medium tracking-wide">Scheduled for collection</p>
         </div>
 
         <!-- Completed Card -->
@@ -106,8 +106,7 @@
                 <div class="text-[42px] font-black text-slate-800 leading-none tracking-tight">{{ $completedRequestsCount }}
                 </div>
             </div>
-            <p class="text-[12px] text-slate-400 font-medium tracking-wide">Eco-contribution: {{ $ecoContribution ?? 0 }}kg
-                saved</p>
+            <p class="text-[12px] text-slate-400 font-medium tracking-wide">Successfully picked up</p>
         </div>
     </div>
 
@@ -157,7 +156,7 @@
                                 @else
                                     <form action="{{ route('sslc.pay') }}" method="POST" class="inline">
                                         @csrf
-                                        <input type="hidden" name="amount" value="500">
+                                        <input type="hidden" name="amount" value="20">
                                         <input type="hidden" name="request_id" value="{{ $request->id }}">
                                         <button type="submit" class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-rose-50 text-rose-600 tracking-widest uppercase hover:bg-rose-100 transition-colors">Unpaid</button>
                                     </form>
@@ -257,58 +256,6 @@
         </div>
     </div>
 
-    <!-- Post-Submission Payment Modal -->
-    @if(session('show_payment_modal'))
-    <div id="paymentPromptModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[10000] flex items-center justify-center p-6">
-        <div class="bg-white rounded-[40px] w-full max-w-lg overflow-hidden shadow-2xl transform animate-in zoom-in duration-300">
-            <div class="relative h-48 bg-gradient-to-br from-[#19817E] to-teal-800 flex items-center justify-center overflow-hidden">
-                <div class="absolute inset-0 opacity-10">
-                    <svg class="w-full h-full" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.82v-1.91c-1.39-.23-2.67-.89-3.72-1.94l1.32-1.32c.71.71 1.54 1.15 2.4 1.34v-3.08l-2.02-.67c-1.42-.47-2.38-1.54-2.38-2.92 0-1.12.63-2.13 1.67-2.69V5h2.82v1.91c1.17.19 2.21.72 3.09 1.48l-1.32 1.32c-.52-.45-1.11-.75-1.77-.91v3l2.02.67c1.42.47 2.38 1.54 2.38 2.92 0 1.14-.64 2.16-1.8 2.71zM10.59 9.87c0 .4.27.7.77.87v-1.7c-.45.14-.77.44-.77.83zm2.82 4.26c0-.4-.27-.7-.77-.87v1.7c.45-.14.77-.44.77-.83z"/></svg>
-                </div>
-                <div class="relative z-10 text-center">
-                    <div class="w-20 h-20 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center mx-auto mb-4 border border-white/30">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    </div>
-                    <h3 class="text-2xl font-black text-white tracking-tight">Request Submitted!</h3>
-                </div>
-            </div>
-            <div class="p-10 text-center">
-                <p class="text-slate-500 font-medium mb-8 leading-relaxed">Your collection request has been received. Would you like to pay your service fee now for a smoother experience?</p>
-                
-                <div class="bg-slate-50 rounded-3xl p-6 mb-8 flex justify-between items-center border border-slate-100">
-                    <div class="text-left">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Service Fee</p>
-                        <p class="text-2xl font-black text-slate-800">৳500.00</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <img src="https://securepay.sslcommerz.com/gw/asset/img/sslcommerz-logo.png" class="h-6 opacity-50 grayscale" alt="SSLCommerz">
-                    </div>
-                </div>
-
-                <div class="flex flex-col gap-3">
-                    <form action="{{ route('sslc.pay') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="amount" value="500">
-                        <input type="hidden" name="request_id" value="{{ session('request_id') }}">
-                        <button type="submit" class="w-full bg-[#19817E] text-white py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] hover:bg-teal-700 transition shadow-xl shadow-teal-900/10 active:scale-[0.98]">
-                            Pay Now via SSLCommerz
-                        </button>
-                    </form>
-                    <button onclick="closePaymentModal()" class="w-full py-4 text-slate-400 font-black text-[11px] uppercase tracking-widest hover:text-slate-600 transition">
-                        Pay Later from Dashboard
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        function closePaymentModal() {
-            document.getElementById('paymentPromptModal').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-        document.body.style.overflow = 'hidden';
-    </script>
-    @endif
 
     <script>
         function openRequestModal(btn) {

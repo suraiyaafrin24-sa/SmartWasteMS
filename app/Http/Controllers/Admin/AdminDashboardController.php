@@ -94,9 +94,11 @@ class AdminDashboardController extends Controller
                 $query->where('status', 'Scheduled');
             })->count();
 
-        $todayRequestsCount = $todayQuery->count();
-        $todayCompletedCount = $todayCompletedQuery->count();
-        $clearedTodayPercent = $todayRequestsCount > 0 ? round(($todayCompletedCount / $todayRequestsCount) * 100) : 0;
+        $requestsCreatedTodayQuery = CollectionRequest::whereDate('created_at', date('Y-m-d'));
+        $requestsCreatedToday = (clone $requestsCreatedTodayQuery)->count();
+        $todayCompletedCount = (clone $requestsCreatedTodayQuery)->whereIn('status', ['Completed', 'Collected'])->count();
+        
+        $clearedTodayPercent = $requestsCreatedToday > 0 ? round(($todayCompletedCount / $requestsCreatedToday) * 100) : 0;
 
         $latestRequests = $requestQuery->orderBy('created_at', 'desc')
             ->take(10)
@@ -120,6 +122,8 @@ class AdminDashboardController extends Controller
             'activeStaffCount',
             'totalUsersCount',
             'clearedTodayPercent',
+            'todayCompletedCount',
+            'requestsCreatedToday',
             'latestRequests',
             'activeStaff',
             'newUsersThisMonth',
@@ -290,11 +294,30 @@ class AdminDashboardController extends Controller
         return redirect()->back()->with('success', 'Compliant marked as resolved successfully.');
     }
 
-    public function reports()
+    public function reports(Request $request)
     {
         $collectors = User::where('role', 'waste_collector')->get();
         $generalUsers = User::where('role', 'user')->get();
-        return view('admin.reports.generate', compact('collectors', 'generalUsers'));
+
+        $query = CollectionRequest::with(['user', 'collector'])->orderBy('created_at', 'desc');
+
+        if ($request->filled('user_id') && $request->filled('report_type')) {
+            if ($request->report_type == 'collector') {
+                $query->where('collector_id', $request->user_id);
+            } else {
+                $query->where('user_id', $request->user_id);
+            }
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        $collections = $query->paginate(15)->appends($request->query());
+
+        return view('admin.reports.generate', compact('collectors', 'generalUsers', 'collections'));
     }
 
     public function generateReport(Request $request)
@@ -303,14 +326,14 @@ class AdminDashboardController extends Controller
             'report_type' => 'required|in:collector,user',
             'user_id' => 'required',
             'start_date' => 'required|date',
-            'days' => 'required|integer|min:1|max:365',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
         $actor = User::findOrFail($request->user_id);
-        $endDate = \Carbon\Carbon::parse($request->start_date);
-        $startDate = $endDate->copy()->subDays((int) $request->days);
+        $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
+        $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
 
-        $query = CollectionRequest::whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
+        $query = CollectionRequest::whereBetween('created_at', [$startDate, $endDate]);
 
         if ($request->report_type == 'collector') {
             $query->where('collector_id', $request->user_id);
@@ -326,8 +349,86 @@ class AdminDashboardController extends Controller
             'start_date' => $startDate->format('Y-m-d'),
             'end_date' => $endDate->format('Y-m-d'),
             'type' => $request->report_type,
-            'days' => $request->days
+            'days' => null // No longer used
         ]);
+    }
+
+    public function downloadReport(Request $request)
+    {
+        $query = CollectionRequest::with(['user', 'collector'])->orderBy('created_at', 'desc');
+
+        if ($request->filled('user_id') && $request->filled('report_type')) {
+            if ($request->report_type == 'collector') {
+                $query->where('collector_id', $request->user_id);
+            } else {
+                $query->where('user_id', $request->user_id);
+            }
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        $records = $query->get();
+        $filename = 'collection_report_' . date('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($records) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Date', 'Time', 'User', 'Sector', 'Road', 'Waste Type', 'Shift', 'Assigned Collector', 'Scheduled Date', 'Status']);
+            foreach ($records as $item) {
+                fputcsv($handle, [
+                    $item->created_at->format('M d, Y'),
+                    $item->created_at->format('h:i A'),
+                    $item->user->name ?? 'N/A',
+                    $item->sector ?? 'N/A',
+                    $item->road ?? 'N/A',
+                    $item->type ?? 'N/A',
+                    $item->shift ?? 'N/A',
+                    $item->collector->name ?? 'Unassigned',
+                    $item->scheduled_date ? \Carbon\Carbon::parse($item->scheduled_date)->format('M d, Y') : 'N/A',
+                    $item->status ?? 'N/A',
+                ]);
+            }
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function downloadPdfReport(Request $request)
+    {
+        $actor = User::findOrFail($request->user_id);
+        $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
+        $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
+
+        $query = CollectionRequest::whereBetween('created_at', [$startDate, $endDate]);
+
+        if ($request->report_type == 'collector') {
+            $query->where('collector_id', $request->user_id);
+        } else {
+            $query->where('user_id', $request->user_id);
+        }
+
+        $activity = $query->with(['user', 'collector'])->get();
+
+        $data = [
+            'actor' => $actor,
+            'activity' => $activity,
+            'start_date' => $startDate->format('Y-m-d'),
+            'end_date' => $endDate->format('Y-m-d'),
+            'type' => $request->report_type,
+            'days' => null
+        ];
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.reports.pdf', $data);
+        return $pdf->download('activity_report_' . $actor->name . '_' . date('Y-m-d') . '.pdf');
     }
 
     public function collections(Request $request)
@@ -371,6 +472,16 @@ class AdminDashboardController extends Controller
                     }
                 } catch (\Exception $e) {}
             });
+        }
+        
+        if ($request->has('status') && $request->status != '') {
+            if ($request->status == 'Pending') {
+                $query->whereIn('status', ['Pending', 'Scheduled']);
+            } elseif ($request->status == 'Completed') {
+                $query->whereIn('status', ['Completed', 'Collected']);
+            } elseif ($request->status == 'Today') {
+                $query->whereDate('created_at', today());
+            }
         }
 
         $collections = $query->orderBy('created_at', 'desc')->paginate(15);

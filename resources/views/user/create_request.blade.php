@@ -18,7 +18,7 @@
                     <label class="block text-[11px] font-black text-gray-400 uppercase tracking-[2px] mb-5">Select Waste
                         Category <span class="text-red-500">*</span></label>
                     <div class="relative max-w-xl">
-                        <select name="type" required
+                        <select name="type" required style="background-image: none;"
                             class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-2xl p-5 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer">
                             <option value="">Choose Category...</option>
                             <option value="Organic" {{ old('type') == 'Organic' ? 'selected' : '' }}>🍀 Organic (Food, Garden
@@ -55,7 +55,7 @@
                             <label class="block text-[11px] font-black text-gray-500 uppercase tracking-widest">Preferred
                                 Shift <span class="text-red-500">*</span></label>
                             <div class="relative">
-                                <select name="shift" required
+                                <select name="shift" required style="background-image: none;"
                                     class="w-full bg-gray-50/50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all shadow-sm cursor-pointer appearance-none">
                                     <option value="Morning Shift">🌅 Morning Shift (07 AM - 10 AM)</option>
                                     <option value="Evening Shift">🌇 Evening Shift (04 PM - 06 PM)</option>

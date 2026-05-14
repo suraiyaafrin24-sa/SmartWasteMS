@@ -21,7 +21,7 @@
     </div>
 
     <!-- Quick Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
         <!-- Collection Status Card -->
         <div
             class="bg-white rounded-3xl p-6 border border-gray-50 flex flex-col justify-between h-44 relative overflow-hidden group">
@@ -43,6 +43,49 @@
                 <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">{{ $pendingCollections }}</div>
             </div>
             <p class="text-[12px] text-slate-400 font-medium leading-snug">Active collections in system</p>
+        </div>
+
+        <!-- Today's Requests Card -->
+        <div
+            class="bg-white rounded-3xl p-6 border border-gray-50 flex flex-col justify-between h-44 relative overflow-hidden group">
+            <div
+                class="absolute right-4 top-1/2 -translate-y-1/2 opacity-[0.03] group-hover:scale-110 transition duration-500">
+                <svg class="w-24 h-24 text-indigo-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                </svg>
+            </div>
+            <div>
+                <div class="text-indigo-500 font-bold text-[13px] mb-1.5 flex items-center gap-1.5 leading-none">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Today's Requests
+                </div>
+                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">{{ $requestsCreatedToday }}</div>
+            </div>
+            <p class="text-[12px] text-slate-400 font-medium leading-snug">New requests submitted today</p>
+        </div>
+
+        <!-- Cleared Today Card -->
+        <div
+            class="bg-white rounded-3xl p-6 border border-gray-50 flex flex-col justify-between h-44 relative overflow-hidden group">
+            <div
+                class="absolute right-4 top-1/2 -translate-y-1/2 opacity-[0.03] group-hover:scale-110 transition duration-500">
+                <svg class="w-24 h-24 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+                </svg>
+            </div>
+            <div>
+                <div class="text-emerald-500 font-bold text-[13px] mb-1.5 flex items-center gap-1.5 leading-none">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Cleared Today
+                </div>
+                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">{{ $todayCompletedCount }}</div>
+            </div>
+            <p class="text-[12px] text-slate-400 font-medium leading-snug">Collections completed today</p>
         </div>
 
         <!-- Active Collectors Card -->
@@ -67,9 +110,6 @@
                 <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">{{ $activeStaffCount }}</div>
             </div>
             <div class="flex items-center gap-1.5 mt-2">
-                <span
-                    class="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 uppercase tracking-widest">{{ $onDutyCount }}
-                    Online Now</span>
                 <p class="text-[12px] text-slate-400 font-medium leading-snug">registered staff</p>
             </div>
         </div>
@@ -98,34 +138,8 @@
                 </div>
             </div>
             <div class="flex items-center gap-1.5 mt-2">
-                <span
-                    class="text-[10px] font-black px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 uppercase tracking-widest">+{{ $newUsersThisMonth }}
-                    New This Month</span>
                 <p class="text-[12px] text-slate-400 font-medium leading-snug">resident accounts</p>
             </div>
-        </div>
-
-        <!-- Completed Card -->
-        <div
-            class="bg-white rounded-3xl p-6 border border-gray-50 flex flex-col justify-between h-44 relative overflow-hidden group">
-            <div
-                class="absolute right-4 top-1/2 -translate-y-1/2 opacity-[0.03] group-hover:scale-110 transition duration-500">
-                <svg class="w-24 h-24 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
-                </svg>
-            </div>
-            <div>
-                <div class="text-emerald-500 font-bold text-[13px] mb-1.5 flex items-center gap-1.5 leading-none">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Cleared Today
-                </div>
-                <div class="text-4xl font-black text-slate-800 leading-none tracking-tight">{{ $clearedTodayPercent }}<span
-                        class="text-xl text-emerald-500 font-bold ml-1">%</span></div>
-            </div>
-            <p class="text-[12px] text-slate-400 font-medium leading-snug">Of daily schedules completed</p>
         </div>
     </div>
 
@@ -151,7 +165,9 @@
                 <table class="w-full text-left text-sm whitespace-nowrap">
                     <thead>
                         <tr class="text-slate-300 font-bold text-[11px] uppercase tracking-widest border-b border-gray-50">
-                            <th class="pb-4 px-2">User / Address</th>
+                            <th class="pb-4 px-2">User</th>
+                            <th class="pb-4 px-2">Requested Date</th>
+                            <th class="pb-4 px-2">Sector</th>
                             <th class="pb-4 px-2">Waste Type</th>
                             <th class="pb-4 px-2">Shift</th>
                             <th class="pb-4 px-2">Assigned Collector</th>
@@ -164,7 +180,15 @@
                             <tr class="hover:bg-gray-50/30 transition-all duration-300">
                                 <td class="py-5 px-2">
                                     <div class="font-black text-slate-800">{{ $request->user->name }}</div>
-                                    <div class="text-[11px] text-slate-400 font-medium">{{ $request->address }}</div>
+                                </td>
+                                <td class="py-5 px-2">
+                                    <div class="text-[11px] font-black text-slate-800 leading-none mb-1">{{ $request->created_at->format('M d, Y') }}</div>
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">at {{ $request->created_at->format('h:i A') }}</div>
+                                </td>
+                                <td class="py-5 px-2">
+                                    <span class="bg-teal-50 text-teal-600 border border-teal-100 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                        {{ $request->sector ?? 'N/A' }}
+                                    </span>
                                 </td>
                                 <td class="py-5 px-2">
                                     <span
@@ -210,31 +234,41 @@
                                 <td class="py-5 px-2 text-right">
                                     @if(!$request->collector && $request->status == 'Pending')
                                         <form action="{{ route('admin.requests.assign', $request->id) }}" method="POST"
-                                            class="flex items-center justify-end gap-1.5">
+                                            class="flex items-center justify-end gap-2">
                                             @csrf
                                             <div class="relative">
                                                 <select name="collector_id" required
-                                                    class="text-[10px] font-black bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 pr-6 focus:ring-1 focus:ring-teal-500 outline-none w-24 appearance-none cursor-pointer">
-                                                    <option value="">Staff Select</option>
+                                                    class="text-[10px] font-bold bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 pr-8 focus:ring-1 focus:ring-teal-500 outline-none appearance-none cursor-pointer">
+                                                    <option value="">Select Collector</option>
                                                     @foreach($collectors as $c)
-                                                        <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                                        <option value="{{ $c->id }}">
+                                                            {{ $c->name }}
+                                                            @if($c->sector)
+                                                                — {{ $c->sector }}
+                                                            @elseif($c->dutyRosters->first())
+                                                                — {{ $c->dutyRosters->first()->sector }}
+                                                            @endif
+                                                        </option>
                                                     @endforeach
                                                 </select>
-                                                <div class="absolute inset-y-0 right-1.5 flex items-center pointer-events-none text-gray-400">
+                                                <div class="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-gray-400">
                                                     <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="scheduled_date"
-                                                value="{{ $request->scheduled_date ?? date('Y-m-d') }}">
+                                            <input type="date" name="scheduled_date" required value="{{ $request->scheduled_date ? \Carbon\Carbon::parse($request->scheduled_date)->format('Y-m-d') : date('Y-m-d') }}" min="{{ date('Y-m-d') }}" class="text-[10px] font-bold bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 outline-none">
                                             <button type="submit"
                                                 class="bg-[#19817E] text-white text-[9px] font-black px-3 py-1.5 rounded-lg hover:bg-teal-700 transition uppercase tracking-widest">Assign</button>
                                         </form>
                                     @else
                                         <button data-user="{{ $request->user->name }}"
                                             data-phone="{{ $request->phone ?? $request->user->phone ?? 'N/A' }}"
-                                            data-address="{{ $request->address }}" data-type="{{ $request->type }}"
+                                            data-address="{{ $request->address }}" 
+                                            data-sector="{{ $request->sector ?? 'N/A' }}"
+                                            data-road="{{ $request->road ?? 'N/A' }}"
+                                            data-type="{{ $request->type }}"
                                             data-details="{{ $request->details ?? 'No special instructions provided.' }}"
                                             data-date="{{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d, Y') }}"
+                                            data-requested-at="at {{ $request->created_at->format('h:i A') }}"
                                             data-time="{{ $request->shift ?? 'Anytime' }}" data-status="{{ $request->status }}"
                                             data-collector="{{ $request->collector->name ?? 'Unassigned' }}"
                                             onclick="openRequestModal(this)"
@@ -244,7 +278,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-4 text-center text-gray-500">No requests found.</td>
+                                <td colspan="8" class="py-4 text-center text-gray-500">No requests found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -256,52 +290,100 @@
         <div id="detailsModal"
             class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-6">
             <div class="bg-white rounded-[24px] w-full max-w-md overflow-hidden shadow-2xl transform transition-all">
-                <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                    <h3 class="text-base font-black text-gray-900 tracking-tight">Collection Request Overview</h3>
-                    <button onclick="closeDetailsModal()" class="text-gray-400 hover:text-gray-600 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                            </path>
-                        </svg>
+                <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-cente                <div class="px-8 py-6 bg-white border-b border-gray-50 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-black text-slate-800 tracking-tight">Request Details</h3>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em] mt-0.5">Comprehensive overview of collection task</p>
+                    </div>
+                    <button onclick="closeDetailsModal()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all duration-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-                <div class="p-6 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Resident / User
-                            </p>
-                            <p id="modalUser" class="text-xs font-bold text-gray-800"></p>
+
+                <div class="p-8 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                    <!-- User & Assignment -->
+                    <div class="grid grid-cols-2 gap-6 pb-6 border-b border-slate-50">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resident Name</p>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-black border border-blue-100">
+                                    <span id="modalUserInitials"></span>
+                                </div>
+                                <p id="modalUser" class="text-sm font-black text-slate-800"></p>
+                            </div>
                         </div>
-                        <div class="text-right">
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Assigned To</p>
-                            <p id="modalCollector" class="text-xs font-bold text-[#19817E]"></p>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Full Pickup Address
-                        </p>
-                        <p id="modalAddress" class="text-xs font-medium text-gray-600 leading-tight"></p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Waste Type</p>
-                            <p id="modalType" class="text-xs font-bold text-gray-800"></p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Current Status
-                            </p>
-                            <span id="modalStatus"
-                                class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest"></span>
+                        <div class="text-right space-y-1">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Assigned Staff</p>
+                            <p id="modalCollector" class="text-sm font-black text-[#19817E] bg-teal-50 inline-block px-3 py-1 rounded-lg"></p>
                         </div>
                     </div>
-                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Additional Details</p>
-                        <p id="modalDetails" class="text-[11px] font-medium text-gray-700 leading-normal"></p>
+
+                    <!-- Location & Contact -->
+                    <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100/50 space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pickup Address</p>
+                                <p id="modalAddress" class="text-xs font-bold text-slate-700 leading-relaxed"></p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+                                    <p id="modalPhone" class="text-[11px] font-black text-slate-500"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                            <div>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em] mb-0.5">Sector</p>
+                                <p id="modalSector" class="text-xs font-black text-slate-800"></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em] mb-0.5">Road / Block</p>
+                                <p id="modalRoad" class="text-xs font-black text-slate-800"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Schedule & Type -->
+                    <div class="grid grid-cols-2 gap-x-8 gap-y-6">
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Waste Category</p>
+                                <p id="modalType" class="text-xs font-black text-slate-800 bg-white border border-slate-100 px-3 py-2 rounded-xl inline-block shadow-sm"></p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Preferred Shift</p>
+                                <p id="modalTime" class="text-xs font-black text-slate-800"></p>
+                            </div>
+                        </div>
+                        <div class="space-y-4 text-right">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Task Status</p>
+                                <span id="modalStatus" class="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest inline-block"></span>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Scheduled Date</p>
+                                <div class="flex flex-col items-end">
+                                    <p id="modalDate" class="text-xs font-black text-slate-800"></p>
+                                    <p id="modalRequestedAt" class="text-[10px] font-bold text-slate-400 mt-0.5"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Details -->
+                    <div class="p-6 bg-amber-50/30 rounded-3xl border border-amber-100/50">
+                        <div class="flex items-center gap-2 mb-3">
+                            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest">Resident's Instructions</p>
+                        </div>
+                        <p id="modalDetails" class="text-xs font-medium text-slate-600 leading-relaxed"></p>
                     </div>
                 </div>
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-                    <button onclick="closeDetailsModal()"
-                        class="px-5 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-black transition">
+
+                <div class="px-8 py-6 bg-white border-t border-gray-50 flex justify-end">
+                    <button onclick="closeDetailsModal()" class="px-8 py-3.5 bg-slate-900 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl hover:bg-black transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-[0.98]">
                         Close Overview
                     </button>
                 </div>
@@ -310,12 +392,19 @@
 
         <script>
             function openRequestModal(btn) {
-                document.getElementById('modalUser').innerText = btn.getAttribute('data-user');
+                const name = btn.getAttribute('data-user');
+                document.getElementById('modalUser').innerText = name;
+                document.getElementById('modalUserInitials').innerText = name.charAt(0);
                 document.getElementById('modalCollector').innerText = btn.getAttribute('data-collector');
                 document.getElementById('modalAddress').innerText = btn.getAttribute('data-address');
+                document.getElementById('modalPhone').innerText = btn.getAttribute('data-phone');
+                document.getElementById('modalSector').innerText = btn.getAttribute('data-sector');
+                document.getElementById('modalRoad').innerText = btn.getAttribute('data-road');
                 document.getElementById('modalType').innerText = btn.getAttribute('data-type');
+                document.getElementById('modalDate').innerText = btn.getAttribute('data-date');
+                document.getElementById('modalRequestedAt').innerText = 'Requested ' + btn.getAttribute('data-requested-at');
+                document.getElementById('modalTime').innerText = btn.getAttribute('data-time');
                 document.getElementById('modalDetails').innerText = btn.getAttribute('data-details');
-
                 const status = btn.getAttribute('data-status');
                 const statusEl = document.getElementById('modalStatus');
                 statusEl.innerText = status;

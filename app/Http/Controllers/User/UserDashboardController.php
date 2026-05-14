@@ -107,23 +107,19 @@ class UserDashboardController extends Controller
             'sector' => $request->sector,
             'road' => $request->road,
             'zone' => 'Uttara City Corporation Zone',
-            'status' => $status
+            'status' => 'Awaiting Payment',
+            'payment_status' => 'Unpaid'
         ]);
 
         // Notify Admins
         $admins = User::where('role', 'admin')->get();
-        Notification::send($admins, new CollectionStatusNotification($collectionRequest, 'New waste collection request created.', 'new_request'));
+        Notification::send($admins, new CollectionStatusNotification($collectionRequest, 'New waste collection request created (Awaiting Payment).', 'new_request'));
 
-        // Notify the assigned collector if exists
-        if ($collectorId) {
-            $collector = User::find($collectorId);
-            $collector->notify(new CollectionStatusNotification($collectionRequest, 'A new collection request has been assigned to you in ' . $request->sector, 'new_request'));
-        }
-
-        return redirect()->route('user.dashboard')
-            ->with('success', 'Collection request created successfully!')
-            ->with('show_payment_modal', true)
-            ->with('request_id', $collectionRequest->id);
+        // Redirect directly to payment
+        return redirect()->route('sslc.pay', [
+            'amount' => 20, 
+            'request_id' => $collectionRequest->id
+        ]);
     }
 
     public function getCollector(Request $request)

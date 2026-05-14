@@ -25,6 +25,8 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
     Route::post('/complaints/{id}/resolve', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'resolveComplaint'])->name('complaints.resolve');
     Route::get('/reports', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'reports'])->name('reports');
     Route::post('/reports/generate', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'generateReport'])->name('reports.generate');
+    Route::get('/reports/download', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'downloadReport'])->name('reports.download');
+    Route::get('/reports/download-pdf', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'downloadPdfReport'])->name('reports.pdf.download');
     Route::get('/users/create', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'createUser'])->name('users.create');
     Route::post('/users', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'storeUser'])->name('users.store');
     Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'editUser'])->name('users.edit');
@@ -91,7 +93,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/pay', [SslCommerzPaymentController::class, 'index'])->name('sslc.pay');
+    Route::match(['get', 'post'], '/pay', [SslCommerzPaymentController::class, 'index'])->name('sslc.pay');
 });
 
 Route::post('/success', [SslCommerzPaymentController::class, 'success'])->name('sslc.success');

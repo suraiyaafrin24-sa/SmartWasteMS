@@ -52,10 +52,21 @@ class SslCommerzPaymentController extends Controller
                 $requestId = $matches[1];
                 $collectionRequest = \App\Models\CollectionRequest::find($requestId);
                 if ($collectionRequest) {
+                    $newStatus = $collectionRequest->collector_id ? 'Scheduled' : 'Pending';
+                    
                     $collectionRequest->update([
                         'payment_status' => 'Paid',
+                        'status' => $newStatus,
                         'transaction_id' => $tran_id
                     ]);
+
+                    // Notify Collector if assigned
+                    if ($collectionRequest->collector_id) {
+                        $collector = \App\Models\User::find($collectionRequest->collector_id);
+                        if ($collector) {
+                            $collector->notify(new \App\Notifications\CollectionStatusNotification($collectionRequest, 'A new paid collection request has been assigned to you.', 'new_request'));
+                        }
+                    }
                 }
             }
 

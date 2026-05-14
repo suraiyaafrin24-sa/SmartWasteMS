@@ -5,7 +5,7 @@
 @section('content')
     <div class="mb-10 mt-2">
         <h1 class="text-2xl font-black tracking-tight text-slate-800 mb-1">Collection Logs</h1>
-        <p class="text-[13px] font-medium text-slate-400">Chronological history of all completed waste pick-ups and recorded metrics.</p>
+        <p class="text-[13px] font-medium text-slate-400">A detailed record of all your successfully completed waste collections.</p>
     </div>
 
     <div class="bg-white rounded-[40px] p-10 border border-gray-50 shadow-sm shadow-gray-100/50">
@@ -15,8 +15,9 @@
                     <tr class="text-slate-300 font-black border-b border-gray-50 uppercase text-[10px] tracking-[0.2em] leading-none">
                         <th class="pb-8 px-2">Completion Date</th>
                         <th class="pb-8 px-2">Resident Detail</th>
+                        <th class="pb-8 px-2 text-center">Sector</th>
                         <th class="pb-8 px-2 text-center">Waste Type</th>
-                        <th class="pb-8 px-2 text-center">Recorded Weight</th>
+
                         <th class="pb-8 px-2 text-right">Final Status</th>
                     </tr>
                 </thead>
@@ -32,6 +33,11 @@
                             <div class="text-[11px] text-slate-400 font-medium italic">"{{ Str::limit($request->address, 35) }}"</div>
                         </td>
                         <td class="py-6 px-2 text-center">
+                            <span class="bg-teal-50 text-teal-600 border border-teal-100 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                {{ $request->sector ?? 'N/A' }}
+                            </span>
+                        </td>
+                        <td class="py-6 px-2 text-center">
                             <span class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider
                                 @if($request->type == 'Organic') bg-emerald-50 text-emerald-600
                                 @elseif($request->type == 'Recyclable') bg-blue-50 text-blue-600
@@ -40,9 +46,7 @@
                                 {{ $request->type }}
                             </span>
                         </td>
-                        <td class="py-6 px-2 text-center font-black text-slate-800">
-                            {{ $request->weight }} <span class="text-[10px] text-slate-300 uppercase ml-0.5">KG</span>
-                        </td>
+
                         <td class="py-6 px-2 text-right">
                             <span class="px-4 py-2 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-xl uppercase tracking-widest border border-emerald-100/50 shadow-sm shadow-emerald-500/5">
                                 {{ $request->status }}

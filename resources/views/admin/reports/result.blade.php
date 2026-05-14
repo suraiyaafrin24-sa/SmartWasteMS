@@ -9,10 +9,17 @@
             <p class="text-sm font-medium text-gray-500">Summary for {{ $actor->name }} ({{ $start_date }} to
                 {{ $end_date }})</p>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-3">
             <a href="{{ route('admin.reports') }}"
                 class="bg-gray-100 text-gray-700 text-xs font-bold py-3 px-6 rounded-xl hover:bg-gray-200 transition">Back
                 to Generator</a>
+            <a href="{{ route('admin.reports.pdf.download', ['report_type' => $type, 'user_id' => $actor->id, 'start_date' => $start_date, 'end_date' => $end_date]) }}"
+                class="flex items-center gap-2 bg-gray-800 text-white text-xs font-bold py-3 px-6 rounded-xl hover:bg-gray-900 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Download PDF
+            </a>
             <button onclick="window.print()"
                 class="bg-[#19817E] text-white text-xs font-bold py-3 px-8 rounded-xl shadow-lg shadow-teal-500/20 hover:bg-teal-700 transition flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,4 +171,14 @@
             }
         }
     </style>
+
+    <script>
+        function downloadPDF() {
+            // Hide everything outside the printable report
+            document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
+            window.print();
+            // Restore after print dialog closes
+            document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
+        }
+    </script>
 @endsection
