@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 
 class AdminDashboardController extends Controller
@@ -20,14 +21,16 @@ class AdminDashboardController extends Controller
         $search = request('search');
 
         // Base queries for counts
-        $pendingQuery = CollectionRequest::whereIn('status', ['Pending', 'Scheduled']);
+        $pendingQuery = CollectionRequest::whereIn('status', ['Pending', 'Scheduled'])->where('payment_status', 'Paid');
         $staffQuery = User::where('role', 'waste_collector');
         $userQuery = User::where('role', 'user');
-        $todayQuery = CollectionRequest::whereDate('scheduled_date', date('Y-m-d'));
-        $todayCompletedQuery = CollectionRequest::whereDate('scheduled_date', date('Y-m-d'))->whereIn('status', ['Completed', 'Collected']);
+        $todayQuery = CollectionRequest::whereDate('scheduled_date', date('Y-m-d'))->where('payment_status', 'Paid');
+        $todayCompletedQuery = CollectionRequest::whereDate('scheduled_date', date('Y-m-d'))
+            ->whereIn('status', ['Completed', 'Collected'])
+            ->where('payment_status', 'Paid');
         
         // Base query for the list
-        $requestQuery = CollectionRequest::with(['user', 'collector']);
+        $requestQuery = CollectionRequest::with(['user', 'collector'])->where('payment_status', 'Paid');
 
         if ($search) {
             $filter = function($q) use ($search) {
@@ -94,7 +97,7 @@ class AdminDashboardController extends Controller
                 $query->where('status', 'Scheduled');
             })->count();
 
-        $requestsCreatedTodayQuery = CollectionRequest::whereDate('created_at', date('Y-m-d'));
+        $requestsCreatedTodayQuery = CollectionRequest::whereDate('created_at', date('Y-m-d'))->where('payment_status', 'Paid');
         $requestsCreatedToday = (clone $requestsCreatedTodayQuery)->count();
         $todayCompletedCount = (clone $requestsCreatedTodayQuery)->whereIn('status', ['Completed', 'Collected'])->count();
         
@@ -104,7 +107,7 @@ class AdminDashboardController extends Controller
             ->take(10)
             ->get();
             
-        $unassignedRequests = CollectionRequest::where('status', 'Pending')->with('user')->get();
+        $unassignedRequests = CollectionRequest::where('status', 'Pending')->where('payment_status', 'Paid')->with('user')->get();
         $collectors = User::where('role', 'waste_collector')
             ->with(['dutyRosters' => function($q) {
                 $q->whereDate('date', today());
@@ -299,7 +302,7 @@ class AdminDashboardController extends Controller
         $collectors = User::where('role', 'waste_collector')->get();
         $generalUsers = User::where('role', 'user')->get();
 
-        $query = CollectionRequest::with(['user', 'collector'])->orderBy('created_at', 'desc');
+        $query = CollectionRequest::with(['user', 'collector'])->where('payment_status', 'Paid')->orderBy('created_at', 'desc');
 
         if ($request->filled('user_id') && $request->filled('report_type')) {
             if ($request->report_type == 'collector') {
@@ -333,7 +336,7 @@ class AdminDashboardController extends Controller
         $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
         $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
 
-        $query = CollectionRequest::whereBetween('created_at', [$startDate, $endDate]);
+        $query = CollectionRequest::whereBetween('created_at', [$startDate, $endDate])->where('payment_status', 'Paid');
 
         if ($request->report_type == 'collector') {
             $query->where('collector_id', $request->user_id);
@@ -355,7 +358,7 @@ class AdminDashboardController extends Controller
 
     public function downloadReport(Request $request)
     {
-        $query = CollectionRequest::with(['user', 'collector'])->orderBy('created_at', 'desc');
+        $query = CollectionRequest::with(['user', 'collector'])->where('payment_status', 'Paid')->orderBy('created_at', 'desc');
 
         if ($request->filled('user_id') && $request->filled('report_type')) {
             if ($request->report_type == 'collector') {
@@ -404,36 +407,49 @@ class AdminDashboardController extends Controller
 
     public function downloadPdfReport(Request $request)
     {
-        $actor = User::findOrFail($request->user_id);
-        $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
-        $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
+        $actorId = $request->user_id;
+        $reportType = $request->report_type ?? 'all';
+        
+        $startDate = $request->filled('start_date') ? \Carbon\Carbon::parse($request->start_date)->startOfDay() : today()->startOfMonth();
+        $endDate = $request->filled('end_date') ? \Carbon\Carbon::parse($request->end_date)->endOfDay() : today()->endOfDay();
 
-        $query = CollectionRequest::whereBetween('created_at', [$startDate, $endDate]);
+        $query = CollectionRequest::whereBetween('created_at', [$startDate, $endDate])->where('payment_status', 'Paid');
 
-        if ($request->report_type == 'collector') {
-            $query->where('collector_id', $request->user_id);
+        if ($actorId) {
+            $actor = User::findOrFail($actorId);
+            if ($reportType == 'collector') {
+                $query->where('collector_id', $actorId);
+            } else {
+                $query->where('user_id', $actorId);
+            }
         } else {
-            $query->where('user_id', $request->user_id);
+            // Placeholder actor for system-wide report
+            $actor = (object)[
+                'name' => 'System Wide',
+                'role' => 'administrator',
+                'email' => 'admin@smartbin.com'
+            ];
         }
 
-        $activity = $query->with(['user', 'collector'])->get();
+        $activity = $query->with(['user', 'collector'])->orderBy('created_at', 'desc')->get();
 
         $data = [
             'actor' => $actor,
             'activity' => $activity,
-            'start_date' => $startDate->format('Y-m-d'),
-            'end_date' => $endDate->format('Y-m-d'),
-            'type' => $request->report_type,
+            'start_date' => $startDate->format('M d, Y'),
+            'end_date' => $endDate->format('M d, Y'),
+            'type' => $reportType,
             'days' => null
         ];
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.reports.pdf', $data);
-        return $pdf->download('activity_report_' . $actor->name . '_' . date('Y-m-d') . '.pdf');
+        $filename = 'activity_report_' . Str::slug($actor->name) . '_' . date('Y-m-d') . '.pdf';
+        return $pdf->download($filename);
     }
 
     public function collections(Request $request)
     {
-        $query = CollectionRequest::with(['user', 'collector']);
+        $query = CollectionRequest::with(['user', 'collector'])->where('payment_status', 'Paid');
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -713,6 +729,10 @@ class AdminDashboardController extends Controller
         }
 
         $payments = $query->orderBy('updated_at', 'desc')->paginate(15);
-        return view('admin.payments', compact('payments'));
+        
+        $totalPaidAmount = \App\Models\CollectionRequest::where('payment_status', 'Paid')->count() * 20;
+        $totalUnpaidAmount = \App\Models\CollectionRequest::where('payment_status', '!=', 'Paid')->count() * 20;
+
+        return view('admin.payments', compact('payments', 'totalPaidAmount', 'totalUnpaidAmount'));
     }
 }

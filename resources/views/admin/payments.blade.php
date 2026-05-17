@@ -28,6 +28,28 @@
         </div>
     </div>
 
+    <!-- Payment Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Revenue Collected</p>
+                <h3 class="text-3xl font-black text-emerald-600">BDT {{ number_format($totalPaidAmount, 2) }}</h3>
+            </div>
+            <div class="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            </div>
+        </div>
+        <div class="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-1">Pending Payments</p>
+                <h3 class="text-3xl font-black text-orange-500">BDT {{ number_format($totalUnpaidAmount, 2) }}</h3>
+            </div>
+            <div class="w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+        </div>
+    </div>
+
     <div class="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -37,6 +59,7 @@
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Resident</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Collector</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Sector</th>
+                        <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-center">Amount</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-center">Status</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">Transaction ID</th>
                     </tr>
@@ -71,6 +94,13 @@
                             </td>
                             <td class="px-6 py-5 text-center">
                                 @if($payment->payment_status == 'Paid')
+                                    <span class="text-[11px] font-black text-gray-800">BDT 20.00</span>
+                                @else
+                                    <span class="text-[11px] font-black text-gray-300">---</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-5 text-center">
+                                @if($payment->payment_status == 'Paid')
                                     <span class="px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100">
                                         PAID
                                     </span>
@@ -88,7 +118,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-20 text-center">
+                            <td colspan="7" class="py-20 text-center">
                                 <div class="flex flex-col items-center justify-center text-gray-300">
                                     <svg class="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                                     <p class="font-bold uppercase tracking-[2px]">No payment history found</p>

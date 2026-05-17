@@ -20,15 +20,18 @@ class WasteCollectorDashboardController extends Controller
         // Assigned Today
         $assignedToday = CollectionRequest::where('collector_id', $collectorId)
             ->where('scheduled_date', date('Y-m-d'))
+            ->where('payment_status', 'Paid')
             ->get();
             
         $completedCount = CollectionRequest::where('collector_id', $collectorId)
             ->whereIn('status', ['Completed', 'Collected'])
+            ->where('payment_status', 'Paid')
             ->count();
             
         // Current active route (Assigned to this collector and Scheduled)
         $activeRoute = CollectionRequest::where('collector_id', $collectorId)
             ->where('status', 'Scheduled')
+            ->where('payment_status', 'Paid')
             ->with('user')
             ->orderBy('scheduled_date', 'asc')
             ->get();
@@ -42,6 +45,7 @@ class WasteCollectorDashboardController extends Controller
         $availableRequests = CollectionRequest::where('status', 'Pending')
             ->whereNull('collector_id')
             ->whereIn('sector', $mySectors)
+            ->where('payment_status', 'Paid')
             ->with('user')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -111,6 +115,7 @@ class WasteCollectorDashboardController extends Controller
         $collectorId = Auth::id();
         $completedRequests = CollectionRequest::where('collector_id', $collectorId)
             ->whereIn('status', ['Completed', 'Collected'])
+            ->where('payment_status', 'Paid')
             ->with('user')
             ->orderBy('updated_at', 'desc')
             ->paginate(15);
@@ -135,6 +140,7 @@ class WasteCollectorDashboardController extends Controller
     {
         $collectorId = Auth::id();
         $payments = CollectionRequest::where('collector_id', $collectorId)
+            ->where('payment_status', 'Paid')
             ->with('user')
             ->orderBy('created_at', 'desc')
             ->paginate(15);

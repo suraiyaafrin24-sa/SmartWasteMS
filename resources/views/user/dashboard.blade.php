@@ -42,7 +42,7 @@
     <div class="mb-10 mt-2 flex justify-between items-end">
         <div>
             <h1 class="text-2xl font-black tracking-tight text-slate-800 mb-1">My Dashboard</h1>
-            <p class="text-[13px] font-medium text-slate-400">Track your waste collection requests and history.</p>
+            <p class="text-[13px] font-medium text-slate-400">Track your waste collection requests and history</p>
         </div>
 
     </div>
@@ -120,25 +120,26 @@
         </div>
 
         <div class="overflow-x-auto overflow-y-hidden">
-            <table class="w-full text-left text-sm whitespace-nowrap">
+            <table class="w-full table-fixed text-left text-sm whitespace-nowrap">
                 <thead>
                     <tr
                         class="text-slate-300 font-black border-b border-gray-50 uppercase text-[10px] tracking-[0.2em] leading-none">
-                        <th class="pb-6 px-2">Type</th>
-                        <th class="pb-6 px-2">Scheduled Date</th>
-                        <th class="pb-6 px-2 text-center">Status</th>
-                        <th class="pb-6 px-2 text-center">Payment</th>
-                        <th class="pb-6 px-2 text-center">Receipt</th>
-                        <th class="pb-6 px-2">Collector</th>
-                        <th class="pb-6 px-2 text-right">Details</th>
+                        <th class="pb-6 px-4 text-left">Type</th>
+                        <th class="pb-6 px-4 text-left">Scheduled Date</th>
+                        <th class="pb-6 px-4 text-left">Shift</th>
+                        <th class="pb-6 px-4 text-left">Status</th>
+                        <th class="pb-6 px-4 text-left">Payment Status</th>
+                        <th class="pb-6 px-4 text-left">Receipt</th>
+                        <th class="pb-6 px-4 text-left">Collector</th>
                     </tr>
                 </thead>
                 <tbody class="text-slate-700 divide-y divide-gray-50/50">
                     @forelse($recentRequests as $request)
                         <tr class="hover:bg-gray-50/50 transition-all duration-300 group">
-                            <td class="py-6 px-2 font-black text-slate-800">{{ $request->type }}</td>
-                            <td class="py-6 px-2 font-bold text-slate-400">{{ $request->scheduled_date->format('M d, Y') }}</td>
-                            <td class="py-6 px-2 text-center">
+                            <td class="py-6 px-4 font-black text-slate-800 text-left">{{ $request->type }}</td>
+                            <td class="py-6 px-4 font-bold text-slate-400 text-left">{{ $request->scheduled_date->format('M d, Y') }}</td>
+                            <td class="py-6 px-4 font-bold text-slate-500 text-left">{{ $request->shift ?? 'N/A' }}</td>
+                            <td class="py-6 px-4 text-left">
                                 @if($request->status == 'Completed' || $request->status == 'Collected')
                                     <span
                                         class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-emerald-50 text-emerald-600 tracking-widest uppercase">Collected</span>
@@ -150,7 +151,7 @@
                                         class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-gray-50 text-gray-400 tracking-widest uppercase">{{ $request->status }}</span>
                                 @endif
                             </td>
-                            <td class="py-6 px-2 text-center">
+                            <td class="py-6 px-4 text-left">
                                 @if($request->payment_status == 'Paid')
                                     <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-emerald-50 text-emerald-600 tracking-widest uppercase">Paid</span>
                                 @else
@@ -162,7 +163,7 @@
                                     </form>
                                 @endif
                             </td>
-                            <td class="py-6 px-2 text-center">
+                            <td class="py-6 px-4 text-left">
                                 @if($request->payment_status == 'Paid')
                                     <a href="{{ route('user.receipt', $request->id) }}" target="_blank" class="inline-flex items-center gap-1 text-[#19817E] hover:text-teal-700 transition-colors">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -172,20 +173,8 @@
                                     <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">N/A</span>
                                 @endif
                             </td>
-                            <td class="py-6 px-2 font-bold text-slate-500">
+                            <td class="py-6 px-4 font-bold text-slate-500 text-left">
                                 {{ $request->collector ? $request->collector->name : 'Unassigned' }}</td>
-                            <td class="py-6 px-2 text-right">
-                                <button type="button" data-type="{{ $request->type }}"
-                                    data-date="{{ $request->scheduled_date->format('M d, Y') }}"
-                                    data-status="{{ $request->status }}"
-                                    data-collector="{{ $request->collector ? $request->collector->name : 'Waiting for assignment' }}"
-                                    data-phone="{{ $request->collector ? $request->collector->phone : 'N/A' }}"
-                                    data-details="{{ $request->details ?? 'No special instructions provided.' }}"
-                                    data-sector="{{ $request->sector }}" onclick="openRequestModal(this)"
-                                    class="text-[#19817E] hover:text-teal-700 text-[11px] font-black transition-colors uppercase tracking-widest">
-                                    View
-                                </button>
-                            </td>
                         </tr>
                     @empty
                         <tr>
@@ -199,99 +188,5 @@
         </div>
     </div>
 
-    <!-- Request Details Modal -->
-    <div id="detailsModal"
-        class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center p-6">
-        <div class="bg-white rounded-[24px] w-full max-w-sm overflow-hidden shadow-2xl transform transition-all">
-            <div class="px-4 py-2 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-base font-black text-gray-900 tracking-tight">Request Details</h3>
-                <button onclick="closeDetailsModal()" class="text-gray-400 hover:text-gray-600 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-            <div class="p-4 space-y-3">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Status</p>
-                        <span id="modalStatus"
-                            class="px-2 py-0.5 rounded text-[9px] font-black tracking-wide uppercase"></span>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Scheduled Date</p>
-                        <p id="modalDate" class="text-xs font-bold text-gray-800"></p>
-                    </div>
-                </div>
 
-                <div class="p-3 bg-teal-50/50 rounded-xl border border-teal-100/50 flex justify-between">
-                    <div>
-                        <p class="text-[9px] font-black text-teal-600 uppercase tracking-widest mb-0.5">Assigned Collector
-                        </p>
-                        <p id="modalCollector" class="text-xs font-bold text-gray-800"></p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[9px] font-black text-teal-600 uppercase tracking-widest mb-0.5">Contact</p>
-                        <p id="modalCollectorPhone" class="text-xs font-bold text-gray-800"></p>
-                    </div>
-                </div>
-
-                <div>
-                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Sector</p>
-                    <p id="modalSector" class="text-xs font-medium text-gray-600 leading-tight"></p>
-                </div>
-
-                <div class="p-3 bg-amber-50/50 rounded-xl border border-amber-100/50">
-                    <p class="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-1">My Instructions</p>
-                    <p id="modalDetails" class="text-[11px] font-medium text-amber-800 leading-normal"></p>
-                </div>
-            </div>
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-                <button onclick="closeDetailsModal()"
-                    class="px-5 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-black transition">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <script>
-        function openRequestModal(btn) {
-            const status = btn.getAttribute('data-status');
-            const statusEl = document.getElementById('modalStatus');
-            statusEl.innerText = status;
-
-            // Status styling logic
-            statusEl.className = 'px-2.5 py-1 rounded-md text-[10px] font-black tracking-wide uppercase ';
-            if (status === 'Completed' || status === 'Collected') {
-                statusEl.className += 'bg-emerald-100 text-emerald-600';
-            } else if (status === 'Scheduled') {
-                statusEl.className += 'bg-amber-100 text-amber-600';
-            } else {
-                statusEl.className += 'bg-gray-100 text-gray-600';
-            }
-
-            document.getElementById('modalDate').innerText = btn.getAttribute('data-date');
-            document.getElementById('modalCollector').innerText = btn.getAttribute('data-collector');
-            document.getElementById('modalCollectorPhone').innerText = btn.getAttribute('data-phone');
-            document.getElementById('modalSector').innerText = btn.getAttribute('data-sector');
-            document.getElementById('modalDetails').innerText = btn.getAttribute('data-details');
-
-            const modal = document.getElementById('detailsModal');
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeDetailsModal() {
-            const modal = document.getElementById('detailsModal');
-            modal.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeDetailsModal();
-        });
-    </script>
 @endsection

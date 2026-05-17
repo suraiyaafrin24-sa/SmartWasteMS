@@ -172,7 +172,6 @@
                             <th class="pb-4 px-2">Shift</th>
                             <th class="pb-4 px-2">Assigned Collector</th>
                             <th class="pb-4 px-2">Status</th>
-                            <th class="pb-4 px-2 text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody class="text-slate-700 font-bold divide-y divide-gray-50/50">
@@ -231,54 +230,10 @@
                                             class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-[#FEF3C7] text-[#D97706] tracking-widest uppercase">Pending</span>
                                     @endif
                                 </td>
-                                <td class="py-5 px-2 text-right">
-                                    @if(!$request->collector && $request->status == 'Pending')
-                                        <form action="{{ route('admin.requests.assign', $request->id) }}" method="POST"
-                                            class="flex items-center justify-end gap-2">
-                                            @csrf
-                                            <div class="relative">
-                                                <select name="collector_id" required
-                                                    class="text-[10px] font-bold bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 pr-8 focus:ring-1 focus:ring-teal-500 outline-none appearance-none cursor-pointer">
-                                                    <option value="">Select Collector</option>
-                                                    @foreach($collectors as $c)
-                                                        <option value="{{ $c->id }}">
-                                                            {{ $c->name }}
-                                                            @if($c->sector)
-                                                                — {{ $c->sector }}
-                                                            @elseif($c->dutyRosters->first())
-                                                                — {{ $c->dutyRosters->first()->sector }}
-                                                            @endif
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                <div class="absolute inset-y-0 right-2.5 flex items-center pointer-events-none text-gray-400">
-                                                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                                                </div>
-                                            </div>
-                                            <input type="date" name="scheduled_date" required value="{{ $request->scheduled_date ? \Carbon\Carbon::parse($request->scheduled_date)->format('Y-m-d') : date('Y-m-d') }}" min="{{ date('Y-m-d') }}" class="text-[10px] font-bold bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 outline-none">
-                                            <button type="submit"
-                                                class="bg-[#19817E] text-white text-[9px] font-black px-3 py-1.5 rounded-lg hover:bg-teal-700 transition uppercase tracking-widest">Assign</button>
-                                        </form>
-                                    @else
-                                        <button data-user="{{ $request->user->name }}"
-                                            data-phone="{{ $request->phone ?? $request->user->phone ?? 'N/A' }}"
-                                            data-address="{{ $request->address }}" 
-                                            data-sector="{{ $request->sector ?? 'N/A' }}"
-                                            data-road="{{ $request->road ?? 'N/A' }}"
-                                            data-type="{{ $request->type }}"
-                                            data-details="{{ $request->details ?? 'No special instructions provided.' }}"
-                                            data-date="{{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d, Y') }}"
-                                            data-requested-at="at {{ $request->created_at->format('h:i A') }}"
-                                            data-time="{{ $request->shift ?? 'Anytime' }}" data-status="{{ $request->status }}"
-                                            data-collector="{{ $request->collector->name ?? 'Unassigned' }}"
-                                            onclick="openRequestModal(this)"
-                                            class="text-slate-400 hover:text-slate-600 text-[11px] font-black border border-slate-100 px-4 py-1.5 rounded-lg transition-all duration-200">View</button>
-                                    @endif
-                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="py-4 text-center text-gray-500">No requests found.</td>
+                                <td colspan="7" class="py-4 text-center text-gray-500">No requests found.</td>
                             </tr>
                         @endforelse
                     </tbody>

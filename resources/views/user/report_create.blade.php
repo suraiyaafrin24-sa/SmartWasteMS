@@ -16,7 +16,7 @@
                 <div class="space-y-8">
                     <div class="space-y-2">
                         <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Issue Subject <span class="text-red-500">*</span></label>
-                        <input type="text" name="subject" required placeholder="e.g. Missed pickup in Sector 4" class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-4 px-5 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold placeholder:text-slate-300">
+                        <input type="text" name="subject" required placeholder="e.g. Missed pickup in Sector 1" class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-4 px-5 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold placeholder:text-slate-300">
                         @error('subject') <p class="text-[10px] font-black text-red-500 uppercase tracking-widest mt-2 px-1">{{ $message }}</p> @enderror
                     </div>
 

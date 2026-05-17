@@ -90,7 +90,6 @@
                             <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Date/Time</th>
                             <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Area / Road</th>
                             <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Waste Type</th>
-                        
                             <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                 {{ $type == 'collector' ? 'Requested By' : 'Collected By' }}</th>
                             <th class="py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">

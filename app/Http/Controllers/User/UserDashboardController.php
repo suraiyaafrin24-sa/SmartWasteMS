@@ -19,7 +19,7 @@ class UserDashboardController extends Controller
         $user = Auth::user();
 
         $totalRequests = CollectionRequest::where('user_id', $user->id)
-            ->where('status', '!=', 'Cancelled')
+            ->whereNotIn('status', ['Cancelled', 'Awaiting Payment'])
             ->count();
             
         $pendingPickups = CollectionRequest::where('user_id', $user->id)
@@ -197,8 +197,8 @@ class UserDashboardController extends Controller
             abort(403);
         }
 
-        if ($request->status !== 'Pending' && $request->status !== 'Scheduled') {
-            return redirect()->back()->with('error', 'Only pending or scheduled requests can be cancelled.');
+        if ($request->status !== 'Pending' && $request->status !== 'Scheduled' && $request->payment_status !== 'Unpaid' && $request->status !== 'Awaiting Payment') {
+            return redirect()->back()->with('error', 'Only pending, scheduled, or unpaid requests can be cancelled.');
         }
 
         $request->update(['status' => 'Cancelled']);

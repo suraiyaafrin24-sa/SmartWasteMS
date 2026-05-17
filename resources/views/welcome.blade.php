@@ -45,17 +45,17 @@
 
             <nav class="hidden md:flex space-x-8 font-medium">
 
-                <a href="#home" class="hover:font-bold hover:text-black">Home</a>
-                <a href="#features" class="hover:font-bold hover:text-black">Features</a>
-                <a href="#technology" class="hover:font-bold hover:text-black">Technology</a>
-                <a href="#contact" class="hover:font-bold hover:text-black">Contact</a>
+                <a href="#home" class="text-gray-700 text-base hover:font-bold hover:text-black">Home</a>
+                <a href="#features" class="text-gray-700 text-base hover:font-bold hover:text-black">Features</a>
+                <a href="#technology" class="text-gray-700 text-base hover:font-bold hover:text-black">Technology</a>
+                <a href="#contact" class="text-gray-700 text-base hover:font-bold hover:text-black">Contact</a>
 
             </nav>
 
             <div class="flex items-center space-x-6">
 
-                <a href="{{ route('login') }}" class="text-gray-600 hover:text-blue-800 font-medium">Login</a>
-
+                <a href="{{ route('login') }}" class="text-gray-600 hover:text-black font-medium">Login</a>
+                
                 <a href="{{ route('register') }}"
                     class="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 font-bold transition-all shadow-lg shadow-emerald-600/20">
                     Register

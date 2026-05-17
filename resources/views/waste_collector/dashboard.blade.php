@@ -49,7 +49,7 @@
                 </div>
                 <div class="text-[32px] font-black text-white leading-none tracking-tight">{{ $activeRoute->count() }}</div>
             </div>
-            <p class="text-[11px] text-white font-black bg-white/10 w-fit px-3 py-1.5 rounded-lg uppercase tracking-wider">{{ $assignedToday->count() }} Pickups Scheduled Today</p>
+            <p class="text-[11px] text-white font-black bg-white/10 w-fit px-3 py-1.5 rounded-lg uppercase tracking-wider">Smart Collection Service</p>
         </div>
 
         <!-- Completed Card (White) -->

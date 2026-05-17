@@ -16,6 +16,7 @@
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Date</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Resident</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">Sector</th>
+                        <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-center">Amount</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-center">Payment Status</th>
                         <th class="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 text-right">Transaction ID</th>
                     </tr>
@@ -38,6 +39,13 @@
                             </td>
                             <td class="px-6 py-5 text-center">
                                 @if($payment->payment_status == 'Paid')
+                                    <span class="text-[11px] font-black text-gray-800">BDT 20.00</span>
+                                @else
+                                    <span class="text-[11px] font-black text-gray-300">---</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-5 text-center">
+                                @if($payment->payment_status == 'Paid')
                                     <span class="px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600">
                                         PAID
                                     </span>
@@ -55,7 +63,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-20 text-center text-gray-400 font-bold uppercase tracking-[2px]">No payment records found.</td>
+                            <td colspan="6" class="py-20 text-center text-gray-400 font-bold uppercase tracking-[2px]">No payment records found.</td>
                         </tr>
                     @endforelse
                 </tbody>

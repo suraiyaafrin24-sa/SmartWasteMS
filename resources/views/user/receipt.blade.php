@@ -135,7 +135,7 @@
                                     <p class="text-xs text-slate-500">Scheduled for {{ $request->scheduled_date->format('M d, Y') }} ({{ $request->shift }})</p>
                                 </td>
                                 <td class="py-2 text-center text-sm font-bold">{{ $request->type }}</td>
-                                <td class="py-2 text-right font-black text-slate-800">৳20.00</td>
+                                <td class="py-2 text-right font-black text-slate-800">BDT 20.00</td>
                             </tr>
                         </tbody>
                     </table>
@@ -146,15 +146,15 @@
                     <div class="w-64 space-y-3">
                         <div class="flex justify-between text-sm">
                             <span class="text-slate-400 font-bold">Subtotal</span>
-                            <span class="text-slate-800 font-black">৳20.00</span>
+                            <span class="text-slate-800 font-black">BDT 20.00</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-slate-400 font-bold">VAT (0%)</span>
-                            <span class="text-slate-800 font-black">৳0.00</span>
+                            <span class="text-slate-800 font-black">BDT 0.00</span>
                         </div>
                         <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
                             <span class="text-slate-800 font-black uppercase text-xs tracking-widest">Total Amount</span>
-                            <span class="text-2xl font-black text-[#19817E]">৳20.00</span>
+                            <span class="text-2xl font-black text-[#19817E]">BDT 20.00</span>
                         </div>
                     </div>
                 </div>
@@ -175,9 +175,7 @@
             </div>
         </div>
         
-        <p class="mt-8 text-center text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
-            © {{ date('Y') }} SmartBin Waste Management System. All rights reserved.
-        </p>
+
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
