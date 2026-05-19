@@ -22,6 +22,7 @@ class CollectionRequest extends Model
         'road',
         'shift',
         'payment_status',
+        'amount',
         'transaction_id'
     ];
 

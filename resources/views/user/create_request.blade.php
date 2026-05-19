@@ -161,7 +161,7 @@
                         Request</a>
                     <button type="submit" style="background-color: #2D5CFE !important; color: #FFFFFF !important;"
                         class="text-[10px] font-black py-4 px-8 rounded-2xl hover:opacity-90 transition shadow-xl shadow-blue-500/25 active:scale-[0.98] duration-150 tracking-widest uppercase">
-                        Submit Collection Request
+                        Pay via SSLCommerz and Confirm
                     </button>
                 </div>
             </form>

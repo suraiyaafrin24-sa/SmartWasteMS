@@ -165,6 +165,20 @@ class AdminDashboardController extends Controller
             'role' => $request->role,
         ]);
 
+        if ($user->role === 'admin') {
+            \App\Models\AdminProfile::create([
+                'user_id' => $user->id,
+                'department' => 'Waste Management Operations',
+                'access_level' => 'Standard Admin',
+            ]);
+        } elseif ($user->role === 'waste_collector') {
+            \App\Models\CollectorProfile::create([
+                'user_id' => $user->id,
+                'assigned_vehicle' => 'Truck #' . rand(100, 999),
+                'shift_preference' => 'Morning Shift',
+            ]);
+        }
+
         return redirect()->route('admin.users')->with('status', 'User created successfully');
     }
 
@@ -719,6 +733,7 @@ class AdminDashboardController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('transaction_id', 'LIKE', "%{$search}%")
                     ->orWhere('payment_status', 'LIKE', "%{$search}%")
+                    ->orWhere('sector', 'LIKE', "%{$search}%")
                     ->orWhereHas('user', function ($qu) use ($search) {
                         $qu->where('name', 'LIKE', "%{$search}%");
                     })

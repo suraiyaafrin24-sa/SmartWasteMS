@@ -108,7 +108,8 @@ class UserDashboardController extends Controller
             'road' => $request->road,
             'zone' => 'Uttara City Corporation Zone',
             'status' => 'Awaiting Payment',
-            'payment_status' => 'Unpaid'
+            'payment_status' => 'Unpaid',
+            'amount' => 20
         ]);
 
         // Notify Admins

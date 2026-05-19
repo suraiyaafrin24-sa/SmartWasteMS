@@ -133,6 +133,9 @@
                                 @else bg-gray-50 text-gray-600 @endif">
                                 {{ $request->type }}
                             </span>
+                            @if(strtotime($request->scheduled_date) < strtotime(date('Y-m-d')))
+                                <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-red-50 text-red-600 border border-red-100">Collection Date Expired</span>
+                            @endif
                         </div>
                         <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Job #{{ $index + 1 }}</span>
                     </div>
@@ -141,9 +144,30 @@
                         {{ $request->address }} @if($request->sector) • {{ $request->sector }} @endif @if($request->scheduled_date) • {{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d') }} @endif
                     </p>
                     
-                    <div class="flex items-center gap-2 mb-6 p-2.5 bg-gray-50 rounded-2xl">
-                        <div class="w-1.5 h-1.5 rounded-full bg-[#19817E] animate-pulse"></div>
-                        <span class="text-[10px] font-black text-[#19817E] uppercase tracking-widest">{{ strtoupper($request->shift ?? 'Scheduled') }} DUTY</span>
+                    @php
+                        $shiftEnded = false;
+                        $today = date('Y-m-d');
+                        $currentTime = date('H:i');
+                        $reqDate = \Carbon\Carbon::parse($request->scheduled_date)->format('Y-m-d');
+                        
+                        if ($reqDate < $today) {
+                            $shiftEnded = true;
+                        } elseif ($reqDate == $today) {
+                            if ($request->shift == 'Morning Shift' && $currentTime >= '10:00') {
+                                $shiftEnded = true;
+                            } elseif ($request->shift == 'Evening Shift' && $currentTime >= '18:00') {
+                                $shiftEnded = true;
+                            }
+                        }
+                    @endphp
+                    <div class="flex items-center justify-between mb-6 p-2.5 bg-gray-50 rounded-2xl">
+                        <div class="flex items-center gap-2">
+                            <div class="w-1.5 h-1.5 rounded-full bg-[#19817E] animate-pulse"></div>
+                            <span class="text-[10px] font-black text-[#19817E] uppercase tracking-widest">{{ strtoupper($request->shift ?? 'Scheduled') }} DUTY</span>
+                        </div>
+                        @if($shiftEnded)
+                            <span class="text-[9px] font-black text-slate-400 bg-slate-100 border border-slate-200 px-2 py-1 rounded-md uppercase tracking-widest leading-none">Shift Ended</span>
+                        @endif
                     </div>
                 </div>
                 

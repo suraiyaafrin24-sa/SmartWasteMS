@@ -19,6 +19,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'profile_image',
         'phone',
@@ -28,6 +29,9 @@ class User extends Authenticatable
         'password',
         'confirm_password',
         'role',
+        'monthly_payment_status',
+        'subscription_valid_until',
+        'last_transaction_id',
     ];
 
     public function isAdmin(): bool
@@ -81,5 +85,15 @@ class User extends Authenticatable
     public function dutyRosters()
     {
         return $this->hasMany(DutyRoster::class, 'collector_id');
+    }
+
+    public function adminProfile()
+    {
+        return $this->hasOne(AdminProfile::class, 'user_id');
+    }
+
+    public function collectorProfile()
+    {
+        return $this->hasOne(CollectorProfile::class, 'user_id');
     }
 }
