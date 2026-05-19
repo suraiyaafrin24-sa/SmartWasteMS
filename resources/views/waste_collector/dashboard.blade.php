@@ -146,18 +146,32 @@
                     
                     @php
                         $shiftEnded = false;
+                        $outsideShiftWindow = false;
+                        $shiftWindowMsg = '';
                         $today = date('Y-m-d');
                         $currentTime = date('H:i');
                         $reqDate = \Carbon\Carbon::parse($request->scheduled_date)->format('Y-m-d');
-                        
+
                         if ($reqDate < $today) {
                             $shiftEnded = true;
                         } elseif ($reqDate == $today) {
-                            if ($request->shift == 'Morning Shift' && $currentTime >= '10:00') {
-                                $shiftEnded = true;
-                            } elseif ($request->shift == 'Evening Shift' && $currentTime >= '18:00') {
-                                $shiftEnded = true;
+                            if ($request->shift == 'Morning Shift') {
+                                if ($currentTime >= '10:00') {
+                                    $shiftEnded = true;
+                                } elseif ($currentTime < '07:00') {
+                                    $outsideShiftWindow = true;
+                                    $shiftWindowMsg = 'Available at 7:00 AM';
+                                }
+                            } elseif ($request->shift == 'Evening Shift') {
+                                if ($currentTime >= '18:00') {
+                                    $shiftEnded = true;
+                                } elseif ($currentTime < '16:00') {
+                                    $outsideShiftWindow = true;
+                                    $shiftWindowMsg = 'Available at 4:00 PM';
+                                }
                             }
+                        } elseif ($reqDate > $today) {
+                            // future date — handled separately by $isFuture below
                         }
                     @endphp
                     <div class="flex items-center justify-between mb-6 p-2.5 bg-gray-50 rounded-2xl">
@@ -175,10 +189,18 @@
                     @php
                         $isFuture = strtotime($request->scheduled_date) > strtotime(date('Y-m-d'));
                     @endphp
-                    
+
                     @if($isFuture)
                         <div class="flex-1 w-full text-center py-3 px-4 rounded-xl bg-gray-100 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] border border-gray-200 cursor-not-allowed" title="Available on {{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d') }}">
                             Available {{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d') }}
+                        </div>
+                    @elseif($shiftEnded)
+                        <div class="flex-1 w-full text-center py-3 px-4 rounded-xl bg-gray-100 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] border border-gray-200 cursor-not-allowed">
+                            Shift Ended
+                        </div>
+                    @elseif($outsideShiftWindow)
+                        <div class="flex-1 w-full text-center py-3 px-4 rounded-xl bg-amber-50 text-amber-500 text-[10px] font-black uppercase tracking-[0.2em] border border-amber-200 cursor-not-allowed" title="{{ $shiftWindowMsg }}">
+                            {{ $shiftWindowMsg }}
                         </div>
                     @else
                         <form action="{{ route('waste_collector.requests.complete', $request->id) }}" method="POST" class="flex-1">

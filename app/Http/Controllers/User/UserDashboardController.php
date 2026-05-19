@@ -221,8 +221,14 @@ class UserDashboardController extends Controller
     {
         $query = \App\Models\DutyRoster::with('collector');
 
-        if ($request->has('sector') && $request->sector != '') {
-            $query->where('sector', $request->sector);
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('sector', 'LIKE', "%{$search}%")
+                  ->orWhereHas('collector', function($qu) use ($search) {
+                      $qu->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
         }
 
         $dutyRosters = $query->orderBy('date', 'desc')->paginate(15);

@@ -95,6 +95,22 @@ class WasteCollectorDashboardController extends Controller
             return redirect()->back()->with('error', 'You cannot mark a future request as collected. Please wait until ' . \Carbon\Carbon::parse($request->scheduled_date)->format('M d, Y') . '.');
         }
 
+        // Shift time window check
+        $currentTime = date('H:i');
+        $shift = $request->shift;
+
+        if ($shift === 'Morning Shift') {
+            // Morning Shift: 07:00 – 10:00
+            if ($currentTime < '07:00' || $currentTime >= '10:00') {
+                return redirect()->back()->with('error', 'Morning Shift collections are only allowed between 7:00 AM and 10:00 AM.');
+            }
+        } elseif ($shift === 'Evening Shift') {
+            // Evening Shift: 16:00 – 18:00
+            if ($currentTime < '16:00' || $currentTime >= '18:00') {
+                return redirect()->back()->with('error', 'Evening Shift collections are only allowed between 4:00 PM and 6:00 PM.');
+            }
+        }
+
         $request->update([
             'status' => 'Collected',
             'weight' => rand(50, 500) / 10 // Dynamic mock weight logic

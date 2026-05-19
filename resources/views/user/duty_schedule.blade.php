@@ -11,32 +11,24 @@
     </div>
 
     <!-- Search/Filter Section -->
-    <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm mb-8">
-        <form action="{{ route('user.duty_schedule') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-end">
-            <div class="w-full md:w-1/3">
-                <label for="sector" class="block text-sm font-bold text-gray-700 mb-2">Search by Sector</label>
-                <select name="sector" id="sector" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-teal-500 focus:border-teal-500 block p-3 font-semibold transition">
-                    <option value="">All Sectors</option>
-                    @foreach($sectors as $sec)
-                        @if(!empty($sec))
-                            <option value="{{ $sec }}" {{ request('sector') == $sec ? 'selected' : '' }}>{{ $sec }}</option>
-                        @endif
-                    @endforeach
-                </select>
+    <div class="mb-8">
+        <form action="{{ route('user.duty_schedule') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-center">
+            <div class="relative w-full md:w-[320px]">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <input type="text" name="search" id="search" value="{{ request('search') }}" class="w-full bg-white border border-gray-200 text-gray-900 text-sm rounded-full focus:ring-[#19817E] focus:border-[#19817E] block pl-12 pr-10 py-2 font-semibold transition shadow-sm h-[42px]" placeholder="">
+                @if(request('search'))
+                <a href="{{ route('user.duty_schedule') }}" class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </a>
+                @endif
             </div>
             <div>
-                <button type="submit" class="bg-[#19817E] text-white text-sm font-semibold py-3 px-6 rounded-xl hover:bg-teal-700 transition shadow-sm flex items-center gap-2 h-[46px]">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    Search
+                <button type="submit" class="bg-[#19817E] text-white text-[13px] font-black py-2.5 px-8 rounded-full hover:bg-teal-700 transition shadow-sm uppercase tracking-widest h-[42px] flex items-center justify-center">
+                    SEARCH
                 </button>
             </div>
-            @if(request('sector'))
-            <div>
-                <a href="{{ route('user.duty_schedule') }}" class="bg-gray-100 text-gray-600 text-sm font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition shadow-sm flex items-center gap-2 h-[46px]">
-                    Clear
-                </a>
-            </div>
-            @endif
         </form>
     </div>
 
