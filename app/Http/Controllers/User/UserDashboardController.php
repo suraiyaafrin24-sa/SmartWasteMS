@@ -202,6 +202,13 @@ class UserDashboardController extends Controller
             return redirect()->back()->with('error', 'Only pending, scheduled, or unpaid requests can be cancelled.');
         }
 
+        $shiftStartTime = $request->shift === 'Morning Shift' ? '07:00' : '16:00';
+        $cancelDeadline = \Carbon\Carbon::parse($request->scheduled_date->format('Y-m-d') . ' ' . $shiftStartTime)->subHour();
+
+        if (now()->greaterThanOrEqualTo($cancelDeadline)) {
+            return redirect()->back()->with('error', 'You can cancel only at least 1 hour before the scheduled shift.');
+        }
+
         $request->update(['status' => 'Cancelled']);
 
         // Notify Admins
@@ -219,7 +226,8 @@ class UserDashboardController extends Controller
 
     public function dutySchedule(Request $request)
     {
-        $query = \App\Models\DutyRoster::with('collector');
+        $query = \App\Models\DutyRoster::with('collector')
+            ->where('sector', Auth::user()->sector);
 
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;

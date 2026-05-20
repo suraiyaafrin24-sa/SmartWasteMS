@@ -23,12 +23,16 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'complained_person' => 'required|string|max:255',
+            'incident_date' => 'required|date',
             'subject' => 'required|string|max:255',
             'description' => 'required|string',
         ]);
 
         Report::create([
             'user_id' => Auth::id(),
+            'complained_person' => $request->complained_person,
+            'incident_date' => $request->incident_date,
             'subject' => $request->subject,
             'description' => $request->description,
             'status' => 'Pending'

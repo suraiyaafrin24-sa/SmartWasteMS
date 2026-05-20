@@ -38,6 +38,11 @@
                     <tr class="hover:bg-gray-50/50 transition-all duration-300 group">
                         <td class="py-6 px-2">
                             <div class="font-black text-slate-800">{{ $report->subject }}</div>
+                            <div class="mt-2 flex flex-wrap items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                <span>Against: {{ $report->complained_person ?? 'N/A' }}</span>
+                                <span class="text-slate-200">|</span>
+                                <span>Date: {{ $report->incident_date ? $report->incident_date->format('M d, Y') : 'N/A' }}</span>
+                            </div>
                         </td>
                         <td class="py-6 px-2 text-center">
                             @if($report->status == 'Resolved')

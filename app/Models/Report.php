@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Report extends Model
 {
-    protected $fillable = ['user_id', 'subject', 'description', 'status'];
+    protected $fillable = ['user_id', 'complained_person', 'incident_date', 'subject', 'description', 'status'];
+
+    protected $casts = [
+        'incident_date' => 'date',
+    ];
 
     public function user()
     {

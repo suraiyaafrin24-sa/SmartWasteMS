@@ -35,15 +35,14 @@
     <!-- Duty Schedule Table -->
     <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm whitespace-nowrap">
+            <table class="w-full table-fixed text-left text-sm whitespace-nowrap">
                 <thead>
                     <tr class="text-gray-400 font-bold border-b border-gray-100 uppercase text-[11px] tracking-wider">
-                        <th class="pb-3 px-2">Collector Name</th>
-                        <th class="pb-3 px-2">Sector</th>
-                        <th class="pb-3 px-2">Road</th>
-                        <th class="pb-3 px-2">Date</th>
-                        <th class="pb-3 px-2">Shift</th>
-                        <th class="pb-3 px-2">Status</th>
+                        <th class="w-[22%] pb-3 px-2">Collector Name</th>
+                        <th class="w-[18%] pb-3 px-2">Sector</th>
+                        <th class="w-[24%] pb-3 px-2">Date</th>
+                        <th class="w-[20%] pb-3 px-2">Shift</th>
+                        <th class="w-[16%] pb-3 px-2">Status</th>
                     </tr>
                 </thead>
                 <tbody class="text-gray-800 font-semibold divide-y divide-gray-50">
@@ -60,7 +59,6 @@
                             <span>{{ $duty->collector ? $duty->collector->name : 'Unassigned' }}</span>
                         </td>
                         <td class="py-4 px-2">{{ $duty->sector }}</td>
-                        <td class="py-4 px-2">{{ $duty->road ?? 'N/A' }}</td>
                         <td class="py-4 px-2">{{ \Carbon\Carbon::parse($duty->date)->format('M d, Y') }}</td>
                         <td class="py-4 px-2">
                             @if(str_contains(strtolower($duty->shift), 'morning'))
@@ -123,7 +121,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="py-8 px-2 text-center text-gray-500">
+                        <td colspan="5" class="py-8 px-2 text-center text-gray-500">
                             <div class="flex flex-col items-center justify-center">
                                 <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                                 <span>No duty staff assignments found for this criteria.</span>

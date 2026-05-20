@@ -90,7 +90,12 @@
                             @endif
                         </td>
                         <td class="py-6 px-2 text-right flex items-center justify-end gap-3">
-                            @if($request->status == 'Pending' || $request->status == 'Scheduled' || $request->payment_status == 'Unpaid' || $request->status == 'Awaiting Payment')
+                            @php
+                                $shiftStartTime = $request->shift === 'Morning Shift' ? '07:00' : '16:00';
+                                $cancelDeadline = \Carbon\Carbon::parse($request->scheduled_date->format('Y-m-d') . ' ' . $shiftStartTime)->subHour();
+                                $canCancelByTime = now()->lt($cancelDeadline);
+                            @endphp
+                            @if(($request->status == 'Pending' || $request->status == 'Scheduled' || $request->payment_status == 'Unpaid' || $request->status == 'Awaiting Payment') && $canCancelByTime)
                                 <form action="{{ route('user.requests.cancel', $request->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this request?')">
                                     @csrf
                                     <button type="submit" class="text-red-300 hover:text-red-500 font-black text-[11px] uppercase tracking-widest transition-colors">Cancel</button>

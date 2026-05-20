@@ -45,6 +45,11 @@
                         </td>
                         <td class="py-6 px-2">
                             <div class="font-black text-slate-800 leading-tight mb-1">{{ $report->subject }}</div>
+                            <div class="mb-2 flex flex-wrap items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                <span>Against: {{ $report->complained_person ?? 'N/A' }}</span>
+                                <span class="text-slate-200">|</span>
+                                <span>Incident: {{ $report->incident_date ? $report->incident_date->format('d M, Y') : 'N/A' }}</span>
+                            </div>
                             <p class="text-[11px] text-slate-500 font-medium line-clamp-1 max-w-[250px] italic">"{{ $report->description }}"</p>
                         </td>
                         <td class="py-6 px-2 text-center">
