@@ -315,6 +315,7 @@ class AdminDashboardController extends Controller
     {
         $collectors = User::where('role', 'waste_collector')->get();
         $generalUsers = User::where('role', 'user')->get();
+        $sectors = collect(range(1, 18))->map(fn ($sector) => 'Sector ' . $sector);
 
         $query = CollectionRequest::with(['user', 'collector'])->where('payment_status', 'Paid')->orderBy('created_at', 'desc');
 
@@ -334,22 +335,68 @@ class AdminDashboardController extends Controller
 
         $collections = $query->paginate(15)->appends($request->query());
 
-        return view('admin.reports.generate', compact('collectors', 'generalUsers', 'collections'));
+        return view('admin.reports.generate', compact('collectors', 'generalUsers', 'collections', 'sectors'));
     }
 
     public function generateReport(Request $request)
     {
         $request->validate([
-            'report_type' => 'required|in:collector,user',
-            'user_id' => 'required',
+            'report_type' => 'required|in:collector,user,subscription_sector',
+            'user_id' => 'required_unless:report_type,subscription_sector',
+            'sector' => 'required_if:report_type,subscription_sector',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $actor = User::findOrFail($request->user_id);
         $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
         $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
 
+        if ($request->report_type === 'subscription_sector') {
+            $subscriptions = User::where('role', 'user')
+                ->where('sector', $request->sector)
+                ->whereNotNull('last_transaction_id')
+                ->whereBetween('updated_at', [$startDate, $endDate])
+                ->get();
+
+            $revenueSummary = $subscriptions
+                ->groupBy(fn ($user) => $user->updated_at->format('F Y'))
+                ->map(function ($users, $month) {
+                    return [
+                        'month' => $month,
+                        'subscriptions' => $users->count(),
+                        'amount' => $users->sum(function ($user) {
+                            if (preg_match('/M(\d+)T/', $user->last_transaction_id, $matches)) {
+                                return match ((int) $matches[1]) {
+                                    6 => 1800,
+                                    12 => 3600,
+                                    default => 300,
+                                };
+                            }
+
+                            return 300;
+                        }),
+                    ];
+                })
+                ->values();
+
+            return view('admin.reports.result', [
+                'actor' => (object) [
+                    'id' => null,
+                    'name' => $request->sector,
+                    'role' => 'sector',
+                    'email' => 'Subscription revenue report',
+                ],
+                'activity' => $subscriptions,
+                'revenueSummary' => $revenueSummary,
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date' => $endDate->format('Y-m-d'),
+                'type' => $request->report_type,
+                'sector' => $request->sector,
+                'days' => null,
+            ]);
+        }
+
+        $actor = User::findOrFail($request->user_id);
         $query = CollectionRequest::whereBetween('created_at', [$startDate, $endDate])->where('payment_status', 'Paid');
 
         if ($request->report_type == 'collector') {
@@ -726,28 +773,36 @@ class AdminDashboardController extends Controller
 
     public function payments(Request $request)
     {
-        $query = CollectionRequest::with(['user', 'collector']);
+        $query = User::whereNotNull('last_transaction_id');
 
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('transaction_id', 'LIKE', "%{$search}%")
-                    ->orWhere('payment_status', 'LIKE', "%{$search}%")
+                $q->where('last_transaction_id', 'LIKE', "%{$search}%")
+                    ->orWhere('monthly_payment_status', 'LIKE', "%{$search}%")
+                    ->orWhere('name', 'LIKE', "%{$search}%")
                     ->orWhere('sector', 'LIKE', "%{$search}%")
-                    ->orWhereHas('user', function ($qu) use ($search) {
-                        $qu->where('name', 'LIKE', "%{$search}%");
-                    })
-                    ->orWhereHas('collector', function ($qc) use ($search) {
-                        $qc->where('name', 'LIKE', "%{$search}%");
-                    });
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('phone', 'LIKE', "%{$search}%");
             });
         }
 
-        $payments = $query->orderBy('updated_at', 'desc')->paginate(15);
-        
-        $totalPaidAmount = \App\Models\CollectionRequest::where('payment_status', 'Paid')->count() * 20;
-        $totalUnpaidAmount = \App\Models\CollectionRequest::where('payment_status', '!=', 'Paid')->count() * 20;
+        $subscriptions = $query->orderBy('updated_at', 'desc')->paginate(15);
 
-        return view('admin.payments', compact('payments', 'totalPaidAmount', 'totalUnpaidAmount'));
+        $totalSubscriptionRevenue = User::whereNotNull('last_transaction_id')
+            ->get()
+            ->sum(function ($user) {
+                if (preg_match('/M(\d+)T/', $user->last_transaction_id, $matches)) {
+                    return match ((int) $matches[1]) {
+                        6 => 1800,
+                        12 => 3600,
+                        default => 300,
+                    };
+                }
+
+                return 300;
+            });
+
+        return view('admin.payments', compact('subscriptions', 'totalSubscriptionRevenue'));
     }
 }

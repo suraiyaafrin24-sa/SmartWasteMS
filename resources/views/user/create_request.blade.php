@@ -10,6 +10,28 @@
 
     <div class="max-w-5xl">
         <div class="bg-white rounded-[32px] p-10 border border-gray-100 shadow-xl shadow-gray-200/40">
+            @if(! $isSubscriptionActive)
+                <div class="mb-8 p-5 bg-amber-50 border border-amber-100 rounded-2xl flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs font-black text-amber-800 uppercase tracking-wider">Subscription required</p>
+                            <p class="text-[11px] text-amber-600 font-medium">You can fill this form, but you need an active package before confirming the request.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('user.subscription') }}"
+                        class="shrink-0 rounded-xl bg-amber-500 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-amber-600 transition">
+                        Buy Package
+                    </a>
+                </div>
+            @endif
+
             <form action="{{ route('user.requests.store') }}" method="POST">
                 @csrf
 
@@ -159,10 +181,17 @@
                     <a href="{{ route('user.dashboard') }}"
                         class="text-[10px] font-black text-gray-400 hover:text-gray-600 transition uppercase tracking-widest">Cancel
                         Request</a>
-                    <button type="submit" style="background-color: #2D5CFE !important; color: #FFFFFF !important;"
-                        class="text-[10px] font-black py-4 px-8 rounded-2xl hover:opacity-90 transition shadow-xl shadow-blue-500/25 active:scale-[0.98] duration-150 tracking-widest uppercase">
-                        Pay via SSLCommerz and Confirm
-                    </button>
+                    @if($isSubscriptionActive)
+                        <button type="submit" style="background-color: #2D5CFE !important; color: #FFFFFF !important;"
+                            class="text-[10px] font-black py-4 px-8 rounded-2xl hover:opacity-90 transition shadow-xl shadow-blue-500/25 active:scale-[0.98] duration-150 tracking-widest uppercase">
+                            Confirm Request
+                        </button>
+                    @else
+                        <a href="{{ route('user.subscription') }}"
+                            class="text-[10px] font-black py-4 px-8 rounded-2xl bg-slate-200 text-slate-500 hover:bg-slate-300 transition tracking-widest uppercase">
+                            Buy Subscription to Confirm
+                        </a>
+                    @endif
                 </div>
             </form>
         </div>

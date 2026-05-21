@@ -194,14 +194,6 @@
                         <div class="flex-1 w-full text-center py-3 px-4 rounded-xl bg-gray-100 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] border border-gray-200 cursor-not-allowed" title="Available on {{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d') }}">
                             Available {{ \Carbon\Carbon::parse($request->scheduled_date)->format('M d') }}
                         </div>
-                    @elseif($shiftEnded)
-                        <div class="flex-1 w-full text-center py-3 px-4 rounded-xl bg-gray-100 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] border border-gray-200 cursor-not-allowed">
-                            Shift Ended
-                        </div>
-                    @elseif($outsideShiftWindow)
-                        <div class="flex-1 w-full text-center py-3 px-4 rounded-xl bg-amber-50 text-amber-500 text-[10px] font-black uppercase tracking-[0.2em] border border-amber-200 cursor-not-allowed" title="{{ $shiftWindowMsg }}">
-                            {{ $shiftWindowMsg }}
-                        </div>
                     @else
                         <form action="{{ route('waste_collector.requests.complete', $request->id) }}" method="POST" class="flex-1">
                             @csrf

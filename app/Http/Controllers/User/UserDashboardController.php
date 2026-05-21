@@ -51,11 +51,30 @@ class UserDashboardController extends Controller
 
     public function createRequest()
     {
-        return view('user.create_request');
+        $isSubscriptionActive = $this->hasActiveSubscription(Auth::user());
+
+        return view('user.create_request', compact('isSubscriptionActive'));
+    }
+
+    public function subscription()
+    {
+        $user = Auth::user();
+        $validUntil = $user->subscription_valid_until
+            ? \Carbon\Carbon::parse($user->subscription_valid_until)
+            : null;
+
+        $isActive = $this->hasActiveSubscription($user);
+
+        return view('user.subscription', compact('user', 'validUntil', 'isActive'));
     }
 
     public function storeRequest(Request $request)
     {
+        if (! $this->hasActiveSubscription(Auth::user())) {
+            return redirect()->route('user.subscription', ['subscription_required' => 1])
+                ->with('error', 'Please buy a subscription package before creating a collection request.');
+        }
+
         $request->validate([
             'type' => 'required|string',
             'scheduled_date' => 'required|date|after_or_equal:today',
@@ -107,20 +126,25 @@ class UserDashboardController extends Controller
             'sector' => $request->sector,
             'road' => $request->road,
             'zone' => 'Uttara City Corporation Zone',
-            'status' => 'Awaiting Payment',
-            'payment_status' => 'Unpaid',
-            'amount' => 20
+            'status' => $status,
+            'payment_status' => 'Paid',
+            'amount' => 0,
+            'transaction_id' => Auth::user()->last_transaction_id,
         ]);
 
         // Notify Admins
         $admins = User::where('role', 'admin')->get();
-        Notification::send($admins, new CollectionStatusNotification($collectionRequest, 'New waste collection request created (Awaiting Payment).', 'new_request'));
+        Notification::send($admins, new CollectionStatusNotification($collectionRequest, 'New subscribed collection request created.', 'new_request'));
 
-        // Redirect directly to payment
-        return redirect()->route('sslc.pay', [
-            'amount' => 20, 
-            'request_id' => $collectionRequest->id
-        ]);
+        if ($collectorId) {
+            $collector = User::find($collectorId);
+
+            if ($collector) {
+                $collector->notify(new CollectionStatusNotification($collectionRequest, 'A new subscribed collection request has been assigned to you.', 'new_request'));
+            }
+        }
+
+        return redirect()->route('user.dashboard')->with('success', 'Collection request granted successfully.');
     }
 
     public function getCollector(Request $request)
@@ -256,5 +280,14 @@ class UserDashboardController extends Controller
         }
 
         return view('user.receipt', compact('request'));
+    }
+
+    private function hasActiveSubscription($user): bool
+    {
+        if (! $user || $user->monthly_payment_status !== 'Paid' || ! $user->subscription_valid_until) {
+            return false;
+        }
+
+        return \Carbon\Carbon::parse($user->subscription_valid_until)->endOfDay()->isFuture();
     }
 }

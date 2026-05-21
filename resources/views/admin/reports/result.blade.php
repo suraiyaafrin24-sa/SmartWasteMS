@@ -6,20 +6,23 @@
     <div class="mb-8 mt-2 flex justify-between items-center no-print">
         <div>
             <h1 class="text-[28px] font-black tracking-tight text-gray-900 mb-1">Activity Summary</h1>
-            <p class="text-sm font-medium text-gray-500">Summary for {{ $actor->name }} ({{ $start_date }} to
-                {{ $end_date }})</p>
+            <p class="text-sm font-medium text-gray-500">
+                {{ $type == 'subscription_sector' ? 'Monthly subscription revenue for ' : 'Summary for ' }}{{ $actor->name }} ({{ $start_date }} to {{ $end_date }})
+            </p>
         </div>
         <div class="flex gap-3">
             <a href="{{ route('admin.reports') }}"
                 class="bg-gray-100 text-gray-700 text-xs font-bold py-3 px-6 rounded-xl hover:bg-gray-200 transition">Back
                 to Generator</a>
-            <a href="{{ route('admin.reports.pdf.download', ['report_type' => $type, 'user_id' => $actor->id, 'start_date' => $start_date, 'end_date' => $end_date]) }}"
-                class="flex items-center gap-2 bg-gray-800 text-white text-xs font-bold py-3 px-6 rounded-xl hover:bg-gray-900 transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                </svg>
-                Download PDF
-            </a>
+            @if($type != 'subscription_sector')
+                <a href="{{ route('admin.reports.pdf.download', ['report_type' => $type, 'user_id' => $actor->id, 'start_date' => $start_date, 'end_date' => $end_date]) }}"
+                    class="flex items-center gap-2 bg-gray-800 text-white text-xs font-bold py-3 px-6 rounded-xl hover:bg-gray-900 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Download PDF
+                </a>
+            @endif
             <button onclick="window.print()"
                 class="bg-[#19817E] text-white text-xs font-bold py-3 px-8 rounded-xl shadow-lg shadow-teal-500/20 hover:bg-teal-700 transition flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +63,7 @@
                     <div>
                         <h4 class="text-lg font-black text-gray-900 leading-none">{{ $actor->name }}</h4>
                         <p class="text-xs font-bold text-teal-600 mt-1 uppercase tracking-widest">
-                            {{ $actor->role == 'waste_collector' ? 'Waste Collector' : 'Resident' }}</p>
+                            {{ $type == 'subscription_sector' ? 'Sector Revenue' : ($actor->role == 'waste_collector' ? 'Waste Collector' : 'Resident') }}</p>
                         <p class="text-[10px] text-gray-500 font-medium mt-1">{{ $actor->email }}</p>
                     </div>
                 </div>
@@ -81,6 +84,41 @@
             </div>
         </div>
 
+        @if($type == 'subscription_sector')
+            <div class="space-y-4">
+                <h3 class="text-[11px] font-black text-gray-600 uppercase tracking-[2px] mb-6">Monthly Subscription Revenue</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b border-gray-100">
+                                <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Month</th>
+                                <th class="py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Sector</th>
+                                <th class="py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Subscriptions</th>
+                                <th class="py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Earned Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @forelse($revenueSummary as $row)
+                                <tr>
+                                    <td class="py-5 text-sm font-bold text-gray-800">{{ $row['month'] }}</td>
+                                    <td class="py-5">
+                                        <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-teal-50 text-teal-600">{{ $sector }}</span>
+                                    </td>
+                                    <td class="py-5 text-center text-sm font-black text-gray-800">{{ $row['subscriptions'] }}</td>
+                                    <td class="py-5 text-right text-sm font-black text-emerald-600">BDT {{ number_format($row['amount'], 2) }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="py-20 text-center bg-gray-50 rounded-[28px]">
+                                        <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">No subscription revenue found for this sector and date range</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @else
         <div class="space-y-4">
             <h3 class="text-[11px] font-black text-gray-600 uppercase tracking-[2px] mb-6">Detailed Activity Ledger</h3>
             <div class="overflow-x-auto">
@@ -143,6 +181,7 @@
                 </div>
             @endif
         </div>
+        @endif
 
         <div class="hidden print:block mt-16 border-t border-gray-200 pt-8 text-center">
             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">This is a computer-generated official

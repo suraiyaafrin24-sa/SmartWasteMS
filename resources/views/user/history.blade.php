@@ -20,8 +20,6 @@
                         <th class="pb-8 px-2">Schedule Detail</th>
                         <th class="pb-8 px-2">Shift</th>
                         <th class="pb-8 px-2 text-center">Status</th>
-                        <th class="pb-8 px-2 text-center">Payment</th>
-                        <th class="pb-8 px-2 text-center">Receipt</th>
                         <th class="pb-8 px-2">Staff Assigned</th>
                         <th class="pb-8 px-2 text-right">Action</th>
                     </tr>
@@ -51,30 +49,10 @@
                                 <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-amber-50 text-amber-600 tracking-widest uppercase">Scheduled</span>
                             @elseif($request->status == 'Cancelled')
                                 <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-red-50 text-red-600 tracking-widest uppercase">Cancelled</span>
+                            @elseif($request->status == 'Awaiting Payment')
+                                <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-blue-50 text-blue-600 tracking-widest uppercase">Pending</span>
                             @else
                                 <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-blue-50 text-blue-600 tracking-widest uppercase">{{ $request->status }}</span>
-                            @endif
-                        </td>
-                        <td class="py-6 px-2 text-center">
-                            @if($request->payment_status == 'Paid')
-                                <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-emerald-50 text-emerald-600 tracking-widest uppercase">Paid</span>
-                            @else
-                                <form action="{{ route('sslc.pay') }}" method="POST" class="inline">
-                                    @csrf
-                                    <input type="hidden" name="amount" value="20">
-                                    <input type="hidden" name="request_id" value="{{ $request->id }}">
-                                    <button type="submit" class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-rose-50 text-rose-600 tracking-widest uppercase hover:bg-rose-100 transition-colors">Unpaid</button>
-                                </form>
-                            @endif
-                        </td>
-                        <td class="py-6 px-2 text-center">
-                            @if($request->payment_status == 'Paid')
-                                <a href="{{ route('user.receipt', $request->id) }}" target="_blank" class="inline-flex items-center gap-1 text-[#19817E] hover:text-teal-700 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                    <span class="text-[10px] font-black uppercase tracking-widest">PDF</span>
-                                </a>
-                            @else
-                                <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">N/A</span>
                             @endif
                         </td>
                         <td class="py-6 px-2">
@@ -95,7 +73,7 @@
                                 $cancelDeadline = \Carbon\Carbon::parse($request->scheduled_date->format('Y-m-d') . ' ' . $shiftStartTime)->subHour();
                                 $canCancelByTime = now()->lt($cancelDeadline);
                             @endphp
-                            @if(($request->status == 'Pending' || $request->status == 'Scheduled' || $request->payment_status == 'Unpaid' || $request->status == 'Awaiting Payment') && $canCancelByTime)
+                            @if(($request->status == 'Pending' || $request->status == 'Scheduled') && $canCancelByTime)
                                 <form action="{{ route('user.requests.cancel', $request->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this request?')">
                                     @csrf
                                     <button type="submit" class="text-red-300 hover:text-red-500 font-black text-[11px] uppercase tracking-widest transition-colors">Cancel</button>
@@ -107,7 +85,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="py-12 px-2 text-center">
+                        <td colspan="7" class="py-12 px-2 text-center">
                             <div class="flex flex-col items-center gap-3">
                                 <div class="w-16 h-16 bg-slate-50 rounded-[24px] flex items-center justify-center text-slate-200">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>

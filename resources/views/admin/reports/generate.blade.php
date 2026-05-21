@@ -34,11 +34,12 @@
                 <div>
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Reporting Target <span class="text-red-500">*</span></label>
                     <div class="relative">
-                        <select name="report_type" id="typeSelect" required onchange="toggleUserList(this.value); filterTable()"
+                        <select name="report_type" id="typeSelect" required onchange="toggleReportFields(this.value); filterTable()"
                             style="background-image: none;"
                             class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl px-4 py-3 pr-10 focus:ring-2 focus:ring-teal-500/20 focus:border-[#19817E] outline-none transition-all appearance-none cursor-pointer">
                             <option value="collector" {{ request('report_type', 'collector') == 'collector' ? 'selected' : '' }}>Waste Collector</option>
                             <option value="user" {{ request('report_type') == 'user' ? 'selected' : '' }}>Resident User</option>
+                            <option value="subscription_sector" {{ request('report_type') == 'subscription_sector' ? 'selected' : '' }}>Subscription Revenue</option>
                         </select>
                         <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -47,10 +48,10 @@
                 </div>
 
                 {{-- Select Individual --}}
-                <div>
+                <div id="personField">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Select Individual <span class="text-red-500">*</span></label>
                     <div class="relative">
-                        <select name="user_id" id="personSelect" required onchange="filterTable()"
+                        <select name="user_id" id="personSelect" onchange="filterTable()"
                             style="background-image: none;"
                             class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl px-4 py-3 pr-10 focus:ring-2 focus:ring-teal-500/20 focus:border-[#19817E] outline-none transition-all appearance-none cursor-pointer">
                             <option value="">Choose Staff / User...</option>
@@ -59,6 +60,23 @@
                             @endforeach
                             @foreach($generalUsers as $u)
                                 <option value="{{ $u->id }}" class="user-opt hidden" {{ request('user_id') == $u->id ? 'selected' : '' }}>{{ $u->name }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sectorField" class="hidden">
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Select Sector <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <select name="sector" id="sectorSelect" onchange="filterTable()"
+                            style="background-image: none;"
+                            class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl px-4 py-3 pr-10 focus:ring-2 focus:ring-teal-500/20 focus:border-[#19817E] outline-none transition-all appearance-none cursor-pointer">
+                            <option value="">Choose Sector...</option>
+                            @foreach($sectors as $sector)
+                                <option value="{{ $sector }}" {{ request('sector') == $sector ? 'selected' : '' }}>{{ $sector }}</option>
                             @endforeach
                         </select>
                         <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400">
@@ -78,6 +96,7 @@
                 <div>
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">End Date <span class="text-red-500">*</span></label>
                     <input type="date" name="end_date" id="endDate" value="{{ request('end_date', date('Y-m-d')) }}" required onchange="filterTable()"
+                        max="{{ date('Y-m-d') }}"
                         class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl px-4 py-3 focus:ring-2 focus:ring-teal-500/20 focus:border-[#19817E] outline-none transition-all">
                 </div>
             </div>
@@ -185,11 +204,26 @@
     </div>
 
     <script>
-        function toggleUserList(type) {
+        function toggleReportFields(type) {
             const select = document.getElementById('personSelect');
+            const personField = document.getElementById('personField');
+            const sectorField = document.getElementById('sectorField');
+            const sectorSelect = document.getElementById('sectorSelect');
             const collectorOpts = document.querySelectorAll('.collector-opt');
             const userOpts = document.querySelectorAll('.user-opt');
-            select.value = "";
+            if (type === 'subscription_sector') {
+                personField.classList.add('hidden');
+                sectorField.classList.remove('hidden');
+                select.required = false;
+                sectorSelect.required = true;
+                select.value = "";
+                return;
+            }
+
+            personField.classList.remove('hidden');
+            sectorField.classList.add('hidden');
+            select.required = true;
+            sectorSelect.required = false;
             if (type === 'collector') {
                 collectorOpts.forEach(o => o.classList.remove('hidden'));
                 userOpts.forEach(o => o.classList.add('hidden'));
@@ -202,11 +236,13 @@
         function filterTable() {
             const reportType = document.getElementById('typeSelect').value;
             const userId = document.getElementById('personSelect').value;
+            const sector = document.getElementById('sectorSelect').value;
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             const params = new URLSearchParams();
             if (reportType) params.set('report_type', reportType);
             if (userId) params.set('user_id', userId);
+            if (sector) params.set('sector', sector);
             if (startDate) params.set('start_date', startDate);
             if (endDate) params.set('end_date', endDate);
             window.location.href = '{{ route('admin.reports') }}?' + params.toString();
@@ -215,12 +251,13 @@
         // On page load: restore correct person list visibility based on current GET param
         document.addEventListener('DOMContentLoaded', function () {
             const type = document.getElementById('typeSelect').value;
+            toggleReportFields(type);
             const collectorOpts = document.querySelectorAll('.collector-opt');
             const userOpts = document.querySelectorAll('.user-opt');
             if (type === 'user') {
                 collectorOpts.forEach(o => o.classList.add('hidden'));
                 userOpts.forEach(o => o.classList.remove('hidden'));
-            } else {
+            } else if (type === 'collector') {
                 collectorOpts.forEach(o => o.classList.remove('hidden'));
                 userOpts.forEach(o => o.classList.add('hidden'));
             }

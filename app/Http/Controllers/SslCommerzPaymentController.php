@@ -13,14 +13,35 @@ class SslCommerzPaymentController extends Controller
         try {
             $amount = $request->amount ?: 100;
             $request_id = $request->request_id;
-            $tran_id = 'REQ' . $request_id . 'T' . uniqid();
+            $paymentType = $request->payment_type === 'subscription' ? 'subscription' : 'request';
+
+            if ($paymentType !== 'subscription') {
+                return redirect()->route('user.subscription', ['subscription_required' => 1])
+                    ->with('error', 'Collection requests are available only with an active subscription package.');
+            }
+
+            $subscriptionPackages = [
+                1 => 300,
+                6 => 1800,
+                12 => 3600,
+            ];
+            $subscriptionMonths = (int) $request->subscription_months;
+
+            if ($paymentType === 'subscription') {
+                $subscriptionMonths = array_key_exists($subscriptionMonths, $subscriptionPackages) ? $subscriptionMonths : 1;
+                $amount = $subscriptionPackages[$subscriptionMonths];
+            }
+
+            $tran_id = $paymentType === 'subscription'
+                ? 'SUB' . auth()->id() . 'M' . $subscriptionMonths . 'T' . uniqid()
+                : 'REQ' . $request_id . 'T' . uniqid();
 
             $sslc = new SSLCommerz();
             $user = auth()->user();
 
             $sslc->amount($amount)
                 ->trxid($tran_id)
-                ->product('Waste Collection Fee')
+                ->product($paymentType === 'subscription' ? $subscriptionMonths . ' Month SmartBin Subscription' : 'Waste Collection Fee')
                 ->customer(
                     $user->name ?? 'Guest', 
                     $user->email ?? 'no-email@example.com', 
@@ -47,6 +68,8 @@ class SslCommerzPaymentController extends Controller
 
         if ($validate) {
             $tran_id = $request->tran_id;
+            $redirectRoute = str_starts_with($tran_id, 'SUB') ? 'user.subscription' : 'user.dashboard';
+
             // Parse request_id from REQ{id}T{uniqid}
             if (preg_match('/REQ(\d+)T/', $tran_id, $matches)) {
                 $requestId = $matches[1];
@@ -68,9 +91,26 @@ class SslCommerzPaymentController extends Controller
                         }
                     }
                 }
+            } elseif (preg_match('/SUB(\d+)M(\d+)T/', $tran_id, $matches)) {
+                $user = \App\Models\User::find($matches[1]);
+                $subscriptionMonths = in_array((int) $matches[2], [1, 6, 12], true) ? (int) $matches[2] : 1;
+
+                if ($user) {
+                    $currentValidUntil = $user->subscription_valid_until
+                        ? \Carbon\Carbon::parse($user->subscription_valid_until)
+                        : now();
+
+                    $startsFrom = $currentValidUntil->isFuture() ? $currentValidUntil : now();
+
+                    $user->update([
+                        'monthly_payment_status' => 'Paid',
+                        'subscription_valid_until' => $startsFrom->copy()->addMonthsNoOverflow($subscriptionMonths),
+                        'last_transaction_id' => $tran_id,
+                    ]);
+                }
             }
 
-            return redirect()->route('user.dashboard', [
+            return redirect()->route($redirectRoute, [
                 'payment' => 'success',
                 'tran_id' => $request->tran_id
             ]);
@@ -80,12 +120,16 @@ class SslCommerzPaymentController extends Controller
 
     public function fail(Request $request)
     {
-        return redirect()->route('user.dashboard', ['payment' => 'failed']);
+        $redirectRoute = str_starts_with($request->tran_id ?? '', 'SUB') ? 'user.subscription' : 'user.dashboard';
+
+        return redirect()->route($redirectRoute, ['payment' => 'failed']);
     }
 
     public function cancel(Request $request)
     {
-        return redirect()->route('user.dashboard', ['payment' => 'cancelled']);
+        $redirectRoute = str_starts_with($request->tran_id ?? '', 'SUB') ? 'user.subscription' : 'user.dashboard';
+
+        return redirect()->route($redirectRoute, ['payment' => 'cancelled']);
     }
 
     public function ipn(Request $request)

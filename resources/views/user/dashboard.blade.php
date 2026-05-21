@@ -128,8 +128,6 @@
                         <th class="pb-6 px-4 text-left">Scheduled Date</th>
                         <th class="pb-6 px-4 text-left">Shift</th>
                         <th class="pb-6 px-4 text-left">Status</th>
-                        <th class="pb-6 px-4 text-left">Payment Status</th>
-                        <th class="pb-6 px-4 text-left">Receipt</th>
                         <th class="pb-6 px-4 text-left">Collector</th>
                     </tr>
                 </thead>
@@ -146,31 +144,12 @@
                                 @elseif($request->status == 'Scheduled')
                                     <span
                                         class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-amber-50 text-amber-600 tracking-widest uppercase">Scheduled</span>
+                                @elseif($request->status == 'Awaiting Payment')
+                                    <span
+                                        class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-gray-50 text-gray-400 tracking-widest uppercase">Pending</span>
                                 @else
                                     <span
                                         class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-gray-50 text-gray-400 tracking-widest uppercase">{{ $request->status }}</span>
-                                @endif
-                            </td>
-                            <td class="py-6 px-4 text-left">
-                                @if($request->payment_status == 'Paid')
-                                    <span class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-emerald-50 text-emerald-600 tracking-widest uppercase">Paid</span>
-                                @else
-                                    <form action="{{ route('sslc.pay') }}" method="POST" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="amount" value="20">
-                                        <input type="hidden" name="request_id" value="{{ $request->id }}">
-                                        <button type="submit" class="px-3 py-1.5 rounded-xl text-[10px] font-black bg-rose-50 text-rose-600 tracking-widest uppercase hover:bg-rose-100 transition-colors">Unpaid</button>
-                                    </form>
-                                @endif
-                            </td>
-                            <td class="py-6 px-4 text-left">
-                                @if($request->payment_status == 'Paid')
-                                    <a href="{{ route('user.receipt', $request->id) }}" target="_blank" class="inline-flex items-center gap-1 text-[#19817E] hover:text-teal-700 transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                        <span class="text-[10px] font-black uppercase tracking-widest">PDF</span>
-                                    </a>
-                                @else
-                                    <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">N/A</span>
                                 @endif
                             </td>
                             <td class="py-6 px-4 font-bold text-slate-500 text-left">
@@ -178,7 +157,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7"
+                            <td colspan="5"
                                 class="py-6 px-2 text-center text-slate-400 italic font-black uppercase text-[10px] tracking-widest">
                                 No recent requests found.</td>
                         </tr>
