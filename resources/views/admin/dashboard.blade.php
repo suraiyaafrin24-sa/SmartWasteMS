@@ -225,9 +225,12 @@
                                     @elseif($request->status == 'Scheduled')
                                         <span
                                             class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-[#E2F0EC] text-[#19817E] tracking-widest uppercase">Scheduled</span>
+                                    @elseif($request->status == 'Cancelled')
+                                        <span
+                                            class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-red-50 text-red-600 tracking-widest uppercase">Cancelled</span>
                                     @else
                                         <span
-                                            class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-[#FEF3C7] text-[#D97706] tracking-widest uppercase">Pending</span>
+                                            class="px-2.5 py-1 rounded-lg text-[9px] font-black bg-[#FEF3C7] text-[#D97706] tracking-widest uppercase">{{ $request->status }}</span>
                                     @endif
                                 </td>
                             </tr>
@@ -369,6 +372,8 @@
                     statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600';
                 } else if (status === 'Scheduled') {
                     statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-600';
+                } else if (status === 'Cancelled') {
+                    statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-red-50 text-red-600';
                 } else {
                     statusEl.className = 'px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-50 text-amber-600';
                 }

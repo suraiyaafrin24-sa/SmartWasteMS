@@ -145,6 +145,7 @@
                                     @if($request->status == 'Completed' || $request->status == 'Collected') bg-emerald-50 text-emerald-600
                                     @elseif($request->status == 'Scheduled') bg-blue-50 text-blue-600
                                     @elseif($request->status == 'Pending') bg-amber-50 text-amber-600
+                                    @elseif($request->status == 'Cancelled') bg-red-50 text-red-600
                                     @else bg-gray-50 text-gray-500 @endif">
                                     {{ $request->status }}
                                 </span>
