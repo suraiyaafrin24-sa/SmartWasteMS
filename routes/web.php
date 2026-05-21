@@ -46,6 +46,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     Route::post('/requests/{id}/assign', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'assignTask'])->name('requests.assign');
     Route::get('/payments', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'payments'])->name('payments');
+    Route::get('/leave-requests', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'leaveRequests'])->name('leave_requests');
+    Route::post('/leave-requests/{leaveRequest}/approve', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'approveLeaveRequest'])->name('leave_requests.approve');
+    Route::post('/leave-requests/{leaveRequest}/reject', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'rejectLeaveRequest'])->name('leave_requests.reject');
 });
 
 // Waste Collector Routes
@@ -61,12 +64,16 @@ Route::middleware(['auth', 'verified', 'role:waste_collector'])->prefix('waste_c
 
     Route::get('/duty-schedule', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'dutySchedule'])->name('duty_schedule');
     Route::get('/payment-collection', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'paymentCollection'])->name('payment_collection');
+    Route::get('/leave-requests', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'leaveRequests'])->name('leave_requests');
+    Route::post('/leave-requests', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'storeLeaveRequest'])->name('leave_requests.store');
 });
 
 // User Routes
 Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\User\UserDashboardController::class, 'index'])->name('dashboard');
     Route::get('/subscription', [\App\Http\Controllers\User\UserDashboardController::class, 'subscription'])->name('subscription');
+    Route::get('/my-subscription', [\App\Http\Controllers\User\UserDashboardController::class, 'mySubscription'])->name('my_subscription');
+    Route::get('/subscription-receipt', [\App\Http\Controllers\User\UserDashboardController::class, 'subscriptionReceipt'])->name('subscription_receipt');
     Route::get('/settings', [\App\Http\Controllers\User\UserSettingsController::class, 'index'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\User\UserSettingsController::class, 'updateProfile'])->name('settings.update');
     Route::delete('/settings/avatar', [\App\Http\Controllers\User\UserSettingsController::class, 'deleteAvatar'])->name('settings.avatar.delete');

@@ -88,6 +88,11 @@ class User extends Authenticatable
         return $this->hasMany(DutyRoster::class, 'collector_id');
     }
 
+    public function leaveRequests()
+    {
+        return $this->hasMany(LeaveRequest::class, 'collector_id');
+    }
+
     public function adminProfile()
     {
         return $this->hasOne(AdminProfile::class, 'user_id');

@@ -37,8 +37,17 @@
                         class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
                         <option value="">Select Collector...</option>
                         @foreach($collectors as $c)
-                            <option value="{{ $c->id }}" data-sector="{{ $c->sector }}" data-road="{{ $c->road }}">
+                            @php $leave = $c->leaveRequests->first(); @endphp
+                            <option value="{{ $c->id }}" data-sector="{{ $c->sector }}" data-road="{{ $c->road }}"
+                                @if($leave)
+                                    data-leave-start="{{ $leave->start_date->format('Y-m-d') }}"
+                                    data-leave-end="{{ $leave->end_date->format('Y-m-d') }}"
+                                @endif
+                            >
                                 {{ $c->name }}
+                                @if($leave)
+                                    — On Leave ({{ $leave->start_date->format('M d') }} - {{ $leave->end_date->format('M d') }})
+                                @endif
                             </option>
                         @endforeach
                     </select>
@@ -263,6 +272,30 @@
             }
         }
 
+        function updateCollectorAvailability() {
+            const selectedDate = dutyDate.value;
+            
+            Array.from(collectorSelect.options).forEach(option => {
+                if (option.value === '') return; // Skip "Select Collector..." option
+                
+                const leaveStart = option.getAttribute('data-leave-start');
+                const leaveEnd = option.getAttribute('data-leave-end');
+                
+                // Check if selected date falls within leave period
+                if (leaveStart && leaveEnd && selectedDate >= leaveStart && selectedDate <= leaveEnd) {
+                    option.disabled = true;
+                } else {
+                    option.disabled = false;
+                }
+            });
+
+            // If current selection is disabled, clear it
+            if (collectorSelect.selectedOptions[0]?.disabled) {
+                collectorSelect.value = '';
+                updateFields();
+            }
+        }
+
         if (collectorSelect) {
             function updateFields() {
                 const selectedOption = collectorSelect.options[collectorSelect.selectedIndex];
@@ -293,11 +326,15 @@
             }
 
             collectorSelect.addEventListener('change', updateFields);
-            dutyDate.addEventListener('change', updateShiftOptions);
+            dutyDate.addEventListener('change', function() {
+                updateShiftOptions();
+                updateCollectorAvailability();
+            });
             
             // Trigger once on load
             updateFields();
             updateShiftOptions();
+            updateCollectorAvailability();
         }
     });
 </script>

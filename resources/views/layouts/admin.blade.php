@@ -111,6 +111,16 @@
                 <span class="text-sm">Staff Schedule</span>
             </a>
 
+            <a href="{{ route('admin.leave_requests') }}"
+                class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('admin.leave_requests*') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10m-7 4h4m-7 4h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                    </path>
+                </svg>
+                <span class="text-sm">Leave Requests</span>
+            </a>
+
             <!-- Manage Users -->
             <a href="{{ route('admin.users') }}"
                 class="flex items-center gap-4 px-4 py-3 {{ request()->routeIs('admin.users') || request()->routeIs('admin.users.create') ? 'bg-[#DCF5F2] text-[#19817E] font-bold' : 'text-slate-400 hover:bg-gray-100 font-semibold' }} rounded-xl transition-all duration-200">

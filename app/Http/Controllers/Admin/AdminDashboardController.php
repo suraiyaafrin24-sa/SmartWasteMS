@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\CollectionRequest;
+use App\Models\LeaveRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -111,6 +112,9 @@ class AdminDashboardController extends Controller
         $collectors = User::where('role', 'waste_collector')
             ->with(['dutyRosters' => function($q) {
                 $q->whereDate('date', today());
+            }, 'leaveRequests' => function($q) {
+                $q->where('status', 'Approved')
+                    ->whereDate('end_date', '>=', today());
             }])
             ->get();
 
@@ -317,23 +321,39 @@ class AdminDashboardController extends Controller
         $generalUsers = User::where('role', 'user')->get();
         $sectors = collect(range(1, 18))->map(fn ($sector) => 'Sector ' . $sector);
 
-        $query = CollectionRequest::with(['user', 'collector'])->where('payment_status', 'Paid')->orderBy('created_at', 'desc');
+        if ($request->report_type === 'subscription_sector') {
+            $query = User::whereNotNull('last_transaction_id');
 
-        if ($request->filled('user_id') && $request->filled('report_type')) {
-            if ($request->report_type == 'collector') {
-                $query->where('collector_id', $request->user_id);
-            } else {
-                $query->where('user_id', $request->user_id);
+            if ($request->filled('sector')) {
+                $query->where('sector', $request->sector);
             }
-        }
 
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
-            $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
-            $query->whereBetween('created_at', [$startDate, $endDate]);
-        }
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
+                $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
+                $query->whereBetween('updated_at', [$startDate, $endDate]);
+            }
 
-        $collections = $query->paginate(15)->appends($request->query());
+            $collections = $query->orderBy('updated_at', 'desc')->paginate(15)->appends($request->query());
+        } else {
+            $query = CollectionRequest::with(['user', 'collector'])->where('payment_status', 'Paid')->orderBy('created_at', 'desc');
+
+            if ($request->filled('user_id') && $request->filled('report_type')) {
+                if ($request->report_type == 'collector') {
+                    $query->where('collector_id', $request->user_id);
+                } else {
+                    $query->where('user_id', $request->user_id);
+                }
+            }
+
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
+                $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
+                $query->whereBetween('created_at', [$startDate, $endDate]);
+            }
+
+            $collections = $query->paginate(15)->appends($request->query());
+        }
 
         return view('admin.reports.generate', compact('collectors', 'generalUsers', 'collections', 'sectors'));
     }
@@ -565,6 +585,9 @@ class AdminDashboardController extends Controller
         $collectors = User::where('role', 'waste_collector')
             ->with(['dutyRosters' => function($q) {
                 $q->whereDate('date', today());
+            }, 'leaveRequests' => function($q) {
+                $q->where('status', 'Approved')
+                    ->whereDate('end_date', '>=', today());
             }])
             ->get();
         return view('admin.collections', compact('collections', 'collectors'));
@@ -680,6 +703,10 @@ class AdminDashboardController extends Controller
             }
         }
 
+        if ($this->collectorHasApprovedLeave($request->collector_id, $request->scheduled_date)) {
+            return redirect()->back()->withInput()->with('error', 'This collector is on approved leave for the selected date.');
+        }
+
         $collectionRequest = CollectionRequest::findOrFail($id);
         
         $collectionRequest->update([
@@ -713,6 +740,14 @@ class AdminDashboardController extends Controller
         // Limit range to 7 days
         if ($startDate->diffInDays($endDate) > 7) {
             return redirect()->back()->withInput()->with('error', 'You can only assign staff for up to 7 days at a time.');
+        }
+
+        if (LeaveRequest::where('collector_id', $request->collector_id)
+            ->where('status', 'Approved')
+            ->whereDate('start_date', '<=', $endDate->format('Y-m-d'))
+            ->whereDate('end_date', '>=', $startDate->format('Y-m-d'))
+            ->exists()) {
+            return redirect()->back()->withInput()->with('error', 'This collector is on approved leave in the selected date range.');
         }
 
         $currentTime = date('H:i');
@@ -769,6 +804,45 @@ class AdminDashboardController extends Controller
         $roster = \App\Models\DutyRoster::findOrFail($id);
         $roster->delete();
         return redirect()->back()->with('success', 'Roster entry removed successfully.');
+    }
+
+    public function leaveRequests()
+    {
+        $leaveRequests = LeaveRequest::with('collector')
+            ->orderByRaw("CASE WHEN status = 'Pending' THEN 0 ELSE 1 END")
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return view('admin.leave_requests', compact('leaveRequests'));
+    }
+
+    public function approveLeaveRequest(LeaveRequest $leaveRequest)
+    {
+        $leaveRequest->update([
+            'status' => 'Approved',
+            'approved_at' => now(),
+            'approved_by' => Auth::id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Leave request approved.');
+    }
+
+    public function rejectLeaveRequest(LeaveRequest $leaveRequest)
+    {
+        $leaveRequest->update([
+            'status' => 'Rejected',
+        ]);
+
+        return redirect()->back()->with('success', 'Leave request rejected.');
+    }
+
+    private function collectorHasApprovedLeave($collectorId, $date): bool
+    {
+        return LeaveRequest::where('collector_id', $collectorId)
+            ->where('status', 'Approved')
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date)
+            ->exists();
     }
 
     public function payments(Request $request)

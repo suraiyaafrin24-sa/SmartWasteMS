@@ -115,87 +115,167 @@
         </form>
     </div>
 
-    {{-- Collection Records Table --}}
+    {{-- Collection/Subscription Records Table --}}
     <div class="mt-10 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
-            <div>
-                <h2 class="text-base font-bold text-gray-800">All Collection Records</h2>
-                <p class="text-[12px] text-gray-400 font-medium mt-0.5">Overview of all waste pickup requests in the system.</p>
+        @if(request('report_type') === 'subscription_sector')
+            <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-gray-800">All Subscription Records</h2>
+                    <p class="text-[12px] text-gray-400 font-medium mt-0.5">Overview of all active subscription payments in the selected sector.</p>
+                </div>
             </div>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead>
-                    <tr class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                        <th class="px-6 py-4">Date</th>
-                        <th class="px-6 py-4">User</th>
-                        <th class="px-6 py-4 text-center">Sector</th>
-                        <th class="px-6 py-4 text-center">Waste Type</th>
-                        <th class="px-6 py-4 text-center">Shift</th>
-                        <th class="px-6 py-4">Assigned Collector</th>
-                        <th class="px-6 py-4 text-center">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50">
-                    @forelse($collections as $item)
-                        <tr class="hover:bg-gray-50/40 transition">
-                            <td class="px-6 py-4">
-                                <div class="text-sm font-black text-gray-800 leading-none">{{ $item->created_at->format('M d, Y') }}</div>
-                                <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">At {{ $item->created_at->format('h:i A') }}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="font-black text-gray-800 text-sm">{{ $item->user->name ?? 'N/A' }}</div>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="bg-teal-50 text-teal-600 border border-teal-100 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
-                                    {{ $item->sector ?? 'N/A' }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest
-                                    @if($item->type == 'Organic') bg-emerald-50 text-emerald-600
-                                    @elseif($item->type == 'Recyclable') bg-blue-50 text-blue-600
-                                    @elseif($item->type == 'Hazardous') bg-red-50 text-red-600
-                                    @else bg-gray-50 text-gray-600 @endif">
-                                    {{ $item->type }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest
-                                    {{ $item->shift == 'Morning Shift' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-indigo-50 text-indigo-600 border border-indigo-100' }}">
-                                    {{ $item->shift ?? 'N/A' }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4">
-                                @if($item->collector)
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-[10px] font-black">
-                                            {{ substr($item->collector->name, 0, 1) }}
-                                        </div>
-                                        <span class="text-[12px] font-black text-gray-700">{{ $item->collector->name }}</span>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4">Resident</th>
+                            <th class="px-6 py-4">Sector</th>
+                            <th class="px-6 py-4">Package</th>
+                            <th class="px-6 py-4 text-center">Amount</th>
+                            <th class="px-6 py-4 text-center">Status</th>
+                            <th class="px-6 py-4">Valid Until</th>
+                            <th class="px-6 py-4 text-right">Transaction ID</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @forelse($collections as $item)
+                            @php
+                                preg_match('/M(\d+)T/', $item->last_transaction_id, $matches);
+                                $months = isset($matches[1]) ? (int) $matches[1] : 1;
+                                $amount = match ($months) {
+                                    6 => 1800,
+                                    12 => 3600,
+                                    default => 300,
+                                };
+                            @endphp
+                            <tr class="hover:bg-gray-50/40 transition">
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-black text-gray-800 leading-none mb-1">{{ $item->updated_at ? $item->updated_at->format('M d, Y') : now()->format('M d, Y') }}</div>
+                                    <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ $item->updated_at ? $item->updated_at->format('h:i A') : now()->format('h:i A') }}</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="font-black text-gray-800 text-sm mb-1">{{ $item->name }}</div>
+                                    <div class="text-[10px] text-gray-500 font-medium leading-none">{{ $item->phone ?? 'No Phone' }}</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="bg-orange-50 text-orange-600 border border-orange-100 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                        {{ $item->sector ?? 'N/A' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                        {{ $months }} {{ $months === 1 ? 'Month' : 'Months' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="text-[11px] font-black text-gray-800">BDT {{ number_format($amount, 2) }}</span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                        {{ $item->monthly_payment_status }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-black text-gray-800 leading-none">
+                                        {{ $item->subscription_valid_until ? $item->subscription_valid_until->format('M d, Y') : 'N/A' }}
                                     </div>
-                                @else
-                                    <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest italic">Unassigned</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest
-                                    @if($item->status == 'Completed' || $item->status == 'Collected') bg-emerald-50 text-emerald-600
-                                    @elseif($item->status == 'Scheduled') bg-blue-50 text-blue-600
-                                    @elseif($item->status == 'Pending') bg-amber-50 text-amber-600
-                                    @else bg-gray-50 text-gray-500 @endif">
-                                    {{ $item->status }}
-                                </span>
-                            </td>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="text-[11px] font-mono font-bold text-teal-600">
+                                        {{ $item->last_transaction_id }}
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="py-16 text-center text-gray-400 font-bold uppercase tracking-[2px] text-[11px]">No subscription records found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h2 class="text-base font-bold text-gray-800">All Collection Records</h2>
+                    <p class="text-[12px] text-gray-400 font-medium mt-0.5">Overview of all waste pickup requests in the system.</p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4">User</th>
+                            <th class="px-6 py-4 text-center">Sector</th>
+                            <th class="px-6 py-4 text-center">Waste Type</th>
+                            <th class="px-6 py-4 text-center">Shift</th>
+                            <th class="px-6 py-4">Assigned Collector</th>
+                            <th class="px-6 py-4 text-center">Status</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="py-16 text-center text-gray-400 font-bold uppercase tracking-[2px] text-[11px]">No collection records found.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        @forelse($collections as $item)
+                            <tr class="hover:bg-gray-50/40 transition">
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-black text-gray-800 leading-none">{{ $item->created_at->format('M d, Y') }}</div>
+                                    <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">At {{ $item->created_at->format('h:i A') }}</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="font-black text-gray-800 text-sm">{{ $item->user->name ?? 'N/A' }}</div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="bg-teal-50 text-teal-600 border border-teal-100 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                                        {{ $item->sector ?? 'N/A' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest
+                                        @if($item->type == 'Organic') bg-emerald-50 text-emerald-600
+                                        @elseif($item->type == 'Recyclable') bg-blue-50 text-blue-600
+                                        @elseif($item->type == 'Hazardous') bg-red-50 text-red-600
+                                        @else bg-gray-50 text-gray-600 @endif">
+                                        {{ $item->type }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest
+                                        {{ $item->shift == 'Morning Shift' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-indigo-50 text-indigo-600 border border-indigo-100' }}">
+                                        {{ $item->shift ?? 'N/A' }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if($item->collector)
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center text-[10px] font-black">
+                                                {{ substr($item->collector->name, 0, 1) }}
+                                            </div>
+                                            <span class="text-[12px] font-black text-gray-700">{{ $item->collector->name }}</span>
+                                        </div>
+                                    @else
+                                        <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest italic">Unassigned</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest
+                                        @if($item->status == 'Completed' || $item->status == 'Collected') bg-emerald-50 text-emerald-600
+                                        @elseif($item->status == 'Scheduled') bg-blue-50 text-blue-600
+                                        @elseif($item->status == 'Pending') bg-amber-50 text-amber-600
+                                        @else bg-gray-50 text-gray-500 @endif">
+                                        {{ $item->status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="py-16 text-center text-gray-400 font-bold uppercase tracking-[2px] text-[11px]">No collection records found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        @endif
         @if($collections->hasPages())
             <div class="px-6 py-4 border-t border-gray-50">
                 {{ $collections->links() }}

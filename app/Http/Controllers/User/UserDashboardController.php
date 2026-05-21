@@ -68,6 +68,80 @@ class UserDashboardController extends Controller
         return view('user.subscription', compact('user', 'validUntil', 'isActive'));
     }
 
+    public function mySubscription()
+    {
+        $user = Auth::user();
+        $validUntil = $user->subscription_valid_until
+            ? \Carbon\Carbon::parse($user->subscription_valid_until)
+            : null;
+
+        $isActive = $this->hasActiveSubscription($user);
+
+        // Detect plan details from last transaction ID
+        $months = null;
+        if ($user->last_transaction_id && preg_match('/SUB\d+M(\d+)T/', $user->last_transaction_id, $matches)) {
+            $months = (int) $matches[1];
+        }
+
+        $planName = 'N/A';
+        $price = 0;
+        if ($isActive) {
+            if ($months === 1) {
+                $planName = 'Monthly Plan';
+                $price = 300;
+            } elseif ($months === 6) {
+                $planName = '6 Months Plan';
+                $price = 1800;
+            } elseif ($months === 12) {
+                $planName = '1 Year Plan';
+                $price = 3600;
+            } else {
+                $planName = 'SmartBin Standard Plan';
+                $price = 300;
+            }
+        }
+
+        return view('user.my_subscription', compact('user', 'validUntil', 'isActive', 'planName', 'price'));
+    }
+
+    public function subscriptionReceipt()
+    {
+        $user = Auth::user();
+        if (!$user->last_transaction_id) {
+            return redirect()->back()->with('error', 'No subscription record found.');
+        }
+
+        $validUntil = $user->subscription_valid_until
+            ? \Carbon\Carbon::parse($user->subscription_valid_until)
+            : null;
+
+        $isActive = $this->hasActiveSubscription($user);
+
+        // Detect plan details from last transaction ID
+        $months = null;
+        if ($user->last_transaction_id && preg_match('/SUB\d+M(\d+)T/', $user->last_transaction_id, $matches)) {
+            $months = (int) $matches[1];
+        }
+
+        $planName = 'N/A';
+        $price = 0;
+        if ($months === 1) {
+            $planName = 'Monthly Plan';
+            $price = 300;
+        } elseif ($months === 6) {
+            $planName = '6 Months Plan';
+            $price = 1800;
+        } elseif ($months === 12) {
+            $planName = '1 Year Plan';
+            $price = 3600;
+        } else {
+            $planName = 'SmartBin Standard Plan';
+            $price = 300;
+        }
+
+        return view('user.subscription_receipt', compact('user', 'validUntil', 'isActive', 'planName', 'price', 'months'));
+    }
+
     public function storeRequest(Request $request)
     {
         if (! $this->hasActiveSubscription(Auth::user())) {
@@ -110,6 +184,18 @@ class UserDashboardController extends Controller
                 ->where('shift', $request->shift)
                 ->first();
             $collectorId = $roster ? $roster->collector_id : null;
+        }
+
+        if ($collectorId) {
+            $requestCount = CollectionRequest::where('collector_id', $collectorId)
+                ->where('scheduled_date', $request->scheduled_date)
+                ->where('shift', $request->shift)
+                ->whereIn('status', ['Pending', 'Scheduled'])
+                ->count();
+            
+            if ($requestCount >= 50) {
+                return redirect()->back()->withInput()->with('error', 'The assigned collector has reached the maximum limit of 50 requests for this shift. Please choose another collector or shift.');
+            }
         }
 
         $status = $collectorId ? 'Scheduled' : 'Pending';
@@ -177,12 +263,13 @@ class UserDashboardController extends Controller
                         }
                     }
 
-                    // Check if this collector is currently busy (Pending or Scheduled) for this date AND shift
-                    $isBooked = CollectionRequest::where('collector_id', $r->collector->id)
+                    // Check if this collector has reached the maximum limit of 50 requests for this date AND shift
+                    $requestCount = CollectionRequest::where('collector_id', $r->collector->id)
                         ->where('scheduled_date', $request->date)
                         ->where('shift', $r->shift)
                         ->whereIn('status', ['Pending', 'Scheduled'])
-                        ->exists();
+                        ->count();
+                    $isBooked = $requestCount >= 50;
 
                     return [
                         'shift' => $r->shift,

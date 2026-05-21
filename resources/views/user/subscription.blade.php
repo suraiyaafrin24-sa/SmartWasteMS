@@ -126,8 +126,9 @@
                         </div>
 
                         <div class="mb-8">
-                            <div class="text-[40px] font-black text-slate-800 leading-none tracking-tight">
-                                &#2547;{{ number_format($package['price']) }}
+                            <div class="text-[32px] font-black text-slate-800 leading-none tracking-tight flex items-baseline gap-2">
+                                <span>BDT</span>
+                                <span>{{ number_format($package['price']) }}</span>
                             </div>
                             <div class="text-[11px] font-bold text-slate-400 mt-2 uppercase tracking-[0.18em]">
                                 {{ $package['months'] }} {{ $package['months'] === 1 ? 'Month' : 'Months' }}
