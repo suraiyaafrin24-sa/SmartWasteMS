@@ -109,13 +109,15 @@
                                             <select name="collector_id" required class="text-[10px] font-bold bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 pr-8 focus:ring-1 focus:ring-teal-500 outline-none appearance-none cursor-pointer">
                                                 <option value="">Select Collector</option>
                                                 @foreach($collectors as $c)
-                                                    @php
-                                                        $scheduledDate = $request->scheduled_date ? $request->scheduled_date->format('Y-m-d') : date('Y-m-d');
-                                                        $leave = $c->leaveRequests->first(function ($leaveRequest) use ($scheduledDate) {
-                                                            return $leaveRequest->start_date->format('Y-m-d') <= $scheduledDate
-                                                                && $leaveRequest->end_date->format('Y-m-d') >= $scheduledDate;
-                                                        });
-                                                    @endphp
+                                                     @php
+                                                         $scheduledDate = $request->scheduled_date ? $request->scheduled_date->format('Y-m-d') : date('Y-m-d');
+                                                         $leave = $c->leaveRequests
+                                                             ->where('status', 'Approved')
+                                                             ->first(function ($leaveRequest) use ($scheduledDate) {
+                                                                 return $leaveRequest->start_date->format('Y-m-d') <= $scheduledDate
+                                                                     && $leaveRequest->end_date->format('Y-m-d') >= $scheduledDate;
+                                                             });
+                                                     @endphp
                                                     <option value="{{ $c->id }}">
                                                         {{ $c->name }}
                                                         @if($c->sector)

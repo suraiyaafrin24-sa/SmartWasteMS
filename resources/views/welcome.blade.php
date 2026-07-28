@@ -211,7 +211,7 @@
 
                     <li>✔ Systematic sector-based collection</li>
                     <li>✔ Admin monitoring dashboard</li>
-                    <li>✔ Waste collector duty rosters</li>
+                    <li>✔ Waste collector duty schedules</li>
 
                 </ul>
 

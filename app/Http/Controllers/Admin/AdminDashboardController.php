@@ -230,6 +230,9 @@ class AdminDashboardController extends Controller
         $collectors = User::where('role', 'waste_collector')
             ->with(['dutyRosters' => function($q) {
                 $q->whereDate('date', today());
+            }, 'leaveRequests' => function($q) {
+                $q->where('status', 'Approved')
+                  ->whereDate('end_date', '>=', today());
             }])
             ->get();
 
@@ -690,18 +693,7 @@ class AdminDashboardController extends Controller
             'scheduled_time' => 'nullable|string',
         ]);
 
-        // Logic to prevent booking passed shifts for today
-        $isToday = $request->scheduled_date == date('Y-m-d');
-        $currentTime = date('H:i');
-        
-        if ($isToday && $request->shift) {
-            if ($request->shift == 'Morning Shift' && $currentTime >= '10:00') {
-                return redirect()->back()->withInput()->with('error', 'Morning shift is no longer available for today.');
-            }
-            if ($request->shift == 'Evening Shift' && $currentTime >= '18:00') {
-                return redirect()->back()->withInput()->with('error', 'Evening shift is no longer available for today.');
-            }
-        }
+
 
         if ($this->collectorHasApprovedLeave($request->collector_id, $request->scheduled_date)) {
             return redirect()->back()->withInput()->with('error', 'This collector is on approved leave for the selected date.');
@@ -759,17 +751,7 @@ class AdminDashboardController extends Controller
         while ($tempDate->lte($endDate)) {
             $currentLoopDate = $tempDate->format('Y-m-d');
             
-            // Logic to prevent booking passed shifts for today
-            if ($currentLoopDate == $todayStr) {
-                if ($request->shift == 'Morning Shift' && $currentTime >= '10:00') {
-                    $tempDate->addDay();
-                    continue;
-                }
-                if ($request->shift == 'Evening Shift' && $currentTime >= '18:00') {
-                    $tempDate->addDay();
-                    continue;
-                }
-            }
+
 
             // Check if THIS collector is already assigned to this shift on this date
             $exists = \App\Models\DutyRoster::where('date', $currentLoopDate)
@@ -796,14 +778,14 @@ class AdminDashboardController extends Controller
             return redirect()->back()->with('error', 'No new assignments were created (already assigned or shifts passed).');
         }
 
-        return redirect()->back()->with('success', "Duty roster updated successfully ($createdCount assignments created).");
+        return redirect()->back()->with('success', "Duty staff updated successfully ($createdCount assignments created).");
     }
 
     public function deleteDutyRoster($id)
     {
         $roster = \App\Models\DutyRoster::findOrFail($id);
         $roster->delete();
-        return redirect()->back()->with('success', 'Roster entry removed successfully.');
+        return redirect()->back()->with('success', 'Staff entry removed successfully.');
     }
 
     public function leaveRequests()

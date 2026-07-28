@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin Duty Roster')
+@section('title', 'Admin Duty Staff')
 
 @section('content')
     <div class="mb-8 mt-2">
@@ -9,7 +9,7 @@
             Sectors.</p>
     </div>
 
-    <!-- Roster Form Section -->
+    <!-- Staff Form Section -->
     <div class="bg-white rounded-[32px] p-8 border border-gray-100 shadow-xl shadow-gray-200/40 mb-10">
         <div class="flex items-center gap-3 mb-8">
             <div class="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center text-[#19817E]">
@@ -37,7 +37,14 @@
                         class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl p-3.5 focus:ring-4 focus:ring-teal-100 focus:border-[#19817E] outline-none transition-all cursor-pointer">
                         <option value="">Select Collector...</option>
                         @foreach($collectors as $c)
-                            @php $leave = $c->leaveRequests->first(); @endphp
+                            @php
+                                $leave = $c->leaveRequests
+                                    ->where('status', 'Approved')
+                                    ->filter(function($l) {
+                                        return $l->end_date->format('Y-m-d') >= date('Y-m-d');
+                                    })
+                                    ->first();
+                            @endphp
                             <option value="{{ $c->id }}" data-sector="{{ $c->sector }}" data-road="{{ $c->road }}"
                                 @if($leave)
                                     data-leave-start="{{ $leave->start_date->format('Y-m-d') }}"
@@ -99,7 +106,7 @@
         </form>
     </div>
 
-    <!-- Active Roster List -->
+    <!-- Active Staff List -->
     <div class="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
         <div class="p-8 border-b border-gray-50 flex justify-between items-center">
             <h3 class="text-lg font-black text-gray-800 tracking-tight text-center lg:text-left">Current Coverage Overview
@@ -240,36 +247,9 @@
         const displayAddress = document.getElementById('display_address');
 
         function updateShiftOptions() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const todayStr = `${year}-${month}-${day}`;
-            
-            const selectedDate = dutyDate.value;
-            const currentTime = now.getHours() * 100 + now.getMinutes();
-            
             Array.from(shiftSelect.options).forEach(option => {
-                if (selectedDate === todayStr) {
-                    if (option.value === 'Morning Shift' && currentTime >= 1000) {
-                        option.disabled = true;
-                    } else if (option.value === 'Evening Shift' && currentTime >= 1800) {
-                        option.disabled = true;
-                    } else {
-                        option.disabled = false;
-                    }
-                } else {
-                    option.disabled = false;
-                }
+                option.disabled = false;
             });
-
-            // If current selection is disabled, pick first enabled one
-            if (shiftSelect.selectedOptions[0]?.disabled) {
-                const firstEnabled = Array.from(shiftSelect.options).find(opt => !opt.disabled);
-                if (firstEnabled) {
-                    shiftSelect.value = firstEnabled.value;
-                }
-            }
         }
 
         function updateCollectorAvailability() {

@@ -102,7 +102,7 @@
                                 <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mx-auto mb-4">
                                     <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                 </div>
-                                <p class="text-[11px] text-gray-400 font-black uppercase tracking-[3px]">No administrative roster assigned</p>
+                                <p class="text-[11px] text-gray-400 font-black uppercase tracking-[3px]">No administrative staff assigned</p>
                             </td>
                         </tr>
                     @endforelse
