@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DGvai\SSLCommerz\SSLCommerz;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class SslCommerzPaymentController extends Controller
@@ -83,6 +84,12 @@ class SslCommerzPaymentController extends Controller
                         'transaction_id' => $tran_id
                     ]);
 
+                    // Log the user back in (callback has no session)
+                    $reqUser = \App\Models\User::find($collectionRequest->user_id);
+                    if ($reqUser) {
+                        Auth::login($reqUser);
+                    }
+
                     // Notify Collector if assigned
                     if ($collectionRequest->collector_id) {
                         $collector = \App\Models\User::find($collectionRequest->collector_id);
@@ -107,6 +114,9 @@ class SslCommerzPaymentController extends Controller
                         'subscription_valid_until' => $startsFrom->copy()->addMonthsNoOverflow($subscriptionMonths),
                         'last_transaction_id' => $tran_id,
                     ]);
+
+                    // Log the user back in (SSLCommerz callback has no session)
+                    Auth::login($user);
                 }
             }
 
