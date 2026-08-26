@@ -497,34 +497,80 @@ class AdminDashboardController extends Controller
         $startDate = $request->filled('start_date') ? \Carbon\Carbon::parse($request->start_date)->startOfDay() : today()->startOfMonth();
         $endDate = $request->filled('end_date') ? \Carbon\Carbon::parse($request->end_date)->endOfDay() : today()->endOfDay();
 
-        $query = CollectionRequest::whereBetween('created_at', [$startDate, $endDate])->where('payment_status', 'Paid');
+        if ($reportType === 'subscription_sector') {
+            $sector = $request->sector;
+            $subscriptions = User::where('role', 'user')
+                ->where('sector', $sector)
+                ->whereNotNull('last_transaction_id')
+                ->whereBetween('updated_at', [$startDate, $endDate])
+                ->get();
 
-        if ($actorId) {
-            $actor = User::findOrFail($actorId);
-            if ($reportType == 'collector') {
-                $query->where('collector_id', $actorId);
-            } else {
-                $query->where('user_id', $actorId);
-            }
-        } else {
-            // Placeholder actor for system-wide report
+            $revenueSummary = $subscriptions
+                ->groupBy(fn ($user) => $user->updated_at->format('F Y'))
+                ->map(function ($users, $month) {
+                    return [
+                        'month' => $month,
+                        'subscriptions' => $users->count(),
+                        'amount' => $users->sum(function ($user) {
+                            if (preg_match('/M(\d+)T/', $user->last_transaction_id, $matches)) {
+                                return match ((int) $matches[1]) {
+                                    6 => 1800,
+                                    12 => 3600,
+                                    default => 300,
+                                };
+                            }
+                            return 300;
+                        }),
+                    ];
+                })
+                ->values();
+
             $actor = (object)[
-                'name' => 'System Wide',
-                'role' => 'administrator',
-                'email' => 'admin@smartbin.com'
+                'name' => $sector,
+                'role' => 'sector',
+                'email' => 'Subscription revenue report'
+            ];
+
+            $data = [
+                'actor' => $actor,
+                'activity' => collect(), // dummy since pdf view expects it
+                'revenueSummary' => $revenueSummary,
+                'start_date' => $startDate->format('M d, Y'),
+                'end_date' => $endDate->format('M d, Y'),
+                'type' => $reportType,
+                'sector' => $sector,
+                'days' => null
+            ];
+        } else {
+            $query = CollectionRequest::whereBetween('created_at', [$startDate, $endDate])->where('payment_status', 'Paid');
+
+            if ($actorId) {
+                $actor = User::findOrFail($actorId);
+                if ($reportType == 'collector') {
+                    $query->where('collector_id', $actorId);
+                } else {
+                    $query->where('user_id', $actorId);
+                }
+            } else {
+                // Placeholder actor for system-wide report
+                $actor = (object)[
+                    'name' => 'System Wide',
+                    'role' => 'administrator',
+                    'email' => 'admin@smartbin.com'
+                ];
+            }
+
+            $activity = $query->with(['user', 'collector'])->orderBy('created_at', 'desc')->get();
+
+            $data = [
+                'actor' => $actor,
+                'activity' => $activity,
+                'start_date' => $startDate->format('M d, Y'),
+                'end_date' => $endDate->format('M d, Y'),
+                'type' => $reportType,
+                'days' => null
             ];
         }
-
-        $activity = $query->with(['user', 'collector'])->orderBy('created_at', 'desc')->get();
-
-        $data = [
-            'actor' => $actor,
-            'activity' => $activity,
-            'start_date' => $startDate->format('M d, Y'),
-            'end_date' => $endDate->format('M d, Y'),
-            'type' => $reportType,
-            'days' => null
-        ];
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.reports.pdf', $data);
         $filename = 'activity_report_' . Str::slug($actor->name) . '_' . date('Y-m-d') . '.pdf';

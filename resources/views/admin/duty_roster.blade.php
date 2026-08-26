@@ -45,16 +45,14 @@
                                     })
                                     ->first();
                             @endphp
-                            <option value="{{ $c->id }}" data-sector="{{ $c->sector }}" data-road="{{ $c->road }}"
+                            <option value="{{ $c->id }}" data-sector="{{ $c->sector }}" data-road="{{ $c->road }}" data-name="{{ $c->name }}"
                                 @if($leave)
                                     data-leave-start="{{ $leave->start_date->format('Y-m-d') }}"
                                     data-leave-end="{{ $leave->end_date->format('Y-m-d') }}"
+                                    data-leave-text=" — On Leave ({{ $leave->start_date->format('M d') }} - {{ $leave->end_date->format('M d') }})"
                                 @endif
                             >
                                 {{ $c->name }}
-                                @if($leave)
-                                    — On Leave ({{ $leave->start_date->format('M d') }} - {{ $leave->end_date->format('M d') }})
-                                @endif
                             </option>
                         @endforeach
                     </select>
@@ -247,9 +245,34 @@
         const displayAddress = document.getElementById('display_address');
 
         function updateShiftOptions() {
+            const selectedDate = dutyDate.value;
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+            const currentHour = today.getHours();
+
             Array.from(shiftSelect.options).forEach(option => {
                 option.disabled = false;
+                if (selectedDate === todayStr) {
+                    if (option.value === 'Morning Shift' && currentHour >= 10) {
+                        option.disabled = true;
+                    }
+                    if (option.value === 'Evening Shift' && currentHour >= 18) {
+                        option.disabled = true;
+                    }
+                }
             });
+
+            if (shiftSelect.selectedOptions[0] && shiftSelect.selectedOptions[0].disabled) {
+                const enabledOption = Array.from(shiftSelect.options).find(opt => !opt.disabled);
+                if (enabledOption) {
+                    shiftSelect.value = enabledOption.value;
+                } else {
+                    shiftSelect.value = '';
+                }
+            }
         }
 
         function updateCollectorAvailability() {
@@ -260,12 +283,16 @@
                 
                 const leaveStart = option.getAttribute('data-leave-start');
                 const leaveEnd = option.getAttribute('data-leave-end');
+                const leaveText = option.getAttribute('data-leave-text') || '';
+                const baseName = option.getAttribute('data-name');
                 
                 // Check if selected date falls within leave period
                 if (leaveStart && leaveEnd && selectedDate >= leaveStart && selectedDate <= leaveEnd) {
                     option.disabled = true;
+                    option.textContent = baseName + leaveText;
                 } else {
                     option.disabled = false;
+                    option.textContent = baseName;
                 }
             });
 

@@ -144,40 +144,65 @@
         </div>
     </div>
 
-    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #4b5563; margin-bottom: 10px;">Detailed Activity Ledger</h3>
-    
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date/Time</th>
-                <th>Area / Road</th>
-                <th>Waste Type</th>
-                <th>{{ $type == 'collector' ? 'Requested By' : 'Collected By' }}</th>
-                <th style="text-align: right;">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($activity as $item)
+    @if($type == 'subscription_sector')
+        <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #4b5563; margin-bottom: 10px;">Monthly Subscription Revenue</h3>
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>
-                        <div class="date">{{ \Carbon\Carbon::parse($item->created_at)->format('M d, Y') }}</div>
-                        <div class="time">{{ \Carbon\Carbon::parse($item->created_at)->format('h:i A') }}</div>
-                    </td>
-                    <td>
-                        <div style="font-weight: bold; font-size: 10px;">{{ $item->sector }}</div>
-                        <div style="color: #6b7280;">{{ $item->road }}</div>
-                    </td>
-                    <td>{{ $item->type }}</td>
-                    <td>{{ $type == 'collector' ? ($item->user->name ?? 'N/A') : ($item->collector->name ?? 'N/A') }}</td>
-                    <td style="text-align: right;">
-                        <span class="status-badge {{ $item->status == 'Completed' ? 'status-completed' : ($item->status == 'Pending' ? 'status-pending' : '') }}">
-                            {{ $item->status }}
-                        </span>
-                    </td>
+                    <th>Month</th>
+                    <th>Sector</th>
+                    <th style="text-align: center;">Subscriptions</th>
+                    <th style="text-align: right;">Earned Amount</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach($revenueSummary as $row)
+                    <tr>
+                        <td style="font-weight: bold; font-size: 11px;">{{ $row['month'] }}</td>
+                        <td>
+                            <span style="background: #ecfdf5; color: #059669; padding: 3px 8px; border-radius: 5px; font-size: 9px; font-weight: bold; text-transform: uppercase;">{{ $sector }}</span>
+                        </td>
+                        <td style="text-align: center; font-weight: bold;">{{ $row['subscriptions'] }}</td>
+                        <td style="text-align: right; color: #059669; font-weight: bold;">BDT {{ number_format($row['amount'], 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @else
+        <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #4b5563; margin-bottom: 10px;">Detailed Activity Ledger</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date/Time</th>
+                    <th>Area / Road</th>
+                    <th>Waste Type</th>
+                    <th>{{ $type == 'collector' ? 'Requested By' : 'Collected By' }}</th>
+                    <th style="text-align: right;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($activity as $item)
+                    <tr>
+                        <td>
+                            <div class="date">{{ \Carbon\Carbon::parse($item->created_at)->format('M d, Y') }}</div>
+                            <div class="time">{{ \Carbon\Carbon::parse($item->created_at)->format('h:i A') }}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: bold; font-size: 10px;">{{ $item->sector }}</div>
+                            <div style="color: #6b7280;">{{ $item->road }}</div>
+                        </td>
+                        <td>{{ $item->type }}</td>
+                        <td>{{ $type == 'collector' ? ($item->user->name ?? 'N/A') : ($item->collector->name ?? 'N/A') }}</td>
+                        <td style="text-align: right;">
+                            <span class="status-badge {{ $item->status == 'Completed' ? 'status-completed' : ($item->status == 'Pending' ? 'status-pending' : '') }}">
+                                {{ $item->status }}
+                            </span>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 
     <div class="footer">
         This is a computer-generated official document from the Uttara City Waste Management Portal.
