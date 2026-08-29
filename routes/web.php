@@ -20,60 +20,89 @@ Route::get('/dashboard', function (Illuminate\Http\Request $request) {
 // Admin Routes
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/users', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'users'])->name('users');
-    Route::get('/complaints', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'complaints'])->name('complaints');
-    Route::post('/complaints/{id}/resolve', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'resolveComplaint'])->name('complaints.resolve');
-    Route::get('/reports', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'reports'])->name('reports');
-    Route::post('/reports/generate', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'generateReport'])->name('reports.generate');
-    Route::get('/reports/download', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'downloadReport'])->name('reports.download');
-    Route::get('/reports/download-pdf', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'downloadPdfReport'])->name('reports.pdf.download');
-    Route::get('/users/create', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'createUser'])->name('users.create');
-    Route::post('/users', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'storeUser'])->name('users.store');
-    Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'editUser'])->name('users.edit');
-    Route::put('/users/{id}', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updateUser'])->name('users.update');
-    Route::delete('/users/{id}', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'deleteUser'])->name('users.delete');
-    Route::get('/collections', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'collections'])->name('collections');
-    Route::get('/duty-schedule', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'dutySchedule'])->name('duty_schedule');
 
-    Route::get('/system-settings', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'settings'])->name('settings');
-    Route::get('/profile', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'profile'])->name('profile');
-    Route::post('/profile', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updateProfile'])->name('profile.update');
-    Route::put('/profile/password', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'updatePassword'])->name('password.update');
-    Route::delete('/profile/avatar', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'deleteAvatar'])->name('profile.avatar.delete');
-    Route::get('/duty-roster', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'showDutyRoster'])->name('duty_roster');
-    Route::post('/duty-roster', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'storeDutyRoster'])->name('duty_roster.store');
-    Route::delete('/duty-roster/{id}', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'deleteDutyRoster'])->name('duty_roster.delete');
+    // User Management
+    Route::get('/users', [\App\Http\Controllers\Admin\AdminUserController::class, 'users'])->name('users');
+    Route::get('/users/create', [\App\Http\Controllers\Admin\AdminUserController::class, 'createUser'])->name('users.create');
+    Route::post('/users', [\App\Http\Controllers\Admin\AdminUserController::class, 'storeUser'])->name('users.store');
+    Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\AdminUserController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{id}', [\App\Http\Controllers\Admin\AdminUserController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{id}', [\App\Http\Controllers\Admin\AdminUserController::class, 'deleteUser'])->name('users.delete');
 
-    Route::post('/requests/{id}/assign', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'assignTask'])->name('requests.assign');
-    Route::get('/payments', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'payments'])->name('payments');
-    Route::get('/leave-requests', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'leaveRequests'])->name('leave_requests');
-    Route::post('/leave-requests/{leaveRequest}/approve', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'approveLeaveRequest'])->name('leave_requests.approve');
-    Route::post('/leave-requests/{leaveRequest}/reject', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'rejectLeaveRequest'])->name('leave_requests.reject');
+    // Complaints
+    Route::get('/complaints', [\App\Http\Controllers\Admin\AdminComplaintController::class, 'complaints'])->name('complaints');
+    Route::post('/complaints/{id}/resolve', [\App\Http\Controllers\Admin\AdminComplaintController::class, 'resolveComplaint'])->name('complaints.resolve');
+
+    // Reports
+    Route::get('/reports', [\App\Http\Controllers\Admin\AdminReportController::class, 'reports'])->name('reports');
+    Route::post('/reports/generate', [\App\Http\Controllers\Admin\AdminReportController::class, 'generateReport'])->name('reports.generate');
+    Route::get('/reports/download', [\App\Http\Controllers\Admin\AdminReportController::class, 'downloadReport'])->name('reports.download');
+    Route::get('/reports/download-pdf', [\App\Http\Controllers\Admin\AdminReportController::class, 'downloadPdfReport'])->name('reports.pdf.download');
+
+    // Collections
+    Route::get('/collections', [\App\Http\Controllers\Admin\AdminCollectionController::class, 'collections'])->name('collections');
+    Route::post('/requests/{id}/assign', [\App\Http\Controllers\Admin\AdminCollectionController::class, 'assignTask'])->name('requests.assign');
+
+    // Duty Roster & Schedule
+    Route::get('/duty-schedule', [\App\Http\Controllers\Admin\AdminDutyRosterController::class, 'dutySchedule'])->name('duty_schedule');
+    Route::get('/duty-roster', [\App\Http\Controllers\Admin\AdminDutyRosterController::class, 'showDutyRoster'])->name('duty_roster');
+    Route::post('/duty-roster', [\App\Http\Controllers\Admin\AdminDutyRosterController::class, 'storeDutyRoster'])->name('duty_roster.store');
+    Route::delete('/duty-roster/{id}', [\App\Http\Controllers\Admin\AdminDutyRosterController::class, 'deleteDutyRoster'])->name('duty_roster.delete');
+
+    // Settings
+    Route::get('/system-settings', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'settings'])->name('settings');
+
+    // Profile
+    Route::get('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'profile'])->name('profile');
+    Route::post('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/profile/password', [\App\Http\Controllers\Admin\AdminProfileController::class, 'updatePassword'])->name('password.update');
+    Route::delete('/profile/avatar', [\App\Http\Controllers\Admin\AdminProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
+
+    // Payments
+    Route::get('/payments', [\App\Http\Controllers\Admin\AdminPaymentController::class, 'payments'])->name('payments');
+
+    // Leave Requests
+    Route::get('/leave-requests', [\App\Http\Controllers\Admin\AdminLeaveRequestController::class, 'leaveRequests'])->name('leave_requests');
+    Route::post('/leave-requests/{leaveRequest}/approve', [\App\Http\Controllers\Admin\AdminLeaveRequestController::class, 'approveLeaveRequest'])->name('leave_requests.approve');
+    Route::post('/leave-requests/{leaveRequest}/reject', [\App\Http\Controllers\Admin\AdminLeaveRequestController::class, 'rejectLeaveRequest'])->name('leave_requests.reject');
 });
 
 // Waste Collector Routes
 Route::middleware(['auth', 'verified', 'role:waste_collector'])->prefix('waste_collector')->name('waste_collector.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'index'])->name('dashboard');
+
+    // Settings
     Route::get('/settings', [\App\Http\Controllers\WasteCollector\WasteCollectorSettingsController::class, 'index'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\WasteCollector\WasteCollectorSettingsController::class, 'updateProfile'])->name('settings.update');
     Route::delete('/settings/avatar', [\App\Http\Controllers\WasteCollector\WasteCollectorSettingsController::class, 'deleteAvatar'])->name('settings.avatar.delete');
     Route::put('/settings/password', [\App\Http\Controllers\WasteCollector\WasteCollectorSettingsController::class, 'updatePassword'])->name('password.update');
-    Route::post('/requests/{id}/accept', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'acceptRequest'])->name('requests.accept');
-    Route::post('/requests/{id}/complete', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'completeRequest'])->name('requests.complete');
-    Route::get('/history', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'history'])->name('history');
 
-    Route::get('/duty-schedule', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'dutySchedule'])->name('duty_schedule');
-    Route::get('/payment-collection', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'paymentCollection'])->name('payment_collection');
-    Route::get('/leave-requests', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'leaveRequests'])->name('leave_requests');
-    Route::post('/leave-requests', [\App\Http\Controllers\WasteCollector\WasteCollectorDashboardController::class, 'storeLeaveRequest'])->name('leave_requests.store');
+    // Requests
+    Route::post('/requests/{id}/accept', [\App\Http\Controllers\WasteCollector\WasteCollectorRequestController::class, 'acceptRequest'])->name('requests.accept');
+    Route::post('/requests/{id}/complete', [\App\Http\Controllers\WasteCollector\WasteCollectorRequestController::class, 'completeRequest'])->name('requests.complete');
+    Route::get('/history', [\App\Http\Controllers\WasteCollector\WasteCollectorRequestController::class, 'history'])->name('history');
+
+    // Duty Schedule
+    Route::get('/duty-schedule', [\App\Http\Controllers\WasteCollector\WasteCollectorDutyScheduleController::class, 'dutySchedule'])->name('duty_schedule');
+
+    // Payment Collection
+    Route::get('/payment-collection', [\App\Http\Controllers\WasteCollector\WasteCollectorPaymentController::class, 'paymentCollection'])->name('payment_collection');
+
+    // Leave Requests
+    Route::get('/leave-requests', [\App\Http\Controllers\WasteCollector\WasteCollectorLeaveRequestController::class, 'leaveRequests'])->name('leave_requests');
+    Route::post('/leave-requests', [\App\Http\Controllers\WasteCollector\WasteCollectorLeaveRequestController::class, 'storeLeaveRequest'])->name('leave_requests.store');
 });
 
 // User Routes
 Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\User\UserDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/subscription', [\App\Http\Controllers\User\UserDashboardController::class, 'subscription'])->name('subscription');
-    Route::get('/my-subscription', [\App\Http\Controllers\User\UserDashboardController::class, 'mySubscription'])->name('my_subscription');
-    Route::get('/subscription-receipt', [\App\Http\Controllers\User\UserDashboardController::class, 'subscriptionReceipt'])->name('subscription_receipt');
+
+    // Subscription
+    Route::get('/subscription', [\App\Http\Controllers\User\UserSubscriptionController::class, 'subscription'])->name('subscription');
+    Route::get('/my-subscription', [\App\Http\Controllers\User\UserSubscriptionController::class, 'mySubscription'])->name('my_subscription');
+    Route::get('/subscription-receipt', [\App\Http\Controllers\User\UserSubscriptionController::class, 'subscriptionReceipt'])->name('subscription_receipt');
+
+    // Settings
     Route::get('/settings', [\App\Http\Controllers\User\UserSettingsController::class, 'index'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\User\UserSettingsController::class, 'updateProfile'])->name('settings.update');
     Route::delete('/settings/avatar', [\App\Http\Controllers\User\UserSettingsController::class, 'deleteAvatar'])->name('settings.avatar.delete');
@@ -84,13 +113,16 @@ Route::middleware(['auth', 'verified', 'role:user'])->prefix('user')->name('user
     Route::get('/reports/create', [\App\Http\Controllers\User\ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports', [\App\Http\Controllers\User\ReportController::class, 'store'])->name('reports.store');
 
-    Route::get('/requests/create', [\App\Http\Controllers\User\UserDashboardController::class, 'createRequest'])->name('requests.create');
-    Route::get('/get-collector', [\App\Http\Controllers\User\UserDashboardController::class, 'getCollector'])->name('get_collector');
-    Route::post('/requests', [\App\Http\Controllers\User\UserDashboardController::class, 'storeRequest'])->name('requests.store');
-    Route::get('/history', [\App\Http\Controllers\User\UserDashboardController::class, 'history'])->name('history');
-    Route::post('/requests/{request}/cancel', [\App\Http\Controllers\User\UserDashboardController::class, 'cancelRequest'])->name('requests.cancel');
-    Route::get('/duty-schedule', [\App\Http\Controllers\User\UserDashboardController::class, 'dutySchedule'])->name('duty_schedule');
-    Route::get('/receipt/{request}', [\App\Http\Controllers\User\UserDashboardController::class, 'receipt'])->name('receipt');
+    // Requests
+    Route::get('/requests/create', [\App\Http\Controllers\User\UserRequestController::class, 'createRequest'])->name('requests.create');
+    Route::get('/get-collector', [\App\Http\Controllers\User\UserRequestController::class, 'getCollector'])->name('get_collector');
+    Route::post('/requests', [\App\Http\Controllers\User\UserRequestController::class, 'storeRequest'])->name('requests.store');
+    Route::get('/history', [\App\Http\Controllers\User\UserRequestController::class, 'history'])->name('history');
+    Route::post('/requests/{request}/cancel', [\App\Http\Controllers\User\UserRequestController::class, 'cancelRequest'])->name('requests.cancel');
+    Route::get('/receipt/{request}', [\App\Http\Controllers\User\UserRequestController::class, 'receipt'])->name('receipt');
+
+    // Duty Schedule
+    Route::get('/duty-schedule', [\App\Http\Controllers\User\UserDutyScheduleController::class, 'dutySchedule'])->name('duty_schedule');
 });
 
 Route::middleware('auth')->group(function () {
@@ -109,4 +141,4 @@ Route::post('/fail', [SslCommerzPaymentController::class, 'fail'])->name('sslc.f
 Route::post('/cancel', [SslCommerzPaymentController::class, 'cancel'])->name('sslc.cancel');
 Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn'])->name('sslc.ipn');
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
