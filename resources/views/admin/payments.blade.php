@@ -9,28 +9,6 @@
             <p class="text-sm font-medium text-gray-500">Monitor resident subscription packages and transaction records.</p>
         </div>
 
-        <div class="w-full md:w-[400px]">
-            <form action="{{ route('admin.payments') }}" method="GET" class="flex gap-2">
-                <div class="relative flex-1">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </div>
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        class="w-full pl-10 pr-10 py-3 bg-white border border-gray-100 rounded-2xl text-sm font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm outline-none">
-                    @if(request('search'))
-                        <a href="{{ route('admin.payments') }}" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-red-500 transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </a>
-                    @endif
-                </div>
-                <button type="submit" class="bg-primary text-white text-[10px] font-black px-6 py-3 rounded-2xl hover:bg-teal-700 transition shadow-lg shadow-teal-700/10 uppercase tracking-widest shrink-0">Search</button>
-            </form>
-        </div>
     </div>
 
     <div class="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm flex items-center justify-between mb-8">

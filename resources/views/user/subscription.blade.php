@@ -178,7 +178,7 @@
                 <div>
                     <div class="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2">Payment Status</div>
                     <div class="text-base font-black {{ $isActive ? 'text-emerald-600' : 'text-rose-600' }}">
-                        {{ $user->monthly_payment_status ?? 'Unpaid' }}
+                        {{ $isActive ? 'Paid' : 'Unpaid' }}
                     </div>
                 </div>
 

@@ -21,6 +21,7 @@ class AdminCollectionController extends Controller
                   ->orWhere('status', 'LIKE', "%{$search}%")
                   ->orWhere('sector', 'LIKE', "%{$search}%")
                   ->orWhere('address', 'LIKE', "%{$search}%")
+                  ->orWhere('shift', 'LIKE', "%{$search}%")
                   ->orWhereHas('user', function($qu) use ($search) {
                       $qu->where('name', 'LIKE', "%{$search}%");
                   })
