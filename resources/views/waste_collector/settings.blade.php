@@ -116,44 +116,48 @@
             </form>
         </div>
 
-            <div class="mt-16 pt-12 border-t border-gray-50">
-                <div class="mb-8 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002-2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+    </div>
+
+    {{-- Password Change Card --}}
+    <div class="max-w-4xl mx-auto mt-8">
+        <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+            <div class="mb-6 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002-2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-slate-800 tracking-tight">SECURITY SETTINGS</h3>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Update your password</p>
+                </div>
+            </div>
+
+            <form action="{{ route('waste_collector.password.update') }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div class="md:col-span-2 space-y-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Current Password</label>
+                        <input type="password" name="current_password" placeholder="••••••••" class="w-full bg-white border border-gray-200 text-gray-800 text-sm rounded-xl p-4 focus:ring-2 focus:ring-amber-100 focus:border-amber-500 outline-none transition-all placeholder:text-gray-300">
                     </div>
-                    <div>
-                        <h3 class="text-lg font-black text-slate-800 tracking-tight">Security</h3>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Update employee account password</p>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">New Password</label>
+                        <input type="password" name="password" placeholder="••••••••" class="w-full bg-white border border-gray-200 text-gray-800 text-sm rounded-xl p-4 focus:ring-2 focus:ring-amber-100 focus:border-amber-500 outline-none transition-all placeholder:text-gray-300">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Confirm New Password</label>
+                        <input type="password" name="password_confirmation" placeholder="••••••••" class="w-full bg-white border border-gray-200 text-gray-800 text-sm rounded-xl p-4 focus:ring-2 focus:ring-amber-100 focus:border-amber-500 outline-none transition-all placeholder:text-gray-300">
                     </div>
                 </div>
 
-                <form action="{{ route('waste_collector.password.update') }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="md:col-span-2">
-                            <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Current Password</label>
-                            <input type="password" name="current_password" placeholder="••••••••" class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-3.5 px-4 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">New Password</label>
-                            <input type="password" name="password" placeholder="••••••••" class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-3.5 px-4 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Confirm New Password</label>
-                            <input type="password" name="password_confirmation" placeholder="••••••••" class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-3.5 px-4 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold">
-                        </div>
-                    </div>
-
-                    <div class="mt-8 flex justify-start">
-                        <button type="submit" class="bg-[#0D161F] text-white text-[13px] font-black py-4 px-10 rounded-2xl hover:bg-black transition shadow-lg shadow-slate-900/20 uppercase tracking-widest">
-                            Update Password
-                        </button>
-                    </div>
-                </form>
+                <div class="mt-8">
+                    <button type="submit" style="background-color: #1F2937 !important; color: #FFFFFF !important;" class="text-[12px] font-black py-4 px-10 rounded-2xl hover:opacity-90 transition shadow-lg shadow-gray-200 active:scale-[0.98] duration-150 tracking-wide uppercase">
+                        UPDATE PASSWORD
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
     <script>
