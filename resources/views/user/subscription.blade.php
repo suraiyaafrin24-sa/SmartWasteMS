@@ -102,7 +102,7 @@
                 <div class="text-[#19817E] font-black text-[11px] uppercase tracking-[0.2em] mb-4">Available Plans</div>
                 <h2 class="text-3xl font-black text-slate-800 tracking-tight mb-3">SmartBin Resident Care</h2>
                 <p class="text-sm font-medium text-slate-400 max-w-2xl leading-6">
-                    Select the package that matches your home collection needs. Each payment extends your active subscription from the current valid date.
+                    Select the package that matches your home collection needs. You can purchase a new package once your current validity expires.
                 </p>
             </div>
 
@@ -154,18 +154,28 @@
                             </li>
                         </ul>
 
-                        <form action="{{ route('sslc.pay') }}" method="POST" class="mt-auto">
-                            @csrf
-                            <input type="hidden" name="payment_type" value="subscription">
-                            <input type="hidden" name="subscription_months" value="{{ $package['months'] }}">
-                            <button type="submit"
-                                class="w-full inline-flex items-center justify-center gap-3 rounded-2xl px-5 py-4 text-sm font-black text-white shadow-sm transition-all {{ $package['button'] }}">
+                        @if($isActive)
+                            <button type="button" disabled
+                                class="w-full inline-flex items-center justify-center gap-3 rounded-2xl px-5 py-4 text-sm font-black text-slate-400 bg-slate-100 shadow-sm transition-all cursor-not-allowed mt-auto">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a5 5 0 00-10 0v2m-2 0h14l-1 12H6L5 9z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                                 </svg>
-                                {{ $isActive ? 'Extend Plan' : 'Buy Package' }}
+                                Active Plan Running
                             </button>
-                        </form>
+                        @else
+                            <form action="{{ route('sslc.pay') }}" method="POST" class="mt-auto">
+                                @csrf
+                                <input type="hidden" name="payment_type" value="subscription">
+                                <input type="hidden" name="subscription_months" value="{{ $package['months'] }}">
+                                <button type="submit"
+                                    class="w-full inline-flex items-center justify-center gap-3 rounded-2xl px-5 py-4 text-sm font-black text-white shadow-sm transition-all {{ $package['button'] }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a5 5 0 00-10 0v2m-2 0h14l-1 12H6L5 9z"></path>
+                                    </svg>
+                                    Buy Package
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 @endforeach
             </div>

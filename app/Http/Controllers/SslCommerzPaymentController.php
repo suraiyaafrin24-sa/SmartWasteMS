@@ -29,6 +29,16 @@ class SslCommerzPaymentController extends Controller
             $subscriptionMonths = (int) $request->subscription_months;
 
             if ($paymentType === 'subscription') {
+                $user = auth()->user();
+                $isActive = $user->monthly_payment_status === 'Paid' && 
+                            $user->subscription_valid_until && 
+                            \Carbon\Carbon::parse($user->subscription_valid_until)->endOfDay()->isFuture();
+                
+                if ($isActive) {
+                    return redirect()->route('user.subscription')
+                        ->with('error', 'You already have an active subscription package. You can buy a new one once it expires.');
+                }
+
                 $subscriptionMonths = array_key_exists($subscriptionMonths, $subscriptionPackages) ? $subscriptionMonths : 1;
                 $amount = $subscriptionPackages[$subscriptionMonths];
             }
@@ -103,15 +113,9 @@ class SslCommerzPaymentController extends Controller
                 $subscriptionMonths = in_array((int) $matches[2], [1, 6, 12], true) ? (int) $matches[2] : 1;
 
                 if ($user) {
-                    $currentValidUntil = $user->subscription_valid_until
-                        ? \Carbon\Carbon::parse($user->subscription_valid_until)
-                        : now();
-
-                    $startsFrom = $currentValidUntil->isFuture() ? $currentValidUntil : now();
-
                     $user->update([
                         'monthly_payment_status' => 'Paid',
-                        'subscription_valid_until' => $startsFrom->copy()->addMonthsNoOverflow($subscriptionMonths),
+                        'subscription_valid_until' => now()->addMonthsNoOverflow($subscriptionMonths),
                         'last_transaction_id' => $tran_id,
                     ]);
 
