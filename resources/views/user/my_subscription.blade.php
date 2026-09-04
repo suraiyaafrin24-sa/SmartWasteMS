@@ -101,7 +101,7 @@
 
                         <!-- Payment Date -->
                         <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
-                            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Payment Date</div>
+                            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">Payment Date & Time</div>
                             <div class="text-sm font-bold text-slate-800">{{ $user->updated_at ? $user->updated_at->format('M d, Y') : 'N/A' }}</div>
                             <div class="text-xs text-slate-400 font-medium mt-0.5">{{ $user->updated_at ? $user->updated_at->format('h:i A') : '' }}</div>
                         </div>
