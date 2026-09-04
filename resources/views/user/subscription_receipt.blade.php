@@ -67,7 +67,7 @@
                     <div class="bg-teal-500/10 text-teal-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-teal-50/20 mb-2 inline-block">
                         Subscription Invoice
                     </div>
-                    <p class="text-slate-400 text-xs font-medium">{{ $user->updated_at ? $user->updated_at->format('F d, Y') : now()->format('F d, Y') }}</p>
+                    <p class="text-slate-400 text-xs font-medium">{{ $user->updated_at ? $user->updated_at->format('F d, Y') . ' at ' . $user->updated_at->format('h:i A') : now()->format('F d, Y') . ' at ' . now()->format('h:i A') }}</p>
                 </div>
             </div>
 
