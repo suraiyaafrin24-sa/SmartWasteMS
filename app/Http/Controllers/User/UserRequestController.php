@@ -192,7 +192,7 @@ class UserRequestController extends Controller
         }
 
         $shiftStartTime = $request->shift === 'Morning Shift' ? '07:00' : '16:00';
-        $cancelDeadline = \Carbon\Carbon::parse($request->scheduled_date->format('Y-m-d') . ' ' . $shiftStartTime)->subHour();
+        $cancelDeadline = \Carbon\Carbon::parse(\Carbon\Carbon::parse($request->scheduled_date)->format('Y-m-d') . ' ' . $shiftStartTime)->subHour();
 
         if (now()->greaterThanOrEqualTo($cancelDeadline)) {
             return redirect()->back()->with('error', 'You can cancel only at least 1 hour before the scheduled shift.');
