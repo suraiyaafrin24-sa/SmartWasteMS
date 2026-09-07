@@ -78,12 +78,7 @@
                         </div>
                         <div class="space-y-2">
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest">Mobile Number <span class="text-red-500">*</span></label>
-                            <div class="flex gap-3">
-                                <div class="w-24 bg-white border border-gray-200 rounded-xl p-4 flex items-center justify-between text-sm">
-                                    <span class="flex items-center gap-1.5"><img src="https://flagcdn.com/w20/bd.png" class="w-4 h-2.5 rounded-sm"> <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></span>
-                                </div>
-                                <input type="text" name="phone" value="{{ Auth::user()->phone }}" placeholder="018XXXXXXXX" class="flex-1 bg-white border border-gray-200 text-gray-800 text-sm rounded-xl p-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-700 outline-none transition-all placeholder:text-gray-300">
-                            </div>
+                            <input type="text" name="phone" value="{{ Auth::user()->phone }}" placeholder="018XXXXXXXX" class="w-full bg-white border border-gray-200 text-gray-800 text-sm rounded-xl p-4 focus:ring-2 focus:ring-blue-100 focus:border-blue-700 outline-none transition-all placeholder:text-gray-300">
                         </div>
 
                         <div class="md:col-span-2 space-y-2">
