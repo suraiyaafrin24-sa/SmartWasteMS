@@ -8,14 +8,7 @@
         <p class="text-[13px] font-medium text-slate-400">Review and resolve service issues reported by residents.</p>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-600 px-5 py-4 rounded-2xl flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                <span class="font-black text-[11px] uppercase tracking-widest">{{ session('success') }}</span>
-            </div>
-        </div>
-    @endif
+
 
     <div class="bg-white rounded-[40px] p-10 border border-gray-50 shadow-sm shadow-gray-100/50">
         <div class="overflow-x-auto overflow-y-hidden">

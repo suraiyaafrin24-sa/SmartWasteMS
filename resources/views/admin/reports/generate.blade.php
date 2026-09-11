@@ -88,7 +88,7 @@
                 {{-- Start Date --}}
                 <div>
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Start Date <span class="text-red-500">*</span></label>
-                    <input type="date" name="start_date" id="startDate" value="{{ request('start_date', date('Y-m-01')) }}" required onchange="filterTable()"
+                    <input type="date" name="start_date" id="startDate" value="{{ request('start_date', date('Y-m-01')) }}" max="{{ date('Y-m-d') }}" required onchange="filterTable()"
                         class="w-full bg-gray-50 border border-gray-100 text-gray-800 text-sm font-bold rounded-xl px-4 py-3 focus:ring-2 focus:ring-teal-500/20 focus:border-[#19817E] outline-none transition-all">
                 </div>
 

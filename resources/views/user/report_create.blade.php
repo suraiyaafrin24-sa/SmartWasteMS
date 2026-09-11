@@ -23,7 +23,7 @@
 
                         <div class="space-y-2">
                             <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Incident Date <span class="text-red-500">*</span></label>
-                            <input type="date" name="incident_date" value="{{ old('incident_date') }}" required class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-4 px-5 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold">
+                            <input type="date" name="incident_date" value="{{ old('incident_date') }}" max="{{ date('Y-m-d') }}" required class="w-full bg-slate-50 border-none text-slate-800 text-sm rounded-xl py-4 px-5 focus:ring-1 focus:ring-teal-200 transition-all outline-none font-bold">
                             @error('incident_date') <p class="text-[10px] font-black text-red-500 uppercase tracking-widest mt-2 px-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
